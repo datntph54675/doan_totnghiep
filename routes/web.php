@@ -17,6 +17,8 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth', EnsureRole::class . ':admin'])->group(function () {
         Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
+        // Tour admin CRUD
+        Route::resource('tours', App\Http\Controllers\Admin\TourController::class, ['as' => 'admin']);
     });
 });
 // Guide auth
