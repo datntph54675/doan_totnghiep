@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\GuideUserSeeder;
+use Database\Seeders\NormalUserSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -21,6 +22,8 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminUserSeeder::class);
         // Run the guide user seeder
         $this->call(GuideUserSeeder::class);
+        // Run the normal user seeder
+        $this->call(NormalUserSeeder::class);
 
     }
 }

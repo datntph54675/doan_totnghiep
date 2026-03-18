@@ -16,7 +16,14 @@ class EnsureRole
     {
         $user = Auth::user();
         if (! $user) {
-            return redirect('/admin/login');
+            // Redirect to the most relevant login page based on URL prefix
+            if ($request->is('admin/*')) {
+                return redirect('/admin/login');
+            }
+            if ($request->is('guide/*')) {
+                return redirect('/guide/login');
+            }
+            return redirect('/login');
         }
 
         $roles = array_map('trim', explode('|', $role));

@@ -4,9 +4,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Controllers\GuideAuthController;
+use App\Http\Controllers\UserAuthController;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+// User auth (default)
+Route::get('login', [UserAuthController::class, 'showLogin'])->name('login');
+Route::post('login', [UserAuthController::class, 'login'])->name('login.post');
+Route::get('register', [UserAuthController::class, 'showRegister'])->name('register');
+Route::post('register', [UserAuthController::class, 'register'])->name('register.post');
+
+Route::middleware(['auth', EnsureRole::class . ':user'])->group(function () {
+    Route::post('logout', [UserAuthController::class, 'logout'])->name('logout');
+    Route::get('dashboard', [UserAuthController::class, 'dashboard'])->name('dashboard');
 });
 
 // Admin auth
