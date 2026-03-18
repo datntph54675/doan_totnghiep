@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminUserSeeder::class);
         // Run the guide user seeder
         $this->call(GuideUserSeeder::class);
+        // Run the category seeder
+        $this->call(CategorySeeder::class);
 
     }
 }

@@ -11,19 +11,19 @@ class TourController extends Controller
     public function index()
     {
         $tours = Tour::with('category')->get();
-        return view('tours.index', compact('tours'));
+        return view('admin.tours.index', compact('tours'));
     }
 
     public function create()
     {
         $categories = Category::all();
-        return view('tours.create', compact('categories'));
+        return view('admin.tours.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'category_id' => 'nullable|exists:category,category_id',
+            'category_id' => 'nullable|exists:categories,category_id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'policy' => 'nullable|string',
@@ -44,19 +44,19 @@ class TourController extends Controller
     public function show(Tour $tour)
     {
         $tour->load('category');
-        return view('tours.show', compact('tour'));
+        return view('admin.tours.show', compact('tour'));
     }
 
     public function edit(Tour $tour)
     {
         $categories = Category::all();
-        return view('tours.edit', compact('tour', 'categories'));
+        return view('admin.tours.edit', compact('tour', 'categories'));
     }
 
     public function update(Request $request, Tour $tour)
     {
         $request->validate([
-            'category_id' => 'nullable|exists:category,category_id',
+            'category_id' => 'nullable|exists:categories,category_id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'policy' => 'nullable|string',

@@ -98,6 +98,8 @@
 <body>
     <div class="container">
         <div class="topbar">
+@extends('layouts.app')
+
             <div>
                 <div class="title">Bảng điều khiển Admin</div>
                 <div class="muted">Chào mừng, {{ auth()->user()->fullname ?? auth()->user()->username }}.</div>
@@ -121,7 +123,7 @@
         <div class="card-grid">
             <div class="card">
                 <div class="muted">Tổng số tour</div>
-                <div class="stat">{{ \DB::table('tour')->count() }}</div>
+                <div class="stat">{{ \DB::table('tours')->count() }}</div>
             </div>
 
             <div class="card">
