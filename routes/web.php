@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminAuthController;
+use App\Http\Middleware\EnsureRole;
+use App\Http\Controllers\GuideAuthController;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Admin auth
+Route::prefix('admin')->group(function () {
+    Route::get('login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
+    Route::post('login', [AdminAuthController::class, 'login'])->name('admin.login.post');
+
+    Route::middleware(['auth', EnsureRole::class . ':admin'])->group(function () {
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+        Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
+    });
+});
+// Guide auth
+Route::prefix('guide')->group(function () {
+    Route::get('login', [GuideAuthController::class, 'showLogin'])->name('guide.login');
+    Route::post('login', [GuideAuthController::class, 'login'])->name('guide.login.post');
+
+    Route::middleware(['auth', EnsureRole::class . ':tour_guide'])->group(function () {
+        Route::post('logout', [GuideAuthController::class, 'logout'])->name('guide.logout');
+        Route::get('dashboard', [\App\Http\Controllers\GuideController::class, 'dashboard'])->name('guide.dashboard');
+        Route::get('tour/{scheduleId}', [\App\Http\Controllers\GuideController::class, 'tourDetail'])->name('guide.tour.detail');
+        Route::get('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'attendance'])->name('guide.attendance');
+        Route::post('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'markAttendance'])->name('guide.attendance.mark');
+        Route::get('tour/{scheduleId}/itinerary', [\App\Http\Controllers\GuideController::class, 'itinerary'])->name('guide.itinerary');
+        Route::put('itinerary/{itineraryId}', [\App\Http\Controllers\GuideController::class, 'updateItinerary'])->name('guide.itinerary.update');
+        Route::get('profile', [\App\Http\Controllers\GuideController::class, 'profile'])->name('guide.profile');
+        Route::put('profile', [\App\Http\Controllers\GuideController::class, 'updateProfile'])->name('guide.profile.update');
+    });
+});
