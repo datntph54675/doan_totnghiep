@@ -136,8 +136,10 @@
 - `hotel_id` (FK) → hotel
 - `start_date` - Ngày khởi hành
 - `end_date` - Ngày kết thúc
+- `status` - Trạng thái [scheduled, ongoing, completed, cancelled]
 - `meeting_point` - Điểm tập trung
 - `notes` - Ghi chú
+- `created_at`, `updated_at` - Thời gian
 
 **Liên kết với:**
 - tour (N-1): Một tour có nhiều lịch khởi hành
