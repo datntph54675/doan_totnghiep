@@ -290,8 +290,8 @@
                 </div>
 
                 <nav class="sidebar-nav">
-                    <a href="#" class="nav-item active">Bảng điều khiển</a>
-                    <a href="#" class="nav-item">Quản lý tour</a>
+                    <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Bảng điều khiển</a>
+                    <a href="{{ route('admin.tours.index') }}" class="nav-item {{ request()->routeIs('admin.tours.*') ? 'active' : '' }}">Quản lý tour</a>
                     <a href="#" class="nav-item">Đơn đặt tour</a>
                     <a href="#" class="nav-item">Khách hàng</a>
                     <a href="#" class="nav-item">Hướng dẫn viên</a>
