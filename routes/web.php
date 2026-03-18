@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Middleware\EnsureRole;
+use App\Http\Controllers\GuideAuthController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -18,5 +19,15 @@ Route::prefix('admin')->group(function () {
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
         // Tour admin CRUD
         Route::resource('tours', App\Http\Controllers\Admin\TourController::class, ['as' => 'admin']);
+    });
+});
+// Guide auth
+Route::prefix('guide')->group(function () {
+    Route::get('login', [GuideAuthController::class, 'showLogin'])->name('guide.login');
+    Route::post('login', [GuideAuthController::class, 'login'])->name('guide.login.post');
+
+    Route::middleware(['auth', EnsureRole::class . ':tour_guide'])->group(function () {
+        Route::post('logout', [GuideAuthController::class, 'logout'])->name('guide.logout');
+        Route::get('dashboard', [GuideAuthController::class, 'dashboard'])->name('guide.dashboard');
     });
 });
