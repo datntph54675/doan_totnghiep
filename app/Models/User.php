@@ -50,4 +50,9 @@ class User extends Authenticatable
     {
         return $this->role === 'user';
     }
+
+    public function guide()
+    {
+        return $this->hasOne(Guide::class, 'user_id', 'user_id');
+    }
 }
