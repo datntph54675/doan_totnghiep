@@ -22,8 +22,15 @@ return new class extends Migration
             $table->string('supplier')->nullable();
             $table->string('image')->nullable();
 
-            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->decimal('price', 15, 2)->default(0);
+            $table->integer('max_people')->default(0);
+            $table->integer('duration')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->dateTime('created_at')->useCurrent();
+            $table->dateTime('updated_at')->useCurrent()->useCurrentOnUpdate();
 
             // FK
             $table->foreign('category_id')->references('category_id')->on('category')->nullOnDelete();

@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('feedback', function (Blueprint $table) {
-            $table->id();
+        Schema::create('payment', function (Blueprint $table) {
+            $table->id('payment_id');
 
             $table->unsignedBigInteger('booking_id');
-
-            $table->enum('type', ['danh_gia', 'su_co'])->default('danh_gia');
-            $table->integer('rating')->nullable()->comment('Rating từ 1-5');
-            $table->text('content')->nullable();
-            $table->dateTime('created_at')->useCurrent();
+            $table->decimal('amount', 15, 2);
+            $table->enum('payment_method', ['cash', 'bank_transfer', 'credit_card', 'e_wallet'])->default('bank_transfer');
+            $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
+            $table->dateTime('payment_date')->useCurrent();
+            $table->text('note')->nullable();
 
             // FK
             $table->foreign('booking_id')->references('booking_id')->on('booking')->cascadeOnDelete();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('feedback');
+        Schema::dropIfExists('payment');
     }
 };
