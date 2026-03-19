@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Controllers\GuideAuthController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\TourController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\TourController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\GuideController;
 
@@ -30,10 +30,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('dashboard');
 
         Route::resource('categories', CategoryController::class);
-        // Categories
-        Route::resource('categories', CategoryController::class);
-
-        // Users
+  
         Route::resource('users', UserController::class)->only(['index','edit','update']);
 
         // Guides
