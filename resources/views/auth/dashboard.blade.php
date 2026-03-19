@@ -89,6 +89,8 @@
 
                 <div class="row">
                     <a class="btn secondary" href="/">Trang chủ</a>
+                    <a class="btn secondary" href="{{ route('profile.show') }}">Cập nhật thông tin</a>
+                    <a class="btn secondary" href="{{ route('password.change') }}">Đổi mật khẩu</a>
                     <form method="POST" action="{{ route('logout') }}" style="margin:0">
                         @csrf
                         <button class="btn" type="submit">Đăng xuất</button>

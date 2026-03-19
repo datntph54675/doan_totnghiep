@@ -180,6 +180,8 @@
             </form>
 
             <p class="help">
+                <a href="{{ route('password.request') }}"><strong>Quên mật khẩu?</strong></a>
+                <br>
                 Admin: <a href="{{ route('admin.login') }}"><strong>/admin/login</strong></a> ·
                 Guide: <a href="{{ route('guide.login') }}"><strong>/guide/login</strong></a>
             </p>
