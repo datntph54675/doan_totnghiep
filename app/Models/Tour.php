@@ -11,7 +11,7 @@ class Tour extends Model
 {
     use HasFactory;
 
-    protected $table = 'tours';
+    protected $table = 'tour';
     protected $primaryKey = 'tour_id';
     public $timestamps = false;
 

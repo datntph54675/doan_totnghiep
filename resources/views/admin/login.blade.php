@@ -4,180 +4,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập Admin</title>
-    <link href="/css/app.css" rel="stylesheet">
+    <title>Đăng nhập Admin - TourViet</title>
     <style>
-        :root {
-            --bg: #f3f6fb;
-            --card: #ffffff;
-            --accent: #2563eb;
-            --muted: #6b7280
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
         * {
-            box-sizing: border-box
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-            background: var(--bg);
-            color: #111
-        }
-
-        .wrap {
+            font-family: 'Inter', system-ui, sans-serif;
             min-height: 100vh;
             display: flex;
+            background: #0f172a;
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #0b4a6f 0%, #065f46 40%, #047857 100%);
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 32px
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .card {
-            width: 100%;
-            max-width: 420px;
-            background: var(--card);
-            border-radius: 12px;
-            padding: 28px;
-            box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08)
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, .04);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px
         }
 
-        .brand {
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, .04);
+            border-radius: 50%;
+            bottom: -80px;
+            left: -80px
+        }
+
+        .left-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: #fff
+        }
+
+        .left-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            display: block
+        }
+
+        .left-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -.5px
+        }
+
+        .left-sub {
+            font-size: 16px;
+            color: rgba(255, 255, 255, .8);
+            line-height: 1.6;
+            max-width: 360px
+        }
+
+        .features {
+            margin-top: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            text-align: left
+        }
+
+        .feature-item {
             display: flex;
             align-items: center;
             gap: 12px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, .9)
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, .12);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0
+        }
+
+        .right-panel {
+            width: 480px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 40px
+        }
+
+        .login-box {
+            width: 100%
+        }
+
+        .login-header {
+            margin-bottom: 32px
+        }
+
+        .login-logo {
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 20px
+        }
+
+        .login-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -.5px
+        }
+
+        .login-sub {
+            font-size: 14px;
+            color: #64748b;
+            margin-top: 6px
+        }
+
+        .form-group {
             margin-bottom: 18px
         }
 
-        .logo {
-            width: 44px;
-            height: 44px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, var(--accent), #7c3aed);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 700
-        }
-
-        h2 {
-            margin: 0;
-            font-size: 20px
-        }
-
-        p.lead {
-            margin: 6px 0 18px;
-            color: var(--muted);
-            font-size: 14px
-        }
-
-        .field {
-            margin-bottom: 14px
-        }
-
-        label {
+        .form-label {
             display: block;
             font-size: 13px;
-            color: #111;
-            margin-bottom: 6px;
-            font-weight: 600
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px
         }
 
-        input[type=text],
-        input[type=password] {
+        .form-control {
             width: 100%;
-            padding: 11px 12px;
-            border: 1px solid #e6e9ef;
-            border-radius: 8px;
-            font-size: 14px;
-            background: #fbfdff
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            color: #0f172a;
+            background: #f8fafc
         }
 
-        .actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+        .form-control:focus {
+            outline: none;
+            border-color: #10b981;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, .08)
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
             margin-top: 8px
         }
 
-        .btn {
-            background: var(--accent);
-            color: #fff;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 0;
-            cursor: pointer;
-            font-weight: 600
+        .error-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px
         }
 
-        .btn.secondary {
-            background: #eef2ff;
-            color: var(--accent);
-            border: 1px solid rgba(37, 99, 235, 0.08)
-        }
-
-        .error {
-            background: #fff5f5;
-            border: 1px solid #f8d7da;
-            color: #b91c1c;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 12px
-        }
-
-        .help {
+        .hint {
+            margin-top: 20px;
+            padding: 14px 16px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
             font-size: 13px;
-            color: var(--muted);
-            margin-top: 12px
+            color: #166534
         }
 
-        @media(max-width:480px) {
-            .card {
-                padding: 20px;
-                border-radius: 10px
+        .back-home {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #64748b;
+            text-decoration: none
+        }
+
+        .back-home:hover {
+            color: #10b981
+        }
+
+        @media(max-width:768px) {
+            .left-panel {
+                display: none
+            }
+
+            .right-panel {
+                width: 100%;
+                padding: 32px 24px
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="wrap">
-        <div class="card">
-            <div class="brand">
-                <div class="logo">DV</div>
-                <div>
-                    <h2>Login Admin</h2>
-                    <p class="lead">Đăng nhập để quản trị hệ thống</p>
+
+    <div class="left-panel">
+        <div class="left-content">
+            <span class="left-icon">🧭</span>
+            <div class="left-title">TourViet Admin</div>
+            <div class="left-sub">Cổng quản trị hệ thống — quản lý tour, khách hàng và đơn đặt.</div>
+
+            <div class="features">
+                <div class="feature-item">
+                    <div class="feature-icon">📋</div><span>Quản lý danh sách tour</span>
                 </div>
+                <div class="feature-item">
+                    <div class="feature-icon">👥</div><span>Quản lý khách hàng và đơn</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📅</div><span>Quản lý lịch khởi hành</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💬</div><span>Quản lý phản hồi</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="login-box">
+            <div class="login-header">
+                <div class="login-logo">DV</div>
+                <div class="login-title">Đăng nhập Admin</div>
+                <div class="login-sub">Đăng nhập để tiếp tục quản trị hệ thống</div>
             </div>
 
             @if($errors->any())
-            <div class="error">{{ $errors->first() }}</div>
+            <div class="error-box">⚠️ {{ $errors->first() }}</div>
             @endif
 
             <form method="POST" action="{{ route('admin.login.post') }}">
                 @csrf
-                <div class="field">
-                    <label for="username">Tên đăng nhập</label>
-                    <input id="username" name="username" type="text" autocomplete="username" value="{{ old('username') }}" required>
+                <div class="form-group">
+                    <label class="form-label" for="username">Tên đăng nhập</label>
+                    <input class="form-control" id="username" name="username" type="text" autocomplete="username" value="{{ old('username') }}" placeholder="Nhập tên đăng nhập" required>
                 </div>
 
-                <div class="field">
-                    <label for="password">Mật khẩu</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" required>
+                <div class="form-group">
+                    <label class="form-label" for="password">Mật khẩu</label>
+                    <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required>
                 </div>
 
-                <div class="actions">
-                    <button class="btn" type="submit">Đăng nhập</button>
-                    <a class="btn secondary" href="/">Về trang chính</a>
-                </div>
+                <button type="submit" class="btn-login">Đăng nhập →</button>
             </form>
 
-            <p class="help">Tài khoản thử: <strong>admin</strong> / <strong>123456</strong></p>
+            <div class="hint">🔑 Tài khoản thử nghiệm: <strong>admin</strong> / <strong>123456</strong></div>
+            <a href="/" class="back-home">← Về trang chủ</a>
         </div>
     </div>
+
 </body>
 
 </html>
