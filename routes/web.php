@@ -4,17 +4,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Controllers\GuideAuthController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\TourUserController;
-use App\Http\Controllers\Admin\TourController;
-use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\TourController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\GuideController;
 
-// Trang chủ
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', function () {
+    return view('welcome');
+});
 
-// Danh sách tour & chi tiết tour (public)
-Route::get('/tours', [TourUserController::class, 'index'])->name('tours.index');
-Route::get('/tours/{id}', [TourUserController::class, 'show'])->name('tours.show');
+// User - public tour pages
+Route::get('/tours', [\App\Http\Controllers\UserTourController::class, 'index'])->name('user.tours');
+Route::get('/tours/{id}', [\App\Http\Controllers\UserTourController::class, 'show'])->name('user.tour.detail');
+Route::get('/tours/{id}/booking', [\App\Http\Controllers\BookingController::class, 'create'])->name('user.booking');
+Route::post('/tours/{id}/booking', [\App\Http\Controllers\BookingController::class, 'store'])->name('user.booking.store');
+Route::get('/booking/{bookingId}/success', [\App\Http\Controllers\BookingController::class, 'success'])->name('user.booking.success');
 
 // Admin auth
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -26,6 +30,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('dashboard');
 
         Route::resource('categories', CategoryController::class);
+        // Categories
+        Route::resource('categories', CategoryController::class);
+
+        // Users
+        Route::resource('users', UserController::class)->only(['index','edit','update']);
+
+        // Guides
+        Route::resource('guides', GuideController::class)->only(['index','edit','update','create','store']);
 
         // Tours
         Route::resource('tours', TourController::class);
