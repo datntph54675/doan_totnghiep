@@ -11,6 +11,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// User - public tour pages
+Route::get('/tours', [\App\Http\Controllers\UserTourController::class, 'index'])->name('user.tours');
+Route::get('/tours/{id}', [\App\Http\Controllers\UserTourController::class, 'show'])->name('user.tour.detail');
+Route::get('/tours/{id}/booking', [\App\Http\Controllers\BookingController::class, 'create'])->name('user.booking');
+Route::post('/tours/{id}/booking', [\App\Http\Controllers\BookingController::class, 'store'])->name('user.booking.store');
+Route::get('/booking/{bookingId}/success', [\App\Http\Controllers\BookingController::class, 'success'])->name('user.booking.success');
+
 // Admin auth
 Route::prefix('admin')->group(function () {
     Route::get('login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
