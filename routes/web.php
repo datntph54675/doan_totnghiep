@@ -30,11 +30,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('dashboard');
 
         Route::resource('categories', CategoryController::class);
-  
-        Route::resource('users', UserController::class)->only(['index','edit','update']);
+
+        Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
 
         // Guides
-        Route::resource('guides', GuideController::class)->only(['index','edit','update','create','store']);
+        Route::resource('guides', GuideController::class)->only(['index', 'edit', 'update', 'create', 'store']);
 
         // Tours
         Route::resource('tours', TourController::class);
@@ -56,5 +56,6 @@ Route::prefix('guide')->group(function () {
         Route::put('itinerary/{itineraryId}', [\App\Http\Controllers\GuideController::class, 'updateItinerary'])->name('guide.itinerary.update');
         Route::get('profile', [\App\Http\Controllers\GuideController::class, 'profile'])->name('guide.profile');
         Route::put('profile', [\App\Http\Controllers\GuideController::class, 'updateProfile'])->name('guide.profile.update');
+        Route::get('customers', [\App\Http\Controllers\GuideController::class, 'customerList'])->name('guide.customers');
     });
 });

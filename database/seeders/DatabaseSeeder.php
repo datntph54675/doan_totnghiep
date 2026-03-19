@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-category-admin
+
         // Run specific seeders compatible with this app's schema
         $this->call([
             AdminUserSeeder::class,
@@ -31,6 +31,6 @@ category-admin
         $this->call(GuideUserSeeder::class);
         // Run the tour data seeder
         $this->call(TourDataSeeder::class);
- main
+
     }
 }

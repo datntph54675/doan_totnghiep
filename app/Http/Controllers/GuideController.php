@@ -141,7 +141,7 @@ class GuideController extends Controller
         ]);
 
         $itinerary = Itinerary::findOrFail($itineraryId);
-        
+
         // Chỉ cập nhật các field được gửi lên
         if (isset($validated['title'])) {
             $itinerary->title = $validated['title'];
@@ -152,7 +152,7 @@ class GuideController extends Controller
         if (isset($validated['location'])) {
             $itinerary->location = $validated['location'];
         }
-        
+
         $itinerary->save();
 
         return back()->with('success', 'Cập nhật lịch trình thành công!');
@@ -168,9 +168,10 @@ class GuideController extends Controller
             : 0;
 
         $totalCustomers = $guide
-            ? \App\Models\Booking::whereIn('schedule_id',
+            ? \App\Models\Booking::whereIn(
+                'schedule_id',
                 DepartureSchedule::where('guide_id', $guide->guide_id)->pluck('schedule_id')
-              )->distinct('customer_id')->count('customer_id')
+            )->distinct('customer_id')->count('customer_id')
             : 0;
 
         return view('guide.profile', compact('guide', 'totalTours', 'totalCustomers'));
@@ -181,21 +182,21 @@ class GuideController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'fullname'     => 'required|string|max:100',
-            'email'        => 'nullable|email|max:100',
-            'phone'        => 'nullable|string|max:20',
-            'language'     => 'nullable|string|max:255',
-            'certificate'  => 'nullable|string|max:255',
+            'fullname' => 'required|string|max:100',
+            'email' => 'nullable|email|max:100',
+            'phone' => 'nullable|string|max:20',
+            'language' => 'nullable|string|max:255',
+            'certificate' => 'nullable|string|max:255',
             'specialization' => 'nullable|string|max:255',
-            'experience'   => 'nullable|string',
-            'password'     => 'nullable|string|min:6|confirmed',
+            'experience' => 'nullable|string',
+            'password' => 'nullable|string|min:6|confirmed',
         ]);
 
         // Cập nhật user
         $userData = [
             'fullname' => $request->fullname,
-            'email'    => $request->email,
-            'phone'    => $request->phone,
+            'email' => $request->email,
+            'phone' => $request->phone,
         ];
         if ($request->filled('password')) {
             $userData['password'] = bcrypt($request->password);
@@ -206,13 +207,32 @@ class GuideController extends Controller
         $guide = Guide::where('user_id', $user->user_id)->first();
         if ($guide) {
             $guide->update([
-                'language'       => $request->language,
-                'certificate'    => $request->certificate,
+                'language' => $request->language,
+                'certificate' => $request->certificate,
                 'specialization' => $request->specialization,
-                'experience'     => $request->experience,
+                'experience' => $request->experience,
             ]);
         }
 
         return back()->with('success', 'Cập nhật thông tin thành công!');
+    }
+    public function customerList()
+    {
+        $user = Auth::user();
+        $guide = Guide::where('user_id', $user->user_id)->first();
+
+        if (!$guide) {
+            return view('guide.customer-list', ['customers' => collect()]);
+        }
+
+        // Lấy danh sách khách hàng từ các tour của hướng dẫn viên
+        $customers = \App\Models\Booking::with('customer')
+            ->whereIn('schedule_id', DepartureSchedule::where('guide_id', $guide->guide_id)->pluck('schedule_id'))
+            ->get()
+            ->map(function ($booking) {
+                return $booking->customer;
+            });
+
+        return view('guide.customer-list', compact('customers'));
     }
 }
