@@ -7,6 +7,6 @@
     <p><strong>Tên:</strong> {{ $category->name }}</p>
     <p><strong>Mô tả:</strong> {{ $category->description }}</p>
     <p><strong>Trạng thái:</strong> {{ $category->status }}</p>
-    <a href="{{ route('categories.index') }}" class="btn btn-secondary">Quay lại</a>
+    <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">Quay lại</a>
 </div>
 @endsection

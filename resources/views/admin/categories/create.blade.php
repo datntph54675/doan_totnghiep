@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Thêm Danh mục</h1>
-    <form action="{{ route('categories.store') }}" method="POST">
+    <form action="{{ route('admin.categories.store') }}" method="POST">
         @csrf
         <div class="form-group">
             <label for="name">Tên</label>
@@ -21,7 +21,7 @@
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Lưu</button>
-        <a href="{{ route('categories.index') }}" class="btn btn-secondary">Quay lại</a>
+        <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">Quay lại</a>
     </form>
 </div>
 @endsection

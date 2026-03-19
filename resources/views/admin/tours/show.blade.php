@@ -16,6 +16,6 @@
     <p><strong>Ngày bắt đầu:</strong> {{ $tour->start_date }}</p>
     <p><strong>Ngày kết thúc:</strong> {{ $tour->end_date }}</p>
     <p><strong>Trạng thái:</strong> {{ $tour->status }}</p>
-    <a href="{{ route('tours.index') }}" class="btn btn-secondary">Quay lại</a>
+    <a href="{{ route('admin.tours.index') }}" class="btn btn-secondary">Quay lại</a>
 </div>
 @endsection

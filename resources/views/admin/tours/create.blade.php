@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Thêm Tour</h1>
-    <form action="{{ route('tours.store') }}" method="POST">
+    <form action="{{ route('admin.tours.store') }}" method="POST">
         @csrf
         <div class="form-group">
             <label for="category_id">Danh mục</label>
@@ -13,10 +13,16 @@
                 <option value="{{ $category->category_id }}">{{ $category->name }}</option>
                 @endforeach
             </select>
+            @error('category_id')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
         </div>
         <div class="form-group">
             <label for="name">Tên Tour</label>
-            <input type="text" name="name" class="form-control" required>
+            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" required>
+            @error('name')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
         </div>
         <div class="form-group">
             <label for="description">Mô tả</label>
@@ -36,11 +42,17 @@
         </div>
         <div class="form-group">
             <label for="price">Giá</label>
-            <input type="number" name="price" class="form-control" step="0.01" required>
+            <input type="number" name="price" class="form-control @error('price') is-invalid @enderror" step="0.01" required>
+            @error('price')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
         </div>
         <div class="form-group">
             <label for="max_people">Số người tối đa</label>
-            <input type="number" name="max_people" class="form-control" required>
+            <input type="number" name="max_people" class="form-control @error('max_people') is-invalid @enderror" required>
+            @error('max_people')
+                <span class="text-danger">{{ $message }}</span>
+            @enderror
         </div>
         <div class="form-group">
             <label for="duration">Thời gian (ngày)</label>
@@ -62,7 +74,7 @@
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Lưu</button>
-        <a href="{{ route('tours.index') }}" class="btn btn-secondary">Quay lại</a>
+        <a href="{{ route('admin.tours.index') }}" class="btn btn-secondary">Quay lại</a>
     </form>
     
 </div>

@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Sửa Tour</h1>
-    <form action="{{ route('tours.update', $tour) }}" method="POST">
+    <form action="{{ route('admin.tours.update', $tour) }}" method="POST">
         @csrf
         @method('PUT')
         <div class="form-group">
@@ -63,7 +63,7 @@
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Cập nhật</button>
-        <a href="{{ route('tours.index') }}" class="btn btn-secondary">Quay lại</a>
+        <a href="{{ route('admin.tours.index') }}" class="btn btn-secondary">Quay lại</a>
     </form>
 </div>
 @endsection

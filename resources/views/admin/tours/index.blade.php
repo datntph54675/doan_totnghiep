@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <h1>Quản lý Tour</h1>
-    <a href="{{ route('tours.create') }}" class="btn btn-primary">Thêm Tour</a>
+    <a href="{{ route('admin.tours.create') }}" class="btn btn-primary">Thêm Tour</a>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -24,9 +24,9 @@
                 <td>{{ number_format($tour->price) }} VND</td>
                 <td>{{ $tour->status }}</td>
                 <td>
-                    <a href="{{ route('tours.show', $tour) }}" class="btn btn-info">Xem</a>
-                    <a href="{{ route('tours.edit', $tour) }}" class="btn btn-warning">Sửa</a>
-                    <!-- <form action="{{ route('tours.destroy', $tour) }}" method="POST" style="display:inline;">
+                    <a href="{{ route('admin.tours.show', $tour) }}" class="btn btn-info">Xem</a>
+                    <a href="{{ route('admin.tours.edit', $tour) }}" class="btn btn-warning">Sửa</a>
+                    <!-- <form action="{{ route('admin.tours.destroy', $tour) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Ẩn</button>

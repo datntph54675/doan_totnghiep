@@ -25,6 +25,8 @@ class Tour extends Model
         'price',
         'max_people',
         'duration',
+        'start_date',
+        'end_date',
         'status'
     ];
 
