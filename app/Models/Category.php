@@ -2,12 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    protected $table = 'category';
+    use HasFactory;
+
+    protected $table = 'categories';
     protected $primaryKey = 'category_id';
-    public $timestamps = false;
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name', 'description', 'status'];
+
+    public function tours()
+    {
+        return $this->hasMany(Tour::class, 'category_id', 'category_id');
+    }
 }

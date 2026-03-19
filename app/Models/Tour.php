@@ -2,15 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Category;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tour extends Model
 {
-    protected $table = 'tour';
+    use HasFactory;
+
+    protected $table = 'tours';
     protected $primaryKey = 'tour_id';
-    public $incrementing = true;
-    protected $keyType = 'int';
+    public $timestamps = false;
 
     protected $fillable = [
         'category_id',
@@ -22,13 +25,26 @@ class Tour extends Model
         'price',
         'max_people',
         'duration',
-        'start_date',
-        'end_date',
-        'status',
+        'status'
     ];
 
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id', 'category_id');
+    }
+
+    public function departureSchedules()
+    {
+        return $this->hasMany(DepartureSchedule::class, 'tour_id', 'tour_id');
+    }
+
+    public function itineraries()
+    {
+        return $this->hasMany(Itinerary::class, 'tour_id', 'tour_id');
+    }
+
+    public function feedbacks()
+    {
+        return $this->hasMany(Feedback::class, 'tour_id', 'tour_id');
     }
 }

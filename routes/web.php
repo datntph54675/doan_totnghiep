@@ -3,10 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Middleware\EnsureRole;
+use App\Http\Controllers\GuideAuthController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TourUserController;
+use App\Http\Controllers\Admin\TourController;
+use App\Http\Controllers\Admin\CategoryController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Trang chủ
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Danh sách tour & chi tiết tour (public)
+Route::get('/tours', [TourUserController::class, 'index'])->name('tours.index');
+Route::get('/tours/{id}', [TourUserController::class, 'show'])->name('tours.show');
 
 // Admin auth
 Route::prefix('admin')->group(function () {
@@ -16,9 +24,35 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['auth', EnsureRole::class . ':admin'])->group(function () {
         Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
+ category-admin
         // Tour admin CRUD
         Route::resource('tours', App\Http\Controllers\Admin\TourController::class, ['as' => 'admin']);
         // Category admin CRUD
         Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class, ['as' => 'admin']);
+
+
+        // Categories (sẽ làm sau)
+        // Route::resource('categories', CategoryController::class);
+
+        // Tours
+        Route::resource('tours', TourController::class);
+ main
+    });
+});
+// Guide auth
+Route::prefix('guide')->group(function () {
+    Route::get('login', [GuideAuthController::class, 'showLogin'])->name('guide.login');
+    Route::post('login', [GuideAuthController::class, 'login'])->name('guide.login.post');
+
+    Route::middleware(['auth', EnsureRole::class . ':tour_guide'])->group(function () {
+        Route::post('logout', [GuideAuthController::class, 'logout'])->name('guide.logout');
+        Route::get('dashboard', [\App\Http\Controllers\GuideController::class, 'dashboard'])->name('guide.dashboard');
+        Route::get('tour/{scheduleId}', [\App\Http\Controllers\GuideController::class, 'tourDetail'])->name('guide.tour.detail');
+        Route::get('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'attendance'])->name('guide.attendance');
+        Route::post('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'markAttendance'])->name('guide.attendance.mark');
+        Route::get('tour/{scheduleId}/itinerary', [\App\Http\Controllers\GuideController::class, 'itinerary'])->name('guide.itinerary');
+        Route::put('itinerary/{itineraryId}', [\App\Http\Controllers\GuideController::class, 'updateItinerary'])->name('guide.itinerary.update');
+        Route::get('profile', [\App\Http\Controllers\GuideController::class, 'profile'])->name('guide.profile');
+        Route::put('profile', [\App\Http\Controllers\GuideController::class, 'updateProfile'])->name('guide.profile.update');
     });
 });
