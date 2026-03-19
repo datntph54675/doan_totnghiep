@@ -30,6 +30,11 @@ class Booking extends Model
         'total_price' => 'decimal:2',
     ];
 
+    public function tour(): BelongsTo
+    {
+        return $this->belongsTo(Tour::class, 'tour_id', 'tour_id');
+    }
+
     public function schedule(): BelongsTo
     {
         return $this->belongsTo(DepartureSchedule::class, 'schedule_id', 'schedule_id');
