@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,13 +24,17 @@
             --danger: #ef4444;
             --warning: #f59e0b;
             --info: #3b82f6;
-            --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+            --shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 1px 2px rgba(0, 0, 0, .06);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -2px rgba(0, 0, 0, .05);
             --radius: 12px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: 'Inter', system-ui, sans-serif;
@@ -47,14 +52,15 @@
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 0; left: 0;
+            top: 0;
+            left: 0;
             z-index: 100;
             transition: transform .3s;
         }
 
         .sidebar-brand {
             padding: 24px 20px 20px;
-            border-bottom: 1px solid rgba(255,255,255,.06);
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
         }
 
         .brand-logo {
@@ -65,10 +71,13 @@
         }
 
         .brand-icon {
-            width: 40px; height: 40px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--primary-light), #34d399);
             border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 20px;
         }
 
@@ -87,17 +96,20 @@
 
         .sidebar-user {
             padding: 16px 20px;
-            border-bottom: 1px solid rgba(255,255,255,.06);
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
         .user-avatar {
-            width: 40px; height: 40px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--primary-light), #6366f1);
             border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #fff;
             font-weight: 700;
             font-size: 15px;
@@ -150,20 +162,24 @@
         }
 
         .nav-item:hover {
-            background: rgba(255,255,255,.06);
+            background: rgba(255, 255, 255, .06);
             color: #fff;
         }
 
         .nav-item.active {
-            background: rgba(16,185,129,.15);
+            background: rgba(16, 185, 129, .15);
             color: var(--sidebar-active);
         }
 
-        .nav-icon { font-size: 18px; width: 22px; text-align: center; }
+        .nav-icon {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+        }
 
         .sidebar-footer {
             padding: 16px 12px;
-            border-top: 1px solid rgba(255,255,255,.06);
+            border-top: 1px solid rgba(255, 255, 255, .06);
         }
 
         .logout-btn {
@@ -182,7 +198,9 @@
             transition: all .2s;
         }
 
-        .logout-btn:hover { background: rgba(239,68,68,.1); }
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, .1);
+        }
 
         /* ── MAIN ── */
         .main {
@@ -252,7 +270,9 @@
             gap: 8px;
         }
 
-        .card-body { padding: 20px 24px 24px; }
+        .card-body {
+            padding: 20px 24px 24px;
+        }
 
         /* ── STAT CARDS ── */
         .stats-grid {
@@ -280,17 +300,31 @@
         }
 
         .stat-icon {
-            width: 52px; height: 52px;
+            width: 52px;
+            height: 52px;
             border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 24px;
             flex-shrink: 0;
         }
 
-        .stat-icon.green  { background: #d1fae5; }
-        .stat-icon.blue   { background: #dbeafe; }
-        .stat-icon.orange { background: #ffedd5; }
-        .stat-icon.purple { background: #ede9fe; }
+        .stat-icon.green {
+            background: #d1fae5;
+        }
+
+        .stat-icon.blue {
+            background: #dbeafe;
+        }
+
+        .stat-icon.orange {
+            background: #ffedd5;
+        }
+
+        .stat-icon.purple {
+            background: #ede9fe;
+        }
 
         .stat-value {
             font-size: 28px;
@@ -316,11 +350,30 @@
             gap: 4px;
         }
 
-        .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
-        .badge-info    { background: #dbeafe; color: #1e40af; }
-        .badge-danger  { background: #fee2e2; color: #991b1b; }
-        .badge-gray    { background: #f1f5f9; color: #475569; }
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-gray {
+            background: #f1f5f9;
+            color: #475569;
+        }
 
         /* ── BUTTONS ── */
         .btn {
@@ -342,16 +395,26 @@
             background: var(--primary);
             color: #fff;
         }
-        .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 4px 12px rgba(5,150,105,.3); }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, .3);
+        }
 
         .btn-outline {
             background: #fff;
             color: var(--text);
             border: 1px solid var(--border);
         }
-        .btn-outline:hover { background: var(--bg); }
 
-        .btn-sm { padding: 6px 12px; font-size: 13px; }
+        .btn-outline:hover {
+            background: var(--bg);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
 
         /* ── TOUR ITEMS ── */
         .tour-item {
@@ -367,7 +430,9 @@
             margin-bottom: 10px;
         }
 
-        .tour-item:last-child { margin-bottom: 0; }
+        .tour-item:last-child {
+            margin-bottom: 0;
+        }
 
         .tour-item:hover {
             border-color: var(--primary-light);
@@ -375,13 +440,22 @@
             box-shadow: var(--shadow-md);
         }
 
-        .tour-item-left { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
+        .tour-item-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
+        }
 
         .tour-thumb {
-            width: 48px; height: 48px;
+            width: 48px;
+            height: 48px;
             background: linear-gradient(135deg, var(--primary-light), #34d399);
             border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 22px;
             flex-shrink: 0;
         }
@@ -404,16 +478,33 @@
             margin-top: 4px;
         }
 
-        .tour-meta span { display: flex; align-items: center; gap: 4px; }
+        .tour-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
-        .tour-item-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .tour-item-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
 
         /* ── TABLE ── */
-        .table-wrap { overflow-x: auto; }
+        .table-wrap {
+            overflow-x: auto;
+        }
 
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
 
-        thead tr { background: #f8fafc; }
+        thead tr {
+            background: #f8fafc;
+        }
 
         th {
             text-align: left;
@@ -432,8 +523,13 @@
             color: var(--text);
         }
 
-        tbody tr:hover { background: #f8fafc; }
-        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
 
         /* ── ALERT ── */
         .alert {
@@ -446,21 +542,33 @@
             gap: 10px;
         }
 
-        .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .alert-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
 
         /* ── MODAL ── */
         .modal-overlay {
             display: none;
-            position: fixed; inset: 0;
-            background: rgba(15,23,42,.5);
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, .5);
             z-index: 200;
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(4px);
         }
 
-        .modal-overlay.active { display: flex; }
+        .modal-overlay.active {
+            display: flex;
+        }
 
         .modal-box {
             background: #fff;
@@ -475,8 +583,15 @@
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-title {
@@ -489,7 +604,9 @@
         }
 
         /* ── FORM ── */
-        .form-group { margin-bottom: 16px; }
+        .form-group {
+            margin-bottom: 16px;
+        }
 
         .form-label {
             display: block;
@@ -514,10 +631,13 @@
         .form-control:focus {
             outline: none;
             border-color: var(--primary-light);
-            box-shadow: 0 0 0 3px rgba(16,185,129,.1);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, .1);
         }
 
-        textarea.form-control { resize: vertical; min-height: 90px; }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 90px;
+        }
 
         .form-actions {
             display: flex;
@@ -535,8 +655,15 @@
             color: var(--text-muted);
         }
 
-        .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
-        .empty-text { font-size: 15px; }
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: .5;
+        }
+
+        .empty-text {
+            font-size: 15px;
+        }
 
         /* ── BACK LINK ── */
         .back-link {
@@ -551,97 +678,135 @@
             transition: color .2s;
         }
 
-        .back-link:hover { color: var(--primary); }
+        .back-link:hover {
+            color: var(--primary);
+        }
 
         /* ── DIVIDER ── */
-        .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 20px 0;
+        }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .main { margin-left: 0; }
-            .content { padding: 16px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            .tour-item { flex-direction: column; align-items: flex-start; }
-            .tour-item-right { width: 100%; justify-content: flex-end; }
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .tour-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .tour-item-right {
+                width: 100%;
+                justify-content: flex-end;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-        <a href="{{ route('guide.dashboard') }}" class="brand-logo">
-            <div class="brand-icon">🧭</div>
-            <div>
-                <div class="brand-name">TourViet</div>
-                <div class="brand-sub">HDV Portal</div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <a href="{{ route('guide.dashboard') }}" class="brand-logo">
+                <div class="brand-icon">🧭</div>
+                <div>
+                    <div class="brand-name">TourViet</div>
+                    <div class="brand-sub">HDV Portal</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="sidebar-user">
+            <div class="user-avatar">{{ strtoupper(substr(auth()->user()->username ?? 'G', 0, 2)) }}</div>
+            <div style="min-width:0">
+                <div class="user-name">{{ auth()->user()->fullname ?? auth()->user()->username }}</div>
+                <div class="user-role">Hướng dẫn viên</div>
             </div>
-        </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-label">Tổng quan</div>
+            <a href="{{ route('guide.dashboard') }}"
+                class="nav-item {{ request()->routeIs('guide.dashboard') ? 'active' : '' }}">
+                <span class="nav-icon">🏠</span> Dashboard
+            </a>
+
+            <div class="nav-label">Tour của tôi</div>
+            <a href="{{ route('guide.dashboard') }}#upcoming" class="nav-item">
+                <span class="nav-icon">📅</span> Tour sắp tới
+            </a>
+            <a href="{{ route('guide.dashboard') }}#ongoing" class="nav-item">
+                <span class="nav-icon">🚀</span> Đang diễn ra
+            </a>
+            <a href="{{ route('guide.dashboard') }}#completed" class="nav-item">
+                <span class="nav-icon">✅</span> Đã hoàn thành
+            </a>
+            <div class="nav-label">Khách hàng</div>
+            <a href="{{ route('guide.customers') }}"
+                class="nav-item {{ request()->routeIs('guide.customers') ? 'active' : '' }}">
+                <span class="nav-icon">👥</span>
+                <span>Danh sách khách hàng</span>
+            </a>
+
+            <div class="nav-label">Tài khoản</div>
+            <a href="{{ route('guide.profile') }}"
+                class="nav-item {{ request()->routeIs('guide.profile') ? 'active' : '' }}">
+                <span class="nav-icon">👤</span> Hồ sơ cá nhân
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <form method="POST" action="{{ route('guide.logout') }}">
+                @csrf
+                <button type="submit" class="logout-btn">
+                    <span>🚪</span> Đăng xuất
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <div class="main">
+        <header class="topbar">
+            <div>
+                <div class="page-title">@yield('page-title', 'Dashboard')</div>
+                <div class="page-sub">@yield('page-sub', '')</div>
+            </div>
+            <div class="topbar-right">
+                <span style="font-size:13px; color:var(--text-muted)">{{ now()->format('d/m/Y') }}</span>
+            </div>
+        </header>
+
+        <main class="content">
+            @if(session('success'))
+                <div class="alert alert-success">✅ {{ session('success') }}</div>
+            @endif
+
+            @yield('content')
+        </main>
     </div>
 
-    <div class="sidebar-user">
-        <div class="user-avatar">{{ strtoupper(substr(auth()->user()->username ?? 'G', 0, 2)) }}</div>
-        <div style="min-width:0">
-            <div class="user-name">{{ auth()->user()->fullname ?? auth()->user()->username }}</div>
-            <div class="user-role">Hướng dẫn viên</div>
-        </div>
-    </div>
-
-    <nav class="sidebar-nav">
-        <div class="nav-label">Tổng quan</div>
-        <a href="{{ route('guide.dashboard') }}" class="nav-item {{ request()->routeIs('guide.dashboard') ? 'active' : '' }}">
-            <span class="nav-icon">🏠</span> Dashboard
-        </a>
-
-        <div class="nav-label">Tour của tôi</div>
-        <a href="{{ route('guide.dashboard') }}#upcoming" class="nav-item">
-            <span class="nav-icon">📅</span> Tour sắp tới
-        </a>
-        <a href="{{ route('guide.dashboard') }}#ongoing" class="nav-item">
-            <span class="nav-icon">🚀</span> Đang diễn ra
-        </a>
-        <a href="{{ route('guide.dashboard') }}#completed" class="nav-item">
-            <span class="nav-icon">✅</span> Đã hoàn thành
-        </a>
-
-        <div class="nav-label">Tài khoản</div>
-        <a href="{{ route('guide.profile') }}" class="nav-item {{ request()->routeIs('guide.profile') ? 'active' : '' }}">
-            <span class="nav-icon">👤</span> Hồ sơ cá nhân
-        </a>
-    </nav>
-
-    <div class="sidebar-footer">
-        <form method="POST" action="{{ route('guide.logout') }}">
-            @csrf
-            <button type="submit" class="logout-btn">
-                <span>🚪</span> Đăng xuất
-            </button>
-        </form>
-    </div>
-</aside>
-
-<div class="main">
-    <header class="topbar">
-        <div>
-            <div class="page-title">@yield('page-title', 'Dashboard')</div>
-            <div class="page-sub">@yield('page-sub', '')</div>
-        </div>
-        <div class="topbar-right">
-            <span style="font-size:13px; color:var(--text-muted)">{{ now()->format('d/m/Y') }}</span>
-        </div>
-    </header>
-
-    <main class="content">
-        @if(session('success'))
-        <div class="alert alert-success">✅ {{ session('success') }}</div>
-        @endif
-
-        @yield('content')
-    </main>
-</div>
-
-@stack('scripts')
+    @stack('scripts')
 </body>
+
 </html>
