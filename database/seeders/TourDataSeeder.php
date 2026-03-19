@@ -9,102 +9,142 @@ class TourDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // Tạo category (cột: name)
-        $categoryId = DB::table('category')->insertGetId([
-            'name' => 'Tour Miền Bắc',
-            'description' => 'Các tour du lịch miền Bắc Việt Nam',
-        ]);
-
-        // Tạo tour (cột: name, không có tour_name)
-        $tourId = DB::table('tour')->insertGetId([
-            'category_id' => $categoryId,
-            'name' => 'Hà Nội - Hạ Long - Sapa 5N4Đ',
-            'description' => 'Khám phá vẻ đẹp miền Bắc với Vịnh Hạ Long và Sapa',
-            'policy' => 'Hoàn tiền 100% nếu hủy trước 7 ngày',
-            'supplier' => 'VietTravel',
-            'price' => 5500000,
-            'max_people' => 30,
-            'duration' => 5,
-            'status' => 'active',
-        ]);
-
-        // Tạo itinerary (cột: itinerary_id, time_start, time_end)
-        $itineraries = [
-            ['tour_id' => $tourId, 'day_number' => 1, 'title' => 'Hà Nội - Khởi hành đi Hạ Long', 'description' => 'Xe đón tại điểm hẹn, khởi hành đi Hạ Long. Tham quan Vịnh Hạ Long, thưởng thức hải sản tươi sống.', 'location' => 'Hạ Long, Quảng Ninh'],
-            ['tour_id' => $tourId, 'day_number' => 2, 'title' => 'Khám phá Vịnh Hạ Long', 'description' => 'Du thuyền trên vịnh, tham quan hang Sửng Sốt, làng chài, chèo kayak.', 'location' => 'Vịnh Hạ Long'],
-            ['tour_id' => $tourId, 'day_number' => 3, 'title' => 'Hạ Long - Hà Nội - Sapa', 'description' => 'Về Hà Nội, khởi hành đi Sapa. Nghỉ đêm tại Sapa.', 'location' => 'Sapa, Lào Cai'],
-            ['tour_id' => $tourId, 'day_number' => 4, 'title' => 'Trekking Sapa - Thác Bạc', 'description' => 'Trekking qua các bản làng, thăm thác Bạc, tìm hiểu văn hóa dân tộc.', 'location' => 'Sapa, Lào Cai'],
-            ['tour_id' => $tourId, 'day_number' => 5, 'title' => 'Sapa - Hà Nội - Kết thúc', 'description' => 'Tham quan chợ Sapa, mua sắm đặc sản. Về Hà Nội, kết thúc chuyến đi.', 'location' => 'Hà Nội'],
+        // 1. Tạo Danh mục (Categories)
+        $categories = [
+            'Tour Miền Bắc' => 'Hành trình di sản và văn hóa ngàn năm',
+            'Tour Miền Trung' => 'Biển xanh cát trắng nắng vàng',
+            'Tour Miền Nam' => 'Trải nghiệm sông nước miền Tây',
+            'Tour Biển Đảo' => 'Thiên đường rực rỡ nắng nhiệt đới',
+            'Tour Sinh Thái' => 'Khám phá thiên nhiên hoang sơ',
+            'Tour Quốc Tế' => 'Vươn tầm thế giới',
         ];
-        foreach ($itineraries as $item) {
-            DB::table('itinerary')->insert($item);
+
+        $catIds = [];
+        foreach ($categories as $name => $desc) {
+            $catIds[$name] = DB::table('categories')->insertGetId([
+                'name' => $name,
+                'description' => $desc,
+                'status' => 'active', // Thêm trường status mới được thêm ở file migration 2026_03_18
+            ]);
         }
 
-        $guideId = DB::table('guide')->first()->guide_id ?? null;
-        if (!$guideId) return;
+        // 2. Tạo 15 Tours mẫu
+        $tours = [
+            // Miền Bắc
+            [
+                'category_id' => $catIds['Tour Miền Bắc'], 'name' => 'Hà Nội - Hạ Long - Sapa 5N4Đ',
+                'description' => 'Khám phá vẻ đẹp di sản Vịnh Hạ Long và đỉnh Fansipan Sapa mờ sương. Trọn gói vé tham quan, khách sạn 4 sao.',
+                'policy' => 'Hoàn 100% nếu hủy trước 7 ngày. Phụ thu phòng đơn: 1.500.000 VNĐ.',
+                'supplier' => 'VietTour', 'price' => 5500000, 'max_people' => 25, 'duration' => 5,
+            ],
+            [
+                'category_id' => $catIds['Tour Miền Bắc'], 'name' => 'Mộc Châu - Mai Châu 2N1Đ - Mùa Hoa Mận',
+                'description' => 'Săn mây, ngắm hoa mận trắng xóa đồi Mộc Châu. Trải nghiệm ngủ nhà sàn Mai Châu.',
+                'policy' => 'Hủy trước 3 ngày mất 50%.',
+                'supplier' => 'Saigontourist', 'price' => 1850000, 'max_people' => 15, 'duration' => 2,
+            ],
+            [
+                'category_id' => $catIds['Tour Miền Bắc'], 'name' => 'Hà Giang - Mã Pì Lèng - Đồng Văn 3N2Đ',
+                'description' => 'Chinh phục cực Bắc Tổ quốc. Ngắm hoa tam giác mạch và vượt đèo Mã Pì Lèng huyền thoại.',
+                'policy' => 'Không áp dụng hoàn hủy dịp Lễ Tết.',
+                'supplier' => 'Vietravel', 'price' => 2750000, 'max_people' => 20, 'duration' => 3,
+            ],
+            [
+                'category_id' => $catIds['Tour Miền Bắc'], 'name' => 'Ninh Bình - Tràng An - Bái Đính 1 Ngày',
+                'description' => 'Tour trong ngày khám phá Tràng An non nước hữu tình và chùa Bái Đính đồ sộ.',
+                'policy' => 'Miễn phí hủy trước 24h.',
+                'supplier' => 'VietTour', 'price' => 850000, 'max_people' => 40, 'duration' => 1,
+            ],
 
-        // Tạo lịch khởi hành sắp tới
-        $scheduleId1 = DB::table('departure_schedule')->insertGetId([
-            'tour_id' => $tourId,
-            'start_date' => now()->addDays(5)->format('Y-m-d'),
-            'end_date' => now()->addDays(10)->format('Y-m-d'),
-            'meeting_point' => 'Số 1 Bà Triệu, Hoàn Kiếm, Hà Nội',
-            'guide_id' => $guideId,
-            'notes' => 'Khách mang theo CCCD và giấy tờ cần thiết',
-            'status' => 'scheduled',
-        ]);
+            // Miền Trung
+            [
+                'category_id' => $catIds['Tour Miền Trung'], 'name' => 'Đà Nẵng - Hội An - Bà Nà 4N3Đ',
+                'description' => 'Trọn vẹn miền Trung: Phố cổ Hội An lung linh, Bà Nà Hills bồng lai tiên cảnh và biển Đà Nẵng.',
+                'policy' => 'Đã bao gồm vé cáp treo Bà Nà. Hủy mất cọc.',
+                'supplier' => 'VietTour', 'price' => 6250000, 'max_people' => 30, 'duration' => 4,
+            ],
+            [
+                'category_id' => $catIds['Tour Miền Trung'], 'name' => 'Huế - Lăng tẩm - Cố Đô 3N2Đ',
+                'description' => 'Thưởng thức Nhã nhạc cung đình, thăm Đại Nội và các lăng tẩm hoàng gia ấn tượng.',
+                'policy' => 'Hoàn 100% nếu hủy trước 5 ngày.',
+                'supplier' => 'Fiditour', 'price' => 3400000, 'max_people' => 25, 'duration' => 3,
+            ],
+            [
+                'category_id' => $catIds['Tour Miền Trung'], 'name' => 'Quy Nhơn - Kỳ Co - Eo Gió 3N2Đ',
+                'description' => 'Khám phá Maldives phiên bản Việt Nam. Lặn ngắm san hô, check-in Eo Gió tuyệt đẹp.',
+                'policy' => 'Không bao gồm chi phí lặn ngắm san hô (tự túc).',
+                'supplier' => 'Vietravel', 'price' => 3950000, 'max_people' => 20, 'duration' => 3,
+            ],
 
-        // Tạo lịch đang diễn ra
-        $scheduleId2 = DB::table('departure_schedule')->insertGetId([
-            'tour_id' => $tourId,
-            'start_date' => now()->subDays(2)->format('Y-m-d'),
-            'end_date' => now()->addDays(3)->format('Y-m-d'),
-            'meeting_point' => 'Số 1 Bà Triệu, Hoàn Kiếm, Hà Nội',
-            'guide_id' => $guideId,
-            'status' => 'ongoing',
-        ]);
+            // Miền Nam
+            [
+                'category_id' => $catIds['Tour Miền Nam'], 'name' => 'Miền Tây - Mỹ Tho - Bến Tre - Cần Thơ 3N2Đ',
+                'description' => 'Hòa mình vào không khí Chợ Nổi Cái Răng, thưởng thức đờn ca tài tử và kẹo dừa Bến Tre.',
+                'policy' => 'Hủy trước 3 ngày phạt 30%.',
+                'supplier' => 'Saigontourist', 'price' => 2100000, 'max_people' => 35, 'duration' => 3,
+            ],
+            [
+                'category_id' => $catIds['Tour Miền Nam'], 'name' => 'Khám phá Sài Gòn 1 Ngày',
+                'description' => 'Tham quan Dinh Độc Lập, Bưu điện Trung tâm, và dạo thuyền trên sông Sài Gòn tối.',
+                'policy' => 'Hủy trước 24h hoàn tiền 100%.',
+                'supplier' => 'VietTour', 'price' => 750000, 'max_people' => 40, 'duration' => 1,
+            ],
+            [
+                'category_id' => $catIds['Tour Miền Nam'], 'name' => 'Tây Ninh - Núi Bà Đen 1 Ngày',
+                'description' => 'Hành hương đỉnh núi Bà Đen bằng hệ thống cáp treo hiện đại lớn nhất Đông Nam Bộ.',
+                'policy' => 'Chưa bao gồm ăn trưa buffet (phụ thu 300k).',
+                'supplier' => 'Vietravel', 'price' => 950000, 'max_people' => 45, 'duration' => 1,
+            ],
 
-        // Tạo khách hàng mẫu (cột: id_number, không có address/cccd)
-        $customers = [
-            ['fullname' => 'Trần Văn An',   'email' => 'an.tran@example.com',   'phone' => '0901234567', 'id_number' => '001234567891', 'gender' => 'Nam'],
-            ['fullname' => 'Lê Thị Bình',   'email' => 'binh.le@example.com',   'phone' => '0902234567', 'id_number' => '001234567892', 'gender' => 'Nữ'],
-            ['fullname' => 'Phạm Minh Châu', 'email' => 'chau.pham@example.com', 'phone' => '0903234567', 'id_number' => '001234567893', 'gender' => 'Nam'],
+            // Biển Đảo (hot)
+            [
+                'category_id' => $catIds['Tour Biển Đảo'], 'name' => 'Phú Quốc - Grand World - Hòn Thơm 4N3Đ',
+                'description' => 'Nghỉ dưỡng trọn gói tại Đảo Ngọc. Trải nghiệm cáp treo Hòn Thơm và Thành phố không ngủ.',
+                'policy' => 'Đã gồm vé máy bay khứ hồi từ HN/HCM. Không hoàn hủy.',
+                'supplier' => 'VietTour', 'price' => 8900000, 'max_people' => 30, 'duration' => 4,
+            ],
+            [
+                'category_id' => $catIds['Tour Biển Đảo'], 'name' => 'Nha Trang - VinWonders - Đảo Yến 3N2Đ',
+                'description' => 'Vui chơi thả ga tại VinWonders, khám phá bãi tắm đôi lạ mắt tại Đảo Yến Sơn Hải.',
+                'policy' => 'Phụ thu phòng đơn 1.2 triệu.',
+                'supplier' => 'Fiditour', 'price' => 4800000, 'max_people' => 25, 'duration' => 3,
+            ],
+            [
+                'category_id' => $catIds['Tour Biển Đảo'], 'name' => 'Côn Đảo - Tâm Linh - Lặn Biển 3N2Đ',
+                'description' => 'Hành trình ý nghĩa thăm mộ Cô Sáu, nhà tù Côn Đảo kết hợp lặn ngắm tuyệt tác rạn san hô.',
+                'policy' => 'Yêu cầu mặc trang phục lịch sự khi viếng mộ.',
+                'supplier' => 'Vietravel', 'price' => 6500000, 'max_people' => 15, 'duration' => 3,
+            ],
+
+            // Sinh Thái & Quốc Tế
+            [
+                'category_id' => $catIds['Tour Sinh Thái'], 'name' => 'Trekking Tà Năng - Phan Dũng 2N1Đ',
+                'description' => 'Cung đường trekking đẹp nhất Việt Nam đi qua 3 tỉnh Lâm Đồng - Ninh Thuận - Bình Thuận.',
+                'policy' => 'Yêu cầu khách có thể lực tốt. Không nhận trẻ dưới 16 tuổi.',
+                'supplier' => 'VietTour', 'price' => 2800000, 'max_people' => 15, 'duration' => 2,
+            ],
+            [
+                'category_id' => $catIds['Tour Quốc Tế'], 'name' => 'Thái Lan - Bangkok - Pattaya 5N4Đ',
+                'description' => 'Trải nghiệm văn hóa, mua sắm và show diễn Alcazar hoành tráng ở xứ chùa Vàng.',
+                'policy' => 'Đã gồm VMB và khách sạn 4 sao thái lan. Yêu cầu Passport còn hạn 6 tháng.',
+                'supplier' => 'Vietravel', 'price' => 7900000, 'max_people' => 25, 'duration' => 5,
+            ]
         ];
 
-        foreach ($customers as $customer) {
-            $customerId = DB::table('customer')->insertGetId($customer);
+        foreach ($tours as $t) {
+            $t['status'] = 'active';
+            DB::table('tours')->insert($t);
+        }
 
-            // booking cần: customer_id, tour_id, schedule_id, num_people, total_price, status, payment_status
-            $bookingId1 = DB::table('booking')->insertGetId([
-                'customer_id'    => $customerId,
-                'tour_id'        => $tourId,
-                'schedule_id'    => $scheduleId1,
-                'num_people'     => 1,
-                'total_price'    => 5500000,
-                'status'         => 'upcoming',
-                'payment_status' => 'paid',
+        // Tạo 10 Customer / User ngẫu nhiên nếu chưa có đủ
+        for ($i = 1; $i <= 10; $i++) {
+            DB::table('customer')->insert([
+                'fullname' => 'Khách hàng số ' . $i,
+                'email' => 'khachhang'.$i.'@example.com',
+                'phone' => '09010000' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                'id_number' => '0010020030' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                'gender' => $i % 2 == 0 ? 'Nữ' : 'Nam',
             ]);
-
-            $bookingId2 = DB::table('booking')->insertGetId([
-                'customer_id'    => $customerId,
-                'tour_id'        => $tourId,
-                'schedule_id'    => $scheduleId2,
-                'num_people'     => 1,
-                'total_price'    => 5500000,
-                'status'         => 'ongoing',
-                'payment_status' => 'paid',
-            ]);
-
-            // Feedback mẫu
-            if ($customerId % 2 == 0) {
-                DB::table('feedback')->insert([
-                    'booking_id' => $bookingId2,
-                    'type'       => 'danh_gia',
-                    'rating'     => rand(4, 5),
-                    'content'    => 'Tour rất tuyệt vời, hướng dẫn viên nhiệt tình!',
-                    'created_at' => now()->subDays(1),
-                ]);
-            }
         }
     }
 }
