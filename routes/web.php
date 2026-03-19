@@ -9,6 +9,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// User - public tour pages
+Route::get('/tours', [\App\Http\Controllers\UserTourController::class, 'index'])->name('user.tours');
+Route::get('/tours/{id}', [\App\Http\Controllers\UserTourController::class, 'show'])->name('user.tour.detail');
+
 // Admin auth
 Route::prefix('admin')->group(function () {
     Route::get('login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
