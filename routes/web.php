@@ -18,5 +18,7 @@ Route::prefix('admin')->group(function () {
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
         // Tour admin CRUD
         Route::resource('tours', App\Http\Controllers\Admin\TourController::class, ['as' => 'admin']);
+        // Category admin CRUD
+        Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class, ['as' => 'admin']);
     });
 });

@@ -292,6 +292,7 @@
                 <nav class="sidebar-nav">
                     <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Bảng điều khiển</a>
                     <a href="{{ route('admin.tours.index') }}" class="nav-item {{ request()->routeIs('admin.tours.*') ? 'active' : '' }}">Quản lý tour</a>
+                    <a href="{{ route('admin.categories.index') }}" class="nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">Danh mục</a>
                     <a href="#" class="nav-item">Đơn đặt tour</a>
                     <a href="#" class="nav-item">Khách hàng</a>
                     <a href="#" class="nav-item">Hướng dẫn viên</a>
@@ -349,6 +350,11 @@
                     <div class="card">
                         <div class="muted">Hướng dẫn viên</div>
                         <div class="stat">{{ \DB::table('guide')->count() }}</div>
+                    </div>
+
+                    <div class="card">
+                        <div class="muted">Danh mục</div>
+                        <div class="stat">{{ \DB::table('category')->count() }}</div>
                     </div>
                 </div>
             </main>
