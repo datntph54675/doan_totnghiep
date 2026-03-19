@@ -279,7 +279,7 @@
 <body>
     <div class="container">
         <div class="topbar">
-@extends('layouts.app')
+            @extends('layouts.app')
 
             <div>
                 <div class="title">Bảng điều khiển Admin</div>
@@ -287,24 +287,21 @@
             </div>
 
             <div class="user-box">
-                <div class="avatar">{{ strtoupper(substr(auth()->user()->username ?? 'AD',0,2)) }}</div>
+                <div class="avatar">{{ strtoupper(substr(auth()->user()->username ?? 'AD', 0, 2)) }}</div>
                 <div>
                     <div style="font-weight:600">{{ auth()->user()->fullname ?? auth()->user()->username }}</div>
                     <div class="muted">Role: {{ auth()->user()->role }}</div>
                 </div>
 
                 <nav class="sidebar-nav">
- category-admin
                     <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Bảng điều khiển</a>
                     <a href="{{ route('admin.tours.index') }}" class="nav-item {{ request()->routeIs('admin.tours.*') ? 'active' : '' }}">Quản lý tour</a>
                     <a href="{{ route('admin.categories.index') }}" class="nav-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">Danh mục</a>
-=======
                     <a href="#" class="nav-item active">Bảng điều khiển</a>
                     <a href="#" class="nav-item">Quản lý tour</a>
- main
                     <a href="#" class="nav-item">Đơn đặt tour</a>
-                    <a href="#" class="nav-item">Khách hàng</a>
-                    <a href="#" class="nav-item">Hướng dẫn viên</a>
+                    <a href="{{ route('admin.users.index') }}" class="nav-item">Khách hàng</a>
+                    <a href="{{ route('admin.guides.index') }}" class="nav-item">Hướng dẫn viên</a>
                 </nav>
 
                 <div class="sidebar-footer">
@@ -313,39 +310,13 @@
                         <button class="btn-logout" type="submit">Đăng xuất</button>
                     </form>
                 </div>
-            </aside>
+                </aside>
 
- category-admin
-            <main class="main-content">
-                <div class="topbar">
-                    <div style="display:flex;align-items:center;gap:10px">
-                        <button class="mobile-toggle" aria-label="Mở menu" aria-expanded="false">☰</button>
-                        <div>
-                            <div class="title">Bảng điều khiển Admin</div>
-                            <div class="muted">Chào mừng, {{ auth()->user()->fullname ?? auth()->user()->username }}.</div>
-                        </div>
-                    </div>
-
-                    <div class="user-box">
-                        <div class="avatar">{{ strtoupper(substr(auth()->user()->username ?? 'AD',0,2)) }}</div>
-                        <div>
-                            <div style="font-weight:600">{{ auth()->user()->fullname ?? auth()->user()->username }}</div>
-                            <div class="muted">Role: {{ auth()->user()->role }}</div>
-                        </div>
-                        <div class="actions">
-                            <form method="POST" action="{{ route('admin.logout') }}">
-                                @csrf
-                                <button class="btn-logout" type="submit">Đăng xuất</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card-grid">
-                    <div class="card">
-                        <div class="muted">Tổng số tour</div>
-                        <div class="stat">{{ \DB::table('tour')->count() }}</div>
-                    </div>
+        <div class="card-grid">
+            <div class="card">
+                <div class="muted">Tổng số tour</div>
+                <div class="stat">{{ \DB::table('tours')->count() }}</div>
+            </div>
 
                     <div class="card">
                         <div class="muted">Đơn đặt tour</div>
@@ -357,39 +328,10 @@
                         <div class="stat">{{ \DB::table('customer')->count() }}</div>
                     </div>
 
-                    <div class="card">
-                        <div class="muted">Hướng dẫn viên</div>
-                        <div class="stat">{{ \DB::table('guide')->count() }}</div>
-                    </div>
-
-                    <div class="card">
-                        <div class="muted">Danh mục</div>
-                        <div class="stat">{{ \DB::table('category')->count() }}</div>
-                    </div>
-                </div>
-            </main>
-
-        <div class="card-grid">
-            <div class="card">
-                <div class="muted">Tổng số tour</div>
-                <div class="stat">{{ \DB::table('tours')->count() }}</div>
-            </div>
-
-            <div class="card">
-                <div class="muted">Đơn đặt tour</div>
-                <div class="stat">{{ \DB::table('booking')->count() }}</div>
-            </div>
-
-            <div class="card">
-                <div class="muted">Khách hàng</div>
-                <div class="stat">{{ \DB::table('customer')->count() }}</div>
-            </div>
-
             <div class="card">
                 <div class="muted">Hướng dẫn viên</div>
                 <div class="stat">{{ \DB::table('guide')->count() }}</div>
             </div>
- main
         </div>
     </div>
     <script>
@@ -398,23 +340,23 @@
             var sidebar = document.querySelector('.sidebar');
             if (!btn || !sidebar) return;
 
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                var open = sidebar.classList.toggle('show');
-                btn.setAttribute('aria-expanded', String(open));
-            });
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        var open = sidebar.classList.toggle('show');
+                        btn.setAttribute('aria-expanded', String(open));
+                    });
 
-            // close when clicking outside
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 980 && sidebar.classList.contains('show')) {
-                    if (!sidebar.contains(e.target) && !btn.contains(e.target)) {
-                        sidebar.classList.remove('show');
-                        btn.setAttribute('aria-expanded', 'false');
-                    }
-                }
-            });
-        });
-    </script>
+                    // close when clicking outside
+                    document.addEventListener('click', function(e) {
+                        if (window.innerWidth <= 980 && sidebar.classList.contains('show')) {
+                            if (!sidebar.contains(e.target) && !btn.contains(e.target)) {
+                                sidebar.classList.remove('show');
+                                btn.setAttribute('aria-expanded', 'false');
+                            }
+                        }
+                    });
+                });
+            </script>
 </body>
 
 </html>
