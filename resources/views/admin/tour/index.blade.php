@@ -143,7 +143,7 @@
             <thead>
                 <tr>
                     <th style="text-align:left;padding:8px">ID</th>
-                    <th style="text-align:left;padding:8px">Category ID</th>
+                    <th style="text-align:left;padding:8px">Danh mục</th>
                     <th style="text-align:left;padding:8px">Tên</th>
                     <th style="text-align:left;padding:8px">Mô tả</th>
                     <th style="text-align:left;padding:8px">Chính sách</th>
