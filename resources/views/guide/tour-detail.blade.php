@@ -42,10 +42,26 @@
                 <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Điểm tập trung</div>
                 <div style="font-size:16px;font-weight:600">{{ $schedule->meeting_point ?? '—' }}</div>
             </div>
+            <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Giá tour</div>
+                <div style="font-size:16px;font-weight:600;color:var(--primary)">
+                    {{ $schedule->tour->price ? number_format($schedule->tour->price, 0, ',', '.') . ' ₫' : '—' }}
+                </div>
+            </div>
+            <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Danh mục</div>
+                <div style="font-size:16px;font-weight:600">{{ $schedule->tour->category->name ?? '—' }}</div>
+            </div>
         </div>
 
+        @if($schedule->tour->description ?? false)
+        <div style="margin-top:20px;padding:14px 16px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;font-size:14px;color:#0c4a6e">
+            📖 {{ $schedule->tour->description }}
+        </div>
+        @endif
+
         @if($schedule->notes)
-        <div style="margin-top:20px;padding:14px 16px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;font-size:14px;color:#92400e">
+        <div style="margin-top:12px;padding:14px 16px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;font-size:14px;color:#92400e">
             📝 {{ $schedule->notes }}
         </div>
         @endif
