@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('category', function (Blueprint $table) {
-            $table->id('category_id');
-            $table->string('name', 100);
-            $table->text('description')->nullable();
-            $table->timestamps();
+        Schema::table('category', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('category');
+        Schema::table('category', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };
