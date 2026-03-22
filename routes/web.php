@@ -4,25 +4,48 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Controllers\GuideAuthController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\TourController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\GuideController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TourUserController;
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// User - public tour pages
+Route::get('/tours', [TourUserController::class, 'index'])->name('tours.index');
+Route::get('/tours/{id}', [TourUserController::class, 'show'])->name('tours.show');
+Route::get('/tours/{id}/booking', [\App\Http\Controllers\BookingController::class, 'create'])->name('user.booking');
+Route::post('/tours/{id}/booking', [\App\Http\Controllers\BookingController::class, 'store'])->name('user.booking.store');
+Route::get('/booking/{bookingId}/success', [\App\Http\Controllers\BookingController::class, 'success'])->name('user.booking.success');
 
 // User - public tour pages
 Route::get('/tours', [\App\Http\Controllers\UserTourController::class, 'index'])->name('user.tours');
 Route::get('/tours/{id}', [\App\Http\Controllers\UserTourController::class, 'show'])->name('user.tour.detail');
 
 // Admin auth
-Route::prefix('admin')->group(function () {
-    Route::get('login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
-    Route::post('login', [AdminAuthController::class, 'login'])->name('admin.login.post');
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
+    Route::post('login', [AdminAuthController::class, 'login'])->name('login.post');
 
     Route::middleware(['auth', EnsureRole::class . ':admin'])->group(function () {
-        Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-        Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('admin.dashboard');
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
+        Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('dashboard');
+
+        Route::resource('categories', CategoryController::class);
+
+        Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
+
+        // Guides
+        Route::resource('guides', GuideController::class)->only(['index', 'edit', 'update', 'create', 'store']);
+
+        // Tours
+        Route::resource('tours', TourController::class);
     });
 });
+
 // Guide auth
 Route::prefix('guide')->group(function () {
     Route::get('login', [GuideAuthController::class, 'showLogin'])->name('guide.login');
@@ -38,5 +61,6 @@ Route::prefix('guide')->group(function () {
         Route::put('itinerary/{itineraryId}', [\App\Http\Controllers\GuideController::class, 'updateItinerary'])->name('guide.itinerary.update');
         Route::get('profile', [\App\Http\Controllers\GuideController::class, 'profile'])->name('guide.profile');
         Route::put('profile', [\App\Http\Controllers\GuideController::class, 'updateProfile'])->name('guide.profile.update');
+        Route::get('customers', [\App\Http\Controllers\GuideController::class, 'customerList'])->name('guide.customers');
     });
 });

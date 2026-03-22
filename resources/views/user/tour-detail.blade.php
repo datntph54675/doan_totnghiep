@@ -292,7 +292,7 @@
             <div class="price-label">Giá chỉ từ</div>
             <div class="price-amount">{{ number_format($tour->price, 0, ',', '.') }} ₫</div>
             <div class="price-per">/ người</div>
-            <a href="#" class="btn-book">🎒 Đặt tour ngay</a>
+            <a href="{{ route('user.booking', $tour->tour_id) }}" class="btn-book">🎒 Đặt tour ngay</a>
         </div>
 
         <div class="quick-info">

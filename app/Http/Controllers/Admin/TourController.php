@@ -13,31 +13,36 @@ class TourController extends Controller
     public function index()
     {
         $tours = Tour::orderBy('tour_id', 'desc')->paginate(15);
-        return view('admin.tour.index', compact('tours'));
+        return view('admin.tours.index', compact('tours'));
     }
 
     public function create()
     {
         $categories = Category::orderBy('name')->get();
-        return view('admin.tour.create', compact('categories'));
+        return view('admin.tours.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'category_id' => 'nullable|exists:category,category_id',
+            'category_id' => 'nullable',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'policy' => 'nullable|string',
             'supplier' => 'nullable|string',
-            'image' => 'nullable|image|max:5120',
-            'price' => 'nullable|numeric',
-            'max_people' => 'nullable|integer',
+            'image' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'max_people' => 'required|integer|min:0',
             'duration' => 'nullable|integer',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
-            'status' => 'nullable|in:active,inactive',
+            'status' => 'required|in:active,inactive',
         ]);
+
+        // Convert empty string to null for category_id
+        if (empty($data['category_id'])) {
+            $data['category_id'] = null;
+        }
 
         // handle uploaded image file
         if ($request->hasFile('image')) {
@@ -55,26 +60,37 @@ class TourController extends Controller
     {
         $tour = Tour::findOrFail($id);
         $categories = Category::orderBy('name')->get();
-        return view('admin.tour.edit', compact('tour', 'categories'));
+        return view('admin.tours.edit', compact('tour', 'categories'));
+    }
+
+    public function show($id)
+    {
+        $tour = Tour::findOrFail($id);
+        return view('admin.tours.show', compact('tour'));
     }
 
     public function update(Request $request, $id)
     {
         $tour = Tour::findOrFail($id);
         $data = $request->validate([
-            'category_id' => 'nullable|exists:category,category_id',
+            'category_id' => 'nullable',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'policy' => 'nullable|string',
             'supplier' => 'nullable|string',
-            'image' => 'nullable|image|max:5120',
-            'price' => 'nullable|numeric',
-            'max_people' => 'nullable|integer',
+            'image' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'max_people' => 'required|integer|min:0',
             'duration' => 'nullable|integer',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
-            'status' => 'nullable|in:active,inactive',
+            'status' => 'required|in:active,inactive',
         ]);
+
+        // Convert empty string to null for category_id
+        if (empty($data['category_id'])) {
+            $data['category_id'] = null;
+        }
 
         if ($request->hasFile('image')) {
             // delete old file if exists
