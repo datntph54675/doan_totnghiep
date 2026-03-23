@@ -1,4 +1,4 @@
-@extends('admin.layout')
+@extends('layouts.app')
 
 @section('content')
     <h2>Thêm hướng dẫn viên</h2>

@@ -36,7 +36,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('users/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
         // Guides
-        Route::resource('guides', GuideController::class)->only(['index', 'edit', 'update', 'create', 'store']);
+        Route::resource('guides', GuideController::class)->only(['index', 'edit', 'update', 'create', 'store', 'show']);
+        Route::patch('guides/{id}/toggle-status', [GuideController::class, 'toggleStatus'])->name('guides.toggle-status');
 
         // Tours
         Route::resource('tours', TourController::class);

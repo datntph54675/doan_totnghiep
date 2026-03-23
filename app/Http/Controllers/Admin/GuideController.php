@@ -27,53 +27,67 @@ class GuideController extends Controller
 
     /**
      * Show the form for creating a new guide.
+     * @deprecated This functionality is disabled. Guides are now created through an approval process.
      */
     public function create()
     {
-        return view('admin.guide.create');
+        // return view('admin.guide.create');
+        // Logic commented out - not in use
     }
 
     /**
      * Store a newly created guide in storage.
+     * @deprecated This functionality is disabled. Guides are now created through an approval process.
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'fullname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'cccd' => 'nullable|string|max:20',
-            'language' => 'nullable|string|max:255',
-            'certificate' => 'nullable|string|max:255',
-            'experience' => 'nullable|string',
-            'specialization' => 'nullable|string|max:255',
-        ]);
+        // $validated = $request->validate([
+        //     'fullname' => 'required|string|max:255',
+        //     'email' => 'required|email|unique:users,email',
+        //     'phone' => 'nullable|string|max:20',
+        //     'cccd' => 'nullable|string|max:20',
+        //     'language' => 'nullable|string|max:255',
+        //     'certificate' => 'nullable|string|max:255',
+        //     'experience' => 'nullable|string',
+        //     'specialization' => 'nullable|string|max:255',
+        // ]);
 
-        // Make sure we create a unique username (required by users table)
-        $baseUsername = Str::before($validated['email'], '@');
-        $username = $baseUsername;
-        $i = 1;
-        while (User::where('username', $username)->exists()) {
-            $username = $baseUsername . $i++;
-        }
+        // // Make sure we create a unique username (required by users table)
+        // $baseUsername = Str::before($validated['email'], '@');
+        // $username = $baseUsername;
+        // $i = 1;
+        // while (User::where('username', $username)->exists()) {
+        //     $username = $baseUsername . $i++;
+        // }
 
-        $user = User::create([
-            'username' => $username,
-            'fullname' => $validated['fullname'],
-            'email' => $validated['email'],
-            'password' => bcrypt('password'),
-            'role' => 'tour_guide',
-        ]);
+        // $user = User::create([
+        //     'username' => $username,
+        //     'fullname' => $validated['fullname'],
+        //     'email' => $validated['email'],
+        //     'password' => bcrypt('password'),
+        //     'role' => 'tour_guide',
+        // ]);
 
-        Guide::create([
-            'user_id' => $user->user_id,
-            'cccd' => $validated['cccd'],
-            'language' => $validated['language'],
-            'certificate' => $validated['certificate'],
-            'experience' => $validated['experience'],
-            'specialization' => $validated['specialization'],
-        ]);
+        // Guide::create([
+        //     'user_id' => $user->user_id,
+        //     'phone' => $validated['phone'],
+        //     'cccd' => $validated['cccd'],
+        //     'language' => $validated['language'],
+        //     'certificate' => $validated['certificate'],
+        //     'experience' => $validated['experience'],
+        //     'specialization' => $validated['specialization'],
+        // ]);
 
-        return redirect()->route('admin.guides.index')->with('success', 'Tạo hướng dẫn viên thành công.');
+        // return redirect()->route('admin.guides.index')->with('success', 'Tạo hướng dẫn viên thành công.');
+    }
+
+    /**
+     * Display the specified guide.
+     */
+    public function show($id)
+    {
+        $guide = Guide::with('user')->findOrFail($id);
+        return view('admin.guide.show', compact('guide'));
     }
 
     /**
@@ -91,28 +105,66 @@ class GuideController extends Controller
     public function update(Request $request, $id)
     {
         $guide = Guide::findOrFail($id);
+        $user = $guide->user;
 
         $validated = $request->validate([
+            'fullname' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
+            'phone' => 'nullable|string|max:20',
             'cccd' => 'nullable|string|max:20',
             'language' => 'nullable|string|max:255',
             'certificate' => 'nullable|string|max:255',
             'experience' => 'nullable|string',
             'specialization' => 'nullable|string|max:255',
+        ],[
+            'fullname.required' => 'Họ tên là bắt buộc.',
+            'fullname.max' => 'Họ tên không được vượt quá 255 ký tự.',
+
+            'email.required' => 'Email là bắt buộc.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.max' => 'Email không được vượt quá 255 ký tự.',
+            'email.unique' => 'Email này đã được sử dụng.',
+
+            'phone.max' => 'Số điện thoại không được vượt quá 20 ký tự.',
+
+            'cccd.max' => 'CCCD không được vượt quá 20 ký tự.',
+
+            'language.max' => 'Ngôn ngữ không được vượt quá 255 ký tự.',
+
+            'certificate.max' => 'Chứng chỉ không được vượt quá 255 ký tự.',
+
+            'specialization.max' => 'Chuyên môn không được vượt quá 255 ký tự.',
         ]);
 
-        $guide->update($validated);
+        $user->update([
+            'fullname' => $validated['fullname'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+        ]);
+
+        // Update guide information
+        $guide->update([
+            'cccd' => $validated['cccd'],
+            'language' => $validated['language'],
+            'certificate' => $validated['certificate'],
+            'experience' => $validated['experience'],
+            'specialization' => $validated['specialization'],
+        ]);
 
         return redirect()->route('admin.guides.index')->with('success', 'Cập nhật hướng dẫn viên thành công.');
     }
 
     /**
-     * Remove the specified guide from storage.
+     * Toggle the status of the specified guide.
      */
-    public function destroy($id)
+    public function toggleStatus($id)
     {
         $guide = Guide::findOrFail($id);
-        $guide->delete();
 
-        return redirect()->route('admin.guides.index')->with('success', 'Xóa hướng dẫn viên thành công.');
+        $guide->status = $guide->status === 'active' ? 'inactive' : 'active';
+        $guide->save();
+
+        $message = $guide->status === 'active' ? 'Hiển thị hướng dẫn viên thành công.' : 'Ẩn hướng dẫn viên thành công.';
+        return redirect()->route('admin.guides.index')->with('success', $message);
     }
 }
