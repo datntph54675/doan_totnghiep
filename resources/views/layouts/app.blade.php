@@ -14,6 +14,8 @@
                 <a class="nav-link" href="{{ route('admin.dashboard') }}">Trang chủ</a>
                 <a class="nav-link" href="{{ route('admin.categories.index') }}">Danh mục</a>
                 <a class="nav-link" href="{{ route('admin.tours.index') }}">Tour</a>
+                <a class="nav-link" href="{{ route('admin.users.index') }}">Khách hàng</a>
+                <a class="nav-link" href="{{ route('admin.guides.index') }}">HDV</a>
                 <form action="{{ route('admin.logout') }}" method="POST" style="display:inline;">
                     @csrf
                     <button type="submit" class="btn btn-link nav-link">Đăng xuất</button>

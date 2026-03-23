@@ -13,7 +13,6 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Use the correct primary key column name for ordering.
         $users = User::where('role', 'user')->orderBy('user_id', 'desc')->paginate(20);
         return view('admin.user.index', compact('users'));
     }
@@ -30,21 +29,44 @@ class UserController extends Controller
     /**
      * Update the specified user in storage.
      */
+
+
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
 
         $validated = $request->validate([
-            'fullname' => 'required|string|max:255',
+            'fullname' => 'required|string|max:255|regex:/\S/',
             'email' => 'required|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
-            'role' => 'required|in:user,admin,tour_guide',
+        ], [
+            'fullname.required' => 'Họ tên là bắt buộc.',
+            'fullname.max' => 'Họ tên không được vượt quá 255 ký tự.',
+            'fullname.regex' => 'Họ tên không được chỉ chứa khoảng trắng.',
+
+            'email.required' => 'Email là bắt buộc.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.max' => 'Email không được vượt quá 255 ký tự.',
+            'email.unique' => 'Email này đã được sử dụng.',
         ]);
 
-        $user->fullname = $validated['fullname'];
-        $user->email = $validated['email'];
-        $user->role = $validated['role'];
+        $user->fullname = trim($validated['fullname']);
+        $user->email = trim($validated['email']);
         $user->save();
 
         return redirect(url('admin/users'))->with('success', 'Cập nhật người dùng thành công.');
+    }
+
+    /**
+     * Toggle the status of the specified user.
+     */
+    public function toggleStatus($id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+        $user->save();
+
+        $message = $user->status === 'active' ? 'Hiển thị người dùng thành công.' : 'Ẩn người dùng thành công.';
+        return redirect(url('admin/users'))->with('success', $message);
     }
 }

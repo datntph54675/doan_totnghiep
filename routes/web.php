@@ -33,6 +33,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('categories', CategoryController::class);
 
         Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
+        Route::patch('users/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
         // Guides
         Route::resource('guides', GuideController::class)->only(['index', 'edit', 'update', 'create', 'store']);
