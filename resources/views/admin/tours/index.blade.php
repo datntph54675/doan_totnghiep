@@ -24,13 +24,9 @@
                 <td>{{ number_format($tour->price) }} VND</td>
                 <td>{{ $tour->status }}</td>
                 <td>
-                    <a href="{{ route('admin.tours.show', $tour) }}" class="btn btn-info">Xem</a>
-                    <a href="{{ route('admin.tours.edit', $tour) }}" class="btn btn-warning">Sửa</a>
-                    <!-- <form action="{{ route('admin.tours.destroy', $tour) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Ẩn</button>
-                    </form> -->
+                    <a href="{{ route('admin.tours.show', $tour) }}" class="btn btn-info btn-sm">Xem</a>
+                    <a href="{{ route('admin.tours.edit', $tour) }}" class="btn btn-warning btn-sm">Sửa</a>
+                    <a href="{{ route('admin.tours.departure-schedules.index', $tour->tour_id) }}" class="btn btn-success btn-sm">Lịch xuất phát</a>
                 </td>
             </tr>
             @endforeach

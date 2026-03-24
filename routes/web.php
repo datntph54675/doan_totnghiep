@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureRole;
 use App\Http\Controllers\GuideAuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\TourController;
+use App\Http\Controllers\Admin\DepartureScheduleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\GuideController;
 use App\Http\Controllers\Admin\GuideAssignmentController;
@@ -45,6 +46,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Tours
         Route::resource('tours', TourController::class);
+        Route::get('tours/{tour}/departure-schedules', [TourController::class, 'departureSchedules'])->name('tours.departure-schedules.index');
+
+        // Departure Schedules (Nested under Tours)
+        Route::get('tours/{tour}/departure-schedules/create', [DepartureScheduleController::class, 'create'])->name('tours.departure-schedules.create');
+        Route::post('tours/{tour}/departure-schedules', [DepartureScheduleController::class, 'store'])->name('tours.departure-schedules.store');
+        Route::get('tours/{tour}/departure-schedules/{schedule}/edit', [DepartureScheduleController::class, 'edit'])->name('tours.departure-schedules.edit');
+        Route::put('tours/{tour}/departure-schedules/{schedule}', [DepartureScheduleController::class, 'update'])->name('tours.departure-schedules.update');
+        Route::delete('tours/{tour}/departure-schedules/{schedule}', [DepartureScheduleController::class, 'destroy'])->name('tours.departure-schedules.destroy');
     });
 });
 

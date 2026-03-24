@@ -40,20 +40,8 @@
             <input type="number" name="price" value="{{ $tour->price }}" class="form-control" step="0.01" required>
         </div>
         <div class="form-group">
-            <label for="max_people">Số người tối đa</label>
-            <input type="number" name="max_people" value="{{ $tour->max_people }}" class="form-control" required>
-        </div>
-        <div class="form-group">
             <label for="duration">Thời gian (ngày)</label>
             <input type="number" name="duration" value="{{ $tour->duration }}" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="start_date">Ngày bắt đầu</label>
-            <input type="date" name="start_date" value="{{ $tour->start_date }}" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="end_date">Ngày kết thúc</label>
-            <input type="date" name="end_date" value="{{ $tour->end_date }}" class="form-control">
         </div>
         <div class="form-group">
             <label for="status">Trạng thái</label>

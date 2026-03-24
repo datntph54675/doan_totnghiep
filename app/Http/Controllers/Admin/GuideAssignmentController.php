@@ -51,6 +51,16 @@ class GuideAssignmentController extends Controller
         $data['assigned_by'] = Auth::id() ?? (Auth::user()->user_id ?? null);
         $data['assigned_at'] = now();
 
+        $exists = GuideAssignment::where('schedule_id', $data['schedule_id'])
+            ->where('guide_id', $data['guide_id'])
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['guide_id' => 'HDV này đã được phân công cho lịch trình đã chọn.']);
+        }
+
         GuideAssignment::create($data);
 
         return redirect()->route('admin.guide-assignments.index')
@@ -89,6 +99,17 @@ class GuideAssignmentController extends Controller
             'status' => 'required|in:active,cancelled,completed',
             'note' => 'nullable|string',
         ]);
+
+        $exists = GuideAssignment::where('schedule_id', $data['schedule_id'])
+            ->where('guide_id', $data['guide_id'])
+            ->where('guide_assignment_id', '!=', $guideAssignment->guide_assignment_id)
+            ->exists();
+
+        if ($exists) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['guide_id' => 'HDV này đã được phân công cho lịch trình đã chọn.']);
+        }
 
         $guideAssignment->update($data);
 

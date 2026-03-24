@@ -32,10 +32,7 @@ class TourController extends Controller
             'supplier' => 'nullable|string',
             'image' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'max_people' => 'required|integer|min:0',
             'duration' => 'nullable|integer',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -69,6 +66,12 @@ class TourController extends Controller
         return view('admin.tours.show', compact('tour'));
     }
 
+    public function departureSchedules($id)
+    {
+        $tour = Tour::with(['departureSchedules.guideAssignments.guide.user'])->findOrFail($id);
+        return view('admin.tours.departure_schedules.index', compact('tour'));
+    }
+
     public function update(Request $request, $id)
     {
         $tour = Tour::findOrFail($id);
@@ -80,10 +83,7 @@ class TourController extends Controller
             'supplier' => 'nullable|string',
             'image' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'max_people' => 'required|integer|min:0',
             'duration' => 'nullable|integer',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
             'status' => 'required|in:active,inactive',
         ]);
 
