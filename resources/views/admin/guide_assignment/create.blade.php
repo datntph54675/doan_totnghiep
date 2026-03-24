@@ -1,0 +1,81 @@
+@extends('layouts.app')
+
+@section('title', 'Thêm Phân công HDV')
+
+@section('content')
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Thêm Phân công HDV</h1>
+        </div>
+    </div>
+
+    <form action="{{ route('admin.guide-assignments.store') }}" method="POST" class="needs-validation">
+        @csrf
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="schedule_id" class="form-label">Lịch khởi hành <span class="text-danger">*</span></label>
+                <select name="schedule_id" id="schedule_id" class="form-select @error('schedule_id') is-invalid @enderror" required>
+                    <option value="">-- Chọn lịch khởi hành --</option>
+                    @foreach($schedules as $schedule)
+                        <option value="{{ $schedule->schedule_id }}" @selected(old('schedule_id') == $schedule->schedule_id)>
+                            {{ $schedule->tour->name }} - 
+                            {{ \Illuminate\Support\Carbon::parse($schedule->start_date)->format('d/m/Y') }} đến {{ \Illuminate\Support\Carbon::parse($schedule->end_date)->format('d/m/Y') }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('schedule_id')
+                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label for="guide_id" class="form-label">Hướng dẫn viên <span class="text-danger">*</span></label>
+                <select name="guide_id" id="guide_id" class="form-select @error('guide_id') is-invalid @enderror" required>
+                    <option value="">-- Chọn hướng dẫn viên --</option>
+                    @foreach($guides as $guide)
+                        <option value="{{ $guide->guide_id }}" @selected(old('guide_id') == $guide->guide_id)>
+                            {{ $guide->user->fullname }} ({{ $guide->user->phone ?? 'N/A' }})
+                        </option>
+                    @endforeach
+                </select>
+                @error('guide_id')
+                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                <select name="status" id="status" class="form-select @error('status') is-invalid @enderror" required>
+                    <option value="active" @selected(old('status') == 'active' || old('status') == null)>Hoạt động</option>
+                    <option value="cancelled" @selected(old('status') == 'cancelled')>Hủy</option>
+                    <option value="completed" @selected(old('status') == 'completed')>Hoàn thành</option>
+                </select>
+                @error('status')
+                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                @enderror
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="note" class="form-label">Ghi chú</label>
+            <textarea name="note" id="note" class="form-control @error('note') is-invalid @enderror" rows="3" placeholder="Nhập ghi chú nếu có...">{{ old('note') }}</textarea>
+            @error('note')
+                <span class="invalid-feedback d-block">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Lưu
+            </button>
+            <a href="{{ route('admin.guide-assignments.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </form>
+</div>
+@endsection

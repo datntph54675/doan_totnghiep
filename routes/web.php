@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\TourController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\GuideController;
+use App\Http\Controllers\Admin\GuideAssignmentController;
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TourUserController;
@@ -38,6 +39,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Guides
         Route::resource('guides', GuideController::class)->only(['index', 'edit', 'update', 'create', 'store', 'show']);
         Route::patch('guides/{id}/toggle-status', [GuideController::class, 'toggleStatus'])->name('guides.toggle-status');
+
+        // Guide Assignments
+        Route::resource('guide-assignments', GuideAssignmentController::class);
 
         // Tours
         Route::resource('tours', TourController::class);

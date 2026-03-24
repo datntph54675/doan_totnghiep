@@ -48,4 +48,9 @@ class DepartureSchedule extends Model
     {
         return $this->hasMany(Attendance::class, 'schedule_id', 'schedule_id');
     }
+
+    public function guideAssignments(): HasMany
+    {
+        return $this->hasMany(GuideAssignment::class, 'schedule_id', 'schedule_id');
+    }
 }
