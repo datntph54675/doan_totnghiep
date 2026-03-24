@@ -16,6 +16,7 @@ class DepartureSchedule extends Model
         'tour_id',
         'start_date',
         'end_date',
+        'max_people',
         'meeting_point',
         'guide_id',
         'driver_id',
@@ -27,6 +28,7 @@ class DepartureSchedule extends Model
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'max_people' => 'integer',
     ];
 
     public function tour(): BelongsTo

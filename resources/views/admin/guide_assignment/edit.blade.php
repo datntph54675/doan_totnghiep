@@ -78,12 +78,12 @@
         </div>
 
         <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-check-circle"></i> Cập nhật
-            </button>
             <a href="{{ route('admin.guide-assignments.index') }}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Quay lại
             </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle"></i> Cập nhật
+            </button>
         </div>
     </form>
 </div>

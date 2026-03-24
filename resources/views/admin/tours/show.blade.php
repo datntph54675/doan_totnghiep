@@ -11,11 +11,11 @@
     <p><strong>Nhà cung cấp:</strong> {{ $tour->supplier }}</p>
     <p><strong>Hình ảnh:</strong> {{ $tour->image }}</p>
     <p><strong>Giá:</strong> {{ number_format($tour->price) }} VND</p>
-    <p><strong>Số người tối đa:</strong> {{ $tour->max_people }}</p>
     <p><strong>Thời gian:</strong> {{ $tour->duration }} ngày</p>
-    <p><strong>Ngày bắt đầu:</strong> {{ $tour->start_date }}</p>
-    <p><strong>Ngày kết thúc:</strong> {{ $tour->end_date }}</p>
     <p><strong>Trạng thái:</strong> {{ $tour->status }}</p>
-    <a href="{{ route('admin.tours.index') }}" class="btn btn-secondary">Quay lại</a>
+    <div class="mt-3">
+        <a href="{{ route('admin.tours.departure-schedules.index', $tour->tour_id) }}" class="btn btn-primary">Xem lịch xuất phát</a>
+        <a href="{{ route('admin.tours.index') }}" class="btn btn-secondary">Quay lại</a>
+    </div>
 </div>
 @endsection

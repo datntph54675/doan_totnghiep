@@ -48,23 +48,8 @@
             @enderror
         </div>
         <div class="form-group">
-            <label for="max_people">Số người tối đa</label>
-            <input type="number" name="max_people" class="form-control @error('max_people') is-invalid @enderror" required>
-            @error('max_people')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
-        </div>
-        <div class="form-group">
             <label for="duration">Thời gian (ngày)</label>
             <input type="number" name="duration" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="start_date">Ngày bắt đầu</label>
-            <input type="date" name="start_date" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="end_date">Ngày kết thúc</label>
-            <input type="date" name="end_date" class="form-control">
         </div>
         <div class="form-group">
             <label for="status">Trạng thái</label>
