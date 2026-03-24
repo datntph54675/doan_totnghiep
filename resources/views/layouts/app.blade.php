@@ -128,6 +128,31 @@
 
 <body>
 
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Admin Panel</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ route('admin.dashboard') }}">Trang chủ</a>
+                <a class="nav-link" href="{{ route('admin.categories.index') }}">Danh mục</a>
+                <a class="nav-link" href="{{ route('admin.tours.index') }}">Tour</a>
+                <a class="nav-link" href="{{ route('admin.users.index') }}">Khách hàng</a>
+                <a class="nav-link" href="{{ route('admin.guides.index') }}">HDV</a>
+                <form action="{{ route('admin.logout') }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn btn-link nav-link">Đăng xuất</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>Thành công!</strong> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+
     <div class="wrapper d-flex">
         <nav id="sidebar">
             <div class="sidebar-header border-bottom border-secondary">
