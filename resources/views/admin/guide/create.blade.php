@@ -1,59 +1,105 @@
 @extends('layouts.app')
 
+@section('title', 'Thêm Hướng dẫn viên mới')
+
 @section('content')
-    <h2>Thêm hướng dẫn viên</h2>
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"
+                        class="text-decoration-none">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('admin.guides.index') }}"
+                        class="text-decoration-none">Hướng dẫn viên</a></li>
+                <li class="breadcrumb-item active">Thêm mới</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold text-dark">Thêm Hướng dẫn viên mới</h2>
+    </div>
 
-    @if($errors->any())
-        <div style="background:#ffe4e6;padding:10px;border-radius:6px;margin-bottom:12px">
-            <ul style="margin:0;padding-left:18px">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <form action="{{ route('admin.guides.store') }}" method="POST">
+                @csrf
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="fullname" class="form-label fw-bold text-secondary">Tên người dùng</label>
+                        <input type="text" name="fullname" id="fullname" value="{{ old('fullname') }}"
+                            class="form-control @error('fullname') is-invalid @enderror"
+                            placeholder="Nhập tên người dùng..." required>
+                        @error('fullname')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="email" class="form-label fw-bold text-secondary">Email</label>
+                        <input type="email" name="email" id="email" value="{{ old('email') }}"
+                            class="form-control @error('email') is-invalid @enderror"
+                            placeholder="Nhập email..." required>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="cccd" class="form-label fw-bold text-secondary">CCCD</label>
+                        <input type="text" name="cccd" id="cccd" value="{{ old('cccd') }}"
+                            class="form-control @error('cccd') is-invalid @enderror" placeholder="Nhập số CCCD...">
+                        @error('cccd')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="language" class="form-label fw-bold text-secondary">Ngôn ngữ</label>
+                        <input type="text" name="language" id="language" value="{{ old('language') }}"
+                            class="form-control @error('language') is-invalid @enderror" placeholder="Nhập ngôn ngữ...">
+                        @error('language')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="certificate" class="form-label fw-bold text-secondary">Chứng chỉ</label>
+                        <input type="text" name="certificate" id="certificate" value="{{ old('certificate') }}"
+                            class="form-control @error('certificate') is-invalid @enderror" placeholder="Nhập chứng chỉ...">
+                        @error('certificate')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="specialization" class="form-label fw-bold text-secondary">Chuyên môn</label>
+                        <input type="text" name="specialization" id="specialization" value="{{ old('specialization') }}"
+                            class="form-control @error('specialization') is-invalid @enderror" placeholder="Nhập chuyên môn...">
+                        @error('specialization')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-12 mb-4">
+                        <label for="experience" class="form-label fw-bold text-secondary">Kinh nghiệm</label>
+                        <textarea name="experience" id="experience" rows="4"
+                            class="form-control @error('experience') is-invalid @enderror"
+                            placeholder="Nhập kinh nghiệm...">{{ old('experience') }}</textarea>
+                        @error('experience')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <hr class="my-4 text-secondary opacity-25">
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                        Lưu Hướng dẫn viên
+                    </button>
+                    <a href="{{ route('admin.guides.index') }}" class="btn btn-light border px-4 text-muted">
+                        Hủy bỏ
+                    </a>
+                </div>
+            </form>
         </div>
-    @endif
-
-    <form action="{{ route('admin.guides.store') }}" method="POST" style="max-width:600px">
-        @csrf
-
-        <div style="margin-bottom:10px">
-            <label for="fullname">Tên người dùng</label><br>
-            <input id="fullname" name="fullname" value="{{ old('fullname') }}" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px" required />
-        </div>
-
-        <div style="margin-bottom:10px">
-            <label for="email">Email</label><br>
-            <input id="email" name="email" type="email" value="{{ old('email') }}" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px" required />
-        </div>
-
-        <div style="margin-bottom:10px">
-            <label for="cccd">CCCD</label><br>
-            <input id="cccd" name="cccd" value="{{ old('cccd') }}" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px" />
-        </div>
-
-        <div style="margin-bottom:10px">
-            <label for="language">Ngôn ngữ</label><br>
-            <input id="language" name="language" value="{{ old('language') }}" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px" />
-        </div>
-
-        <div style="margin-bottom:10px">
-            <label for="certificate">Chứng chỉ</label><br>
-            <input id="certificate" name="certificate" value="{{ old('certificate') }}" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px" />
-        </div>
-
-        <div style="margin-bottom:10px">
-            <label for="experience">Kinh nghiệm</label><br>
-            <textarea id="experience" name="experience" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px">{{ old('experience') }}</textarea>
-        </div>
-
-        <div style="margin-bottom:10px">
-            <label for="specialization">Chuyên môn</label><br>
-            <input id="specialization" name="specialization" value="{{ old('specialization') }}" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px" />
-        </div>
-
-        <div style="display:flex;gap:8px">
-            <button type="submit" style="background:#0f62fe;color:#fff;padding:8px 12px;border-radius:6px;border:0">Lưu</button>
-            <a href="{{ route('admin.guides.index') }}" style="padding:8px 12px;border-radius:6px;border:1px solid #e5e7eb;text-decoration:none">Hủy</a>
-        </div>
-    </form>
+    </div>
 @endsection

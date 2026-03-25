@@ -1,0 +1,58 @@
+<svg width="250" height="70" viewBox="0 0 250 70" xmlns="http://www.w3.org/2000/svg">
+  <!-- Biểu tượng chính -->
+  <svg x="0" y="0" width="70" height="66" viewBox="0 0 200 200">
+    <!-- Vòng tròn bên ngoài -->
+    <circle cx="100" cy="100" r="95" fill="none" stroke="black" stroke-width="10" />
+
+    <!-- Nửa trên màu đỏ với gradient -->
+    <path d="M 100,5
+             A 95,95 0 0 1 100,100
+             A 95,95 0 0 1 5,100
+             A 95,95 0 0 1 100,5 Z"
+          fill="url(#redGradient)" />
+    
+    <!-- Nửa dưới màu đen với hiệu ứng mờ nhẹ -->
+    <path d="M 100,100
+             A 95,95 0 0 1 195,100
+             A 95,95 0 0 1 100,195
+             A 95,95 0 0 1 5,100
+             A 95,95 0 0 1 100,100 Z"
+          fill="url(#blackGradient)" />
+
+    <!-- Sóng trắng với hiệu ứng đổ bóng -->
+    <path d="M 30,130
+             Q 60,115 90,130
+             T 150,130"
+          fill="none" stroke="white" stroke-width="10" filter="url(#shadow)" />
+    <path d="M 30,150
+             Q 60,135 90,150
+             T 150,150"
+          fill="none" stroke="white" stroke-width="10" filter="url(#shadow)" />
+
+    <!-- Chi tiết highlight trên màu đỏ -->
+    <circle cx="80" cy="50" r="10" fill="white" />
+    
+    <!-- Định nghĩa gradient -->
+    <defs>
+      <linearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#e63946;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:1" />
+      </linearGradient>
+      <linearGradient id="blackGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#333;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#555;stop-opacity:1" />
+      </linearGradient>
+      <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+        <feOffset dx="2" dy="2" result="offsetblur"/>
+        <feMerge>
+          <feMergeNode/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Chữ "LaptopStore" bên cạnh biểu tượng -->
+  <text x="80" y="50" font-family="Arial, sans-serif" font-weight="bold" font-size="40" fill="#333" filter="url(#shadow)">i-<tspan fill="#e63946">Zone</tspan></text>
+</svg>

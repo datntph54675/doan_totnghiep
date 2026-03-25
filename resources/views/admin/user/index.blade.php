@@ -1,55 +1,86 @@
 @extends('layouts.app')
 
+@section('title', 'Quản lý Khách hàng')
+
 @section('content')
-    <h2>Quản lý khách hàng</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Quản lý Khách hàng</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"
+                            class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Khách hàng</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
 
-    {{-- @if (session('success'))
-        <div style="background:#dff0d8;padding:10px;border-radius:6px;margin-bottom:12px">{{ session('success') }}</div>
-    @endif --}}
-
-    <table style="width:100%;border-collapse:collapse">
-        <thead>
-            <tr style="text-align:left;border-bottom:1px solid #e5e7eb">
-                <th style="padding:8px">ID người dùng</th>
-                <th style="padding:8px">Tên</th>
-                <th style="padding:8px">Email</th>
-                <th style="padding:8px">Vai trò</th>
-                <th style="padding:8px">Ngày tạo</th>
-                <th style="padding:8px">Hành động</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($users as $user)
-                <tr style="border-bottom:1px solid #f3f4f6; {{ $user->status === 'inactive' ? 'opacity: 0.5;' : '' }}">
-                    <td style="padding:8px">{{ $user->user_id }}</td>
-                    <td style="padding:8px">{{ $user->fullname }}</td>
-                    <td style="padding:8px">{{ $user->email }}</td>
-                    <td style="padding:8px">{{ $user->role }}</td>
-                    <td style="padding:8px">{{ optional($user->created_at)->format('Y-m-d') }}</td>
-                    <td style="padding:8px">
-                        <a href="{{ url('admin/users/' . $user->user_id . '/edit') }}"
-                            style="background:#0f62fe;color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none;margin-right:5px">Sửa</a>
-                        <form action="{{ route('admin.users.toggle-status', $user->user_id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" style="background:{{ $user->status === 'active' ? '#dc3545' : '#28a745' }};color:#fff;padding:6px 10px;border-radius:6px;border:none;cursor:pointer">
-                                {{ $user->status === 'active' ? 'Ẩn' : 'Hiện' }}
-                            </button>
-                        </form>
-                    </td>
-
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" style="padding:12px">Không có người dùng nào.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <div style="margin-top:12px">
-        @if (method_exists($users, 'links'))
-            {{ $users->links() }}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-uppercase text-muted small fw-bold" style="width: 80px;">ID</th>
+                            <th class="py-3 text-uppercase text-muted small fw-bold">Tên</th>
+                            <th class="py-3 text-uppercase text-muted small fw-bold">Email</th>
+                            <th class="py-3 text-uppercase text-muted small fw-bold">Vai trò</th>
+                            <th class="py-3 text-uppercase text-muted small fw-bold">Ngày tạo</th>
+                            <th class="pe-4 py-3 text-uppercase text-muted small fw-bold text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($users as $user)
+                            <tr class="{{ $user->status === 'inactive' ? 'opacity-50' : '' }}">
+                                <td class="ps-4">
+                                    <span class="fw-bold text-secondary">#{{ $user->user_id }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ $user->fullname }}</div>
+                                </td>
+                                <td>
+                                    <span class="text-muted">{{ $user->email }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">{{ $user->role }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">{{ optional($user->created_at)->format('d/m/Y') }}</span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="btn-group">
+                                        <a href="{{ url('admin/users/' . $user->user_id . '/edit') }}"
+                                            class="btn btn-sm btn-outline-warning me-2" title="Chỉnh sửa">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('admin.users.toggle-status', $user->user_id) }}" method="POST"
+                                            class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái?')">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-sm {{ $user->status === 'active' ? 'btn-outline-danger' : 'btn-outline-success' }}" title="{{ $user->status === 'active' ? 'Ẩn' : 'Hiện' }}">
+                                                <i class="fas fa-{{ $user->status === 'active' ? 'eye-slash' : 'eye' }}"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="fas fa-users fa-2x mb-2"></i>
+                                    <br>Không có người dùng nào.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @if(method_exists($users, 'links'))
+            <div class="card-footer bg-white border-top-0 py-3">
+                {{ $users->links() }}
+            </div>
         @endif
     </div>
 @endsection
