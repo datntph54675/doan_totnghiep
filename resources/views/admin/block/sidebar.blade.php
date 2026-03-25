@@ -6,8 +6,7 @@
             <!-- Logo Box -->
             <div class="logo-box">
                 <a href="index.html">
-                    <img src="#" alt="logo"
-                        style="width:160px; height:70px;">
+                    <img src="#" alt="logo" style="width:160px; height:70px;">
                 </a>
             </div>
             <!-- End Logo Box -->
@@ -40,7 +39,7 @@
                         </ul>
                     </div>
                 </li>
-                  {{-- Quản lý tài khoản --}}
+                {{-- Quản lý tài khoản --}}
                 <li>
                     <a href="#sidebarTables" data-bs-toggle="collapse">
                         <i data-feather="users"></i>
@@ -63,7 +62,7 @@
                 <!-- Kinh doanh -->
                 <li class="menu-title">Kinh doanh</li>
 
-                 {{-- Thông Báo --}}
+                {{-- Thông Báo --}}
                 <li>
                     <a href="#chat" data-bs-toggle="collapse">
                         <i class="fa fa-comments"></i>
@@ -80,7 +79,7 @@
                     </div>
                 </li>
 
-                 {{-- Hóa đơn --}}
+                {{-- Hóa đơn --}}
                 <li>
                     <a href='#hoadons' data-bs-toggle="collapse">
                         <i data-feather="shopping-bag"></i>
@@ -123,12 +122,13 @@
                                 d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z">
                             </path>
                         </svg>
-                        <span> Phân công HDV  </span>
+                        <span> Phân công HDV </span>
                         <span class="menu-arrow"></span>
                     </a>
                     <div class="collapse" id="guide_assignment">
                         <ul class="nav-second-level">
-                            <li><a class='tp-link' href="{{ route('admin.guide-assignments.index') }}">Danh sách</a></li>
+                            <li><a class='tp-link' href="{{ route('admin.guide-assignments.index') }}">Danh sách</a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -206,14 +206,14 @@
 
                 <!-- Đánh giá -->
                 <li>
-                    <a href="#danhgias" data-bs-toggle="collapse">
+                    <a href="#feedbackSection" data-bs-toggle="collapse">
                         <i class="fa-solid fa-thumbs-up"></i>
                         <span> Đánh giá </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="danhgias">
+                    <div class="collapse" id="feedbackSection">
                         <ul class="nav-second-level">
-                            <li><a class='tp-link' href="#">Danh sách</a></li>
+                            <li><a class='tp-link' href="{{ route('admin.feedback.index') }}">Danh sách</a></li>
                         </ul>
                     </div>
                 </li>

@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\GuideAssignmentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TourUserController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\Admin\FeedbackController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // User - public tour pages
@@ -53,6 +54,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('tours/{tour}/departure-schedules/{schedule}/edit', [DepartureScheduleController::class, 'edit'])->name('tours.departure-schedules.edit');
         Route::put('tours/{tour}/departure-schedules/{schedule}', [DepartureScheduleController::class, 'update'])->name('tours.departure-schedules.update');
         Route::delete('tours/{tour}/departure-schedules/{schedule}', [DepartureScheduleController::class, 'destroy'])->name('tours.departure-schedules.destroy');
+
+        // Feedback
+        Route::get('feedback', [FeedbackController::class, 'index'])->name('feedback.index');
+        Route::post('feedback/hide/{id}', [FeedbackController::class, 'hide'])->name('feedback.hide');
     });
 });
 
