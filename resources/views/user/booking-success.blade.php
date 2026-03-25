@@ -1,4 +1,4 @@
-@extends('user.layout')
+@extends('layouts.user')
 
 @section('title', 'Đặt tour thành công')
 
@@ -113,7 +113,7 @@
         📞 Nhân viên sẽ liên hệ qua số <strong>{{ $booking->customer->phone }}</strong> để xác nhận và hướng dẫn thanh toán.
     </div>
 
-    <a href="{{ route('user.tours') }}" class="btn-outline">← Xem thêm tour</a>
-    <a href="{{ route('user.tour.detail', $booking->tour_id) }}" class="btn-home">Xem lại tour</a>
+    <a href="{{ route('tours.index') }}" class="btn-outline">← Xem thêm tour</a>
+    <a href="{{ route('tours.show', $booking->tour_id) }}" class="btn-home">Xem lại tour</a>
 </div>
 @endsection

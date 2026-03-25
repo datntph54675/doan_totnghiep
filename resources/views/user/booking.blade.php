@@ -1,4 +1,4 @@
-@extends('user.layout')
+@extends('layouts.user')
 
 @section('title', 'Đặt tour - ' . $tour->name)
 
@@ -74,7 +74,7 @@
 
 @section('content')
 
-<a href="{{ route('user.tour.detail', $tour->tour_id) }}" class="back-link">← Quay lại chi tiết tour</a>
+<a href="{{ route('tours.show', $tour->tour_id) }}" class="back-link">← Quay lại chi tiết tour</a>
 
 <div class="booking-hero">
     <h1>🎒 Đặt tour</h1>

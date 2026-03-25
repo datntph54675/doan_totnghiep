@@ -10,18 +10,17 @@ use App\Http\Controllers\Admin\DepartureScheduleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\GuideController;
 use App\Http\Controllers\Admin\GuideAssignmentController;
-
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TourUserController;
-
+use App\Http\Controllers\BookingController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // User - public tour pages
 Route::get('/tours', [TourUserController::class, 'index'])->name('tours.index');
 Route::get('/tours/{id}', [TourUserController::class, 'show'])->name('tours.show');
-Route::get('/tours/{id}/booking', [\App\Http\Controllers\BookingController::class, 'create'])->name('user.booking');
-Route::post('/tours/{id}/booking', [\App\Http\Controllers\BookingController::class, 'store'])->name('user.booking.store');
-Route::get('/booking/{bookingId}/success', [\App\Http\Controllers\BookingController::class, 'success'])->name('user.booking.success');
+Route::get('/tours/{id}/booking', [BookingController::class, 'create'])->name('user.booking');
+Route::post('/tours/{id}/booking', [BookingController::class, 'store'])->name('user.booking.store');
+Route::get('/booking/{bookingId}/success', [BookingController::class, 'success'])->name('user.booking.success');
 
 // Admin auth
 Route::prefix('admin')->name('admin.')->group(function () {

@@ -60,6 +60,7 @@ class BookingController extends Controller
             'schedule_id'    => $validated['schedule_id'],
             'num_people'     => $validated['num_people'],
             'total_price'    => $totalPrice,
+            'booking_date'   => now(),
             'status'         => 'upcoming',
             'payment_status' => 'unpaid',
             'note'           => $validated['note'] ?? null,
