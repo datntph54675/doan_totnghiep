@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tour extends Model
 {
@@ -23,11 +21,12 @@ class Tour extends Model
         'supplier',
         'image',
         'price',
-        'max_people',
         'duration',
-        'start_date',
-        'end_date',
         'status'
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
     ];
 
     public function category()

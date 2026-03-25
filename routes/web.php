@@ -6,12 +6,13 @@ use App\Http\Middleware\EnsureRole;
 use App\Http\Controllers\GuideAuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\TourController;
+use App\Http\Controllers\Admin\DepartureScheduleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\GuideController;
+use App\Http\Controllers\Admin\GuideAssignmentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TourUserController;
 use App\Http\Controllers\BookingController;
-
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // User - public tour pages
@@ -33,12 +34,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('categories', CategoryController::class);
 
         Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
+        Route::patch('users/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
         // Guides
-        Route::resource('guides', GuideController::class)->only(['index', 'edit', 'update', 'create', 'store']);
+        Route::resource('guides', GuideController::class)->only(['index', 'edit', 'update', 'create', 'store', 'show']);
+        Route::patch('guides/{id}/toggle-status', [GuideController::class, 'toggleStatus'])->name('guides.toggle-status');
+
+        // Guide Assignments
+        Route::resource('guide-assignments', GuideAssignmentController::class);
 
         // Tours
         Route::resource('tours', TourController::class);
+        Route::get('tours/{tour}/departure-schedules', [TourController::class, 'departureSchedules'])->name('tours.departure-schedules.index');
+
+        // Departure Schedules (Nested under Tours)
+        Route::get('tours/{tour}/departure-schedules/create', [DepartureScheduleController::class, 'create'])->name('tours.departure-schedules.create');
+        Route::post('tours/{tour}/departure-schedules', [DepartureScheduleController::class, 'store'])->name('tours.departure-schedules.store');
+        Route::get('tours/{tour}/departure-schedules/{schedule}/edit', [DepartureScheduleController::class, 'edit'])->name('tours.departure-schedules.edit');
+        Route::put('tours/{tour}/departure-schedules/{schedule}', [DepartureScheduleController::class, 'update'])->name('tours.departure-schedules.update');
+        Route::delete('tours/{tour}/departure-schedules/{schedule}', [DepartureScheduleController::class, 'destroy'])->name('tours.departure-schedules.destroy');
     });
 });
 

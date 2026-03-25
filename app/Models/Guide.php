@@ -30,4 +30,9 @@ class Guide extends Model
     {
         return $this->hasMany(DepartureSchedule::class, 'guide_id', 'guide_id');
     }
+
+    public function guideAssignments(): HasMany
+    {
+        return $this->hasMany(GuideAssignment::class, 'guide_id', 'guide_id');
+    }
 }
