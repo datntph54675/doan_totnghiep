@@ -47,28 +47,46 @@
 .info-value { font-size: 1rem; font-weight: 700; color: var(--text-dark); }
 .info-value.price { color: var(--accent); font-size: 1.3rem; }
 
-/* TIMELINE */
-.timeline { position: relative; padding-left: 40px; }
-.timeline::before { content:''; position:absolute; left:16px; top:0; bottom:0; width:2px; background: var(--border); }
-.timeline-item { position: relative; margin-bottom: 28px; }
-.timeline-dot {
-    position: absolute; left: -32px; top: 4px;
-    width: 32px; height: 32px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary), #6366f1);
-    color: #fff; font-size: 12px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,102,204,.3);
-}
-.timeline-title { font-size: .95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
-.timeline-desc { font-size: .875rem; color: var(--text-mid); line-height: 1.6; }
-.timeline-meta { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
-.timeline-meta span { font-size: .75rem; color: var(--text-light); display: flex; align-items: center; gap: 4px; }
+/* TIMELINE & ACCORDION */
+.itinerary-item { border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; transition: all 0.3s ease; }
+.itinerary-item:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.itinerary-header { padding: 16px 20px; background: #fff; display: flex; align-items: center; cursor: pointer; user-select: none; }
+.itinerary-day { width: 40px; height: 40px; background: var(--primary-light); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; margin-right: 16px; flex-shrink: 0; }
+.itinerary-title { font-weight: 700; color: var(--text-dark); flex-grow: 1; }
+.itinerary-toggle { color: var(--text-light); transition: transform 0.3s; }
+.itinerary-item.active .itinerary-toggle { transform: rotate(180deg); }
+.itinerary-content { padding: 0 20px 20px 72px; display: none; background: #fff; }
+.itinerary-item.active .itinerary-content { display: block; }
+.itinerary-desc { font-size: 0.95rem; color: var(--text-mid); line-height: 1.7; }
 
-/* SCHEDULE TABLE */
-.schedule-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
-.schedule-table th { background: var(--bg-light); padding: 10px 14px; text-align: left; font-size: .75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
-.schedule-table td { padding: 12px 14px; border-top: 1px solid #f1f5f9; }
-.schedule-table tr:hover td { background: var(--bg-light); }
+/* STICKY BOOKING BAR */
+.sticky-booking-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border); padding: 12px 0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sticky-booking-bar.visible { transform: translateY(0); }
+.sticky-bar-flex { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.sticky-tour-info { display: flex; align-items: center; gap: 12px; }
+.sticky-tour-info img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+.sticky-tour-name { font-weight: 700; color: var(--text-dark); font-size: 1rem; line-height: 1.2; }
+.sticky-price-box { text-align: right; }
+.sticky-price-val { font-size: 1.3rem; font-weight: 800; color: var(--accent); }
+.sticky-per { font-size: 0.75rem; color: var(--text-light); }
+
+/* SCHEDULE CARDS */
+.schedule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.schedule-card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: #fff; transition: all 0.2s; }
+.schedule-card:hover { border-color: var(--primary); background: var(--bg-light); }
+.sch-dates { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.sch-date-box { font-weight: 700; color: var(--text-dark); }
+.sch-arrow { color: var(--text-light); font-size: 0.8rem; }
+.sch-info { font-size: 0.85rem; color: var(--text-mid); display: flex; flex-direction: column; gap: 4px; }
+.sch-info span { display: flex; align-items: center; gap: 6px; }
+.sch-btn { margin-top: 12px; width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--primary); background: transparent; color: var(--primary); font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.sch-btn:hover { background: var(--primary); color: #fff; }
 
 /* POLICY */
 .policy-box { background: #fefce8; border: 1px solid #fde68a; border-radius: var(--radius-sm); padding: 16px 20px; font-size: .875rem; color: #92400e; line-height: 1.7; }
@@ -209,25 +227,26 @@
 
             <!-- LỊCH TRÌNH -->
             @if(isset($tour->itineraries) && $tour->itineraries->count() > 0)
-            <div class="d-card">
+            <div class="d-card" id="section-itinerary">
                 <div class="d-card-header">
                     <span>🗓️</span><h3>Lịch trình chi tiết</h3>
                     <span class="badge badge-blue" style="margin-left:auto">{{ $tour->itineraries->count() }} ngày</span>
                 </div>
                 <div class="d-card-body">
-                    <div class="timeline">
+                    <div class="itinerary-accordion">
                         @foreach($tour->itineraries->sortBy('day_number') as $item)
-                        <div class="timeline-item">
-                            <div class="timeline-dot">{{ $item->day_number }}</div>
-                            <div class="timeline-title">
-                                Ngày {{ $item->day_number }}@if($item->title) — {{ $item->title }}@endif
+                        <div class="itinerary-item @if($loop->first) active @endif">
+                            <div class="itinerary-header" onclick="this.parentElement.classList.toggle('active')">
+                                <div class="itinerary-day">{{ $item->day_number }}</div>
+                                <div class="itinerary-title">Ngày {{ $item->day_number }}: {{ $item->title }}</div>
+                                <div class="itinerary-toggle"><i class="fas fa-chevron-down"></i></div>
                             </div>
-                            @if($item->description)
-                            <div class="timeline-desc">{{ $item->description }}</div>
-                            @endif
-                            <div class="timeline-meta">
-                                @if($item->location ?? null)
-                                <span><i class="fas fa-map-marker-alt"></i> {{ $item->location }}</span>
+                            <div class="itinerary-content">
+                                <div class="itinerary-desc">{!! nl2br(e($item->description)) !!}</div>
+                                @if($item->location)
+                                <div class="timeline-meta" style="margin-top:15px">
+                                    <span><i class="fas fa-map-marker-alt"></i> {{ $item->location }}</span>
+                                </div>
                                 @endif
                             </div>
                         </div>
@@ -239,32 +258,28 @@
 
             <!-- LỊCH KHỞI HÀNH -->
             @if($schedules->count() > 0)
-            <div class="d-card">
+            <div class="d-card" id="section-schedules">
                 <div class="d-card-header">
                     <span>📅</span><h3>Lịch khởi hành sắp tới</h3>
                     <span class="badge badge-green" style="margin-left:auto">{{ $schedules->count() }} chuyến</span>
                 </div>
-                <div class="d-card-body" style="padding:0">
-                    <table class="schedule-table">
-                        <thead>
-                            <tr>
-                                <th>Ngày khởi hành</th>
-                                <th>Ngày kết thúc</th>
-                                <th>Điểm tập trung</th>
-                                <th>Trạng thái</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($schedules as $s)
-                            <tr>
-                                <td style="font-weight:600">{{ $s->start_date->format('d/m/Y') }}</td>
-                                <td>{{ $s->end_date->format('d/m/Y') }}</td>
-                                <td>{{ $s->meeting_point ?? '—' }}</td>
-                                <td><span class="badge badge-green">Còn chỗ</span></td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <div class="d-card-body">
+                    <div class="schedule-grid">
+                        @foreach($schedules as $s)
+                        <div class="schedule-card">
+                            <div class="sch-dates">
+                                <div class="sch-date-box"><i class="far fa-calendar-check"></i> {{ $s->start_date->format('d/m/Y') }}</div>
+                                <div class="sch-arrow"><i class="fas fa-long-arrow-alt-right"></i></div>
+                                <div class="sch-date-box text-muted">{{ $s->end_date->format('d/m/Y') }}</div>
+                            </div>
+                            <div class="sch-info">
+                                <span><i class="fas fa-map-marker-alt"></i> {{ $s->meeting_point ?? 'Liên hệ' }}</span>
+                                <span><i class="fas fa-users"></i> Còn chỗ: {{ $s->max_people }} khách</span>
+                            </div>
+                            <a href="{{ route('user.booking', $tour->tour_id) }}?schedule={{ $s->schedule_id }}" class="sch-btn">Chọn chuyến này</a>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
             @endif
@@ -369,4 +384,47 @@
     </div>
 </div>
 
+<!-- STICKY BOOKING BAR -->
+<div class="sticky-booking-bar" id="sticky-bar">
+    <div class="container">
+        <div class="sticky-bar-flex">
+            <div class="sticky-tour-info">
+                @if($tour->image)
+                    <img src="{{ asset('storage/' . $tour->image) }}" alt="tour">
+                @endif
+                <div>
+                    <div class="sticky-tour-name">{{ $tour->name }}</div>
+                    <div class="hero-meta" style="font-size: 11px; margin-top: 4px;">
+                        <span><i class="fas fa-clock"></i> {{ $tour->duration }} ngày</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sticky-bar-flex" style="gap: 30px;">
+                <div class="sticky-price-box">
+                    <div class="sticky-price-val">{{ number_format($tour->price, 0, ',', '.') }} ₫</div>
+                    <div class="sticky-per">/ khách</div>
+                </div>
+                <a href="{{ route('user.booking', $tour->tour_id) }}" class="btn-book" style="width: 200px; padding: 10px; background: #fff; border: 1px solid var(--primary); color: var(--primary);">
+                    Đặt tour ngay
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@section('scripts')
+<script>
+    window.addEventListener('scroll', function() {
+        const bar = document.getElementById('sticky-bar');
+        const scrollPos = window.scrollY;
+        
+        if (scrollPos > 500) {
+            bar.classList.add('visible');
+        } else {
+            bar.classList.remove('visible');
+        }
+    });
+</script>
 @endsection
