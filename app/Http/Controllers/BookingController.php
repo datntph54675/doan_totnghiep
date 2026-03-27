@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Models\DepartureSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class BookingController extends Controller
 {
@@ -18,7 +19,7 @@ class BookingController extends Controller
             ->findOrFail($tourId);
 
         $schedules = DepartureSchedule::where('tour_id', $tourId)
-            ->where('start_date', '>=', now())
+            ->whereDate('start_date', '>=', Carbon::today())
             ->where('status', 'scheduled')
             ->orderBy('start_date', 'asc')
             ->get();
@@ -45,7 +46,7 @@ class BookingController extends Controller
         ]);
 
         $schedule = DepartureSchedule::findOrFail($validated['schedule_id']);
-        
+
         // Kiểm tra chỗ trống
         if ($validated['num_people'] > $schedule->available_spots) {
             return back()->withErrors([
