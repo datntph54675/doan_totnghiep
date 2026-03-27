@@ -10,98 +10,114 @@ use Illuminate\Support\Str;
 
 class GuideController extends Controller
 {
-    /**
-     * Display a listing of the guides.
-     */
+
     public function index()
     {
         $guides = Guide::whereHas('user', function ($query) {
             $query->where('role', 'tour_guide');
         })
-        ->with('user')
-        ->orderBy('guide_id', 'desc')
-        ->paginate(20);
+            ->with('user')
+            ->orderBy('guide_id', 'desc')
+            ->paginate(20);
 
         return view('admin.guide.index', compact('guides'));
     }
 
-    /**
-     * Show the form for creating a new guide.
-     * @deprecated This functionality is disabled. Guides are now created through an approval process.
-     */
+
     public function create()
     {
-        // return view('admin.guide.create');
-        // Logic commented out - not in use
+        return view('admin.guide.create');
     }
 
-    /**
-     * Store a newly created guide in storage.
-     * @deprecated This functionality is disabled. Guides are now created through an approval process.
-     */
+
     public function store(Request $request)
     {
-        // $validated = $request->validate([
-        //     'fullname' => 'required|string|max:255',
-        //     'email' => 'required|email|unique:users,email',
-        //     'phone' => 'nullable|string|max:20',
-        //     'cccd' => 'nullable|string|max:20',
-        //     'language' => 'nullable|string|max:255',
-        //     'certificate' => 'nullable|string|max:255',
-        //     'experience' => 'nullable|string',
-        //     'specialization' => 'nullable|string|max:255',
-        // ]);
+        $validated = $request->validate([
+            'fullname' => 'required|string|max:255',
+            'email' => ['required', 'email', 'unique:users,email', 'regex:/^[A-Za-z0-9._%+-]+@gmail\.com$/'],
+            'password' => 'required|string|min:6|confirmed|max:20',
+            'password_confirmation' => 'required|string|min:6|max:20',
+            'phone' => 'required|string|max:20',
+            'cccd' => 'required|string|max:20',
+            'language' => 'required|string|max:255',
+            'certificate' => 'required|string|max:255',
+            'experience' => 'required|string',
+            'specialization' => 'required|string|max:255',
+        ], [
+            'fullname.required' => 'Họ tên là bắt buộc.',
+            'fullname.max' => 'Họ tên không được vượt quá 255 ký tự.',
 
-        // // Make sure we create a unique username (required by users table)
-        // $baseUsername = Str::before($validated['email'], '@');
-        // $username = $baseUsername;
-        // $i = 1;
-        // while (User::where('username', $username)->exists()) {
-        //     $username = $baseUsername . $i++;
-        // }
+            'email.required' => 'Email là bắt buộc.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.unique' => 'Email này đã được sử dụng.',
+            'email.regex' => 'Email phải là địa chỉ Gmail.',
 
-        // $user = User::create([
-        //     'username' => $username,
-        //     'fullname' => $validated['fullname'],
-        //     'email' => $validated['email'],
-        //     'password' => bcrypt('password'),
-        //     'role' => 'tour_guide',
-        // ]);
+            'password.required' => 'Mật khẩu là bắt buộc.',
+            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
+            'password.max' => 'Mật khẩu không được vượt quá 20 ký tự.',
 
-        // Guide::create([
-        //     'user_id' => $user->user_id,
-        //     'phone' => $validated['phone'],
-        //     'cccd' => $validated['cccd'],
-        //     'language' => $validated['language'],
-        //     'certificate' => $validated['certificate'],
-        //     'experience' => $validated['experience'],
-        //     'specialization' => $validated['specialization'],
-        // ]);
+            'phone.max' => 'Số điện thoại không được vượt quá 20 ký tự.',
+            'phone.required' => 'Số điện thoại là bắt buộc.',
 
-        // return redirect()->route('admin.guides.index')->with('success', 'Tạo hướng dẫn viên thành công.');
+            'cccd.max' => 'CCCD không được vượt quá 20 ký tự.',
+            'cccd.required' => 'CCCD là bắt buộc.',
+
+            'language.max' => 'Ngôn ngữ không được vượt quá 255 ký tự.',
+            'language.required' => 'Ngôn ngữ là bắt buộc.',
+
+            'certificate.max' => 'Chứng chỉ không được vượt quá 255 ký tự.',
+            'certificate.required' => 'Chứng chỉ là bắt buộc.',
+
+            'specialization.max' => 'Chuyên môn không được vượt quá 255 ký tự.',
+            'specialization.required' => 'Chuyên môn là bắt buộc.',
+
+            'experience.required' => 'Kinh nghiệm là bắt buộc.',
+        ]);
+
+        // Make sure we create a unique username (required by users table)
+        $baseUsername = Str::before($validated['email'], '@');
+        $username = $baseUsername;
+        $i = 1;
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $i++;
+        }
+
+        $user = User::create([
+            'username' => $username,
+            'fullname' => $validated['fullname'],
+            'phone' => $validated['phone'] ?? null,
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+            'role' => 'tour_guide',
+        ]);
+
+        Guide::create([
+            'user_id' => $user->user_id,
+            'cccd' => $validated['cccd'] ?? null,
+            'language' => $validated['language'] ?? null,
+            'certificate' => $validated['certificate'] ?? null,
+            'experience' => $validated['experience'] ?? null,
+            'specialization' => $validated['specialization'] ?? null,
+        ]);
+
+        return redirect()->route('admin.guides.index')->with('success', 'Tạo hướng dẫn viên thành công.');
     }
 
-    /**
-     * Display the specified guide.
-     */
     public function show($id)
     {
         $guide = Guide::with('user')->findOrFail($id);
         return view('admin.guide.show', compact('guide'));
     }
 
-    /**
-     * Show the form for editing the specified guide.
-     */
+
     public function edit($id)
     {
         $guide = Guide::with('user')->findOrFail($id);
         return view('admin.guide.edit', compact('guide'));
     }
 
-    /**
-     * Update the specified guide in storage.
-     */
+
     public function update(Request $request, $id)
     {
         $guide = Guide::findOrFail($id);
@@ -116,7 +132,7 @@ class GuideController extends Controller
             'certificate' => 'nullable|string|max:255',
             'experience' => 'nullable|string',
             'specialization' => 'nullable|string|max:255',
-        ],[
+        ], [
             'fullname.required' => 'Họ tên là bắt buộc.',
             'fullname.max' => 'Họ tên không được vượt quá 255 ký tự.',
 
@@ -154,9 +170,6 @@ class GuideController extends Controller
         return redirect()->route('admin.guides.index')->with('success', 'Cập nhật hướng dẫn viên thành công.');
     }
 
-    /**
-     * Toggle the status of the specified guide.
-     */
     public function toggleStatus($id)
     {
         $guide = Guide::findOrFail($id);
