@@ -18,7 +18,7 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <form action="{{ route('admin.guides.store') }}" method="POST">
+            <form action="{{ route('admin.tours.store') }}" method="POST">
                 @csrf
 
                 <div class="row">
@@ -95,7 +95,7 @@
                     <button type="submit" class="btn btn-primary px-4 shadow-sm">
                         Lưu Hướng dẫn viên
                     </button>
-                    <a href="{{ route('admin.guides.index') }}" class="btn btn-light border px-4 text-muted">
+                    <a href="{{ route('admin.tours.index') }}" class="btn btn-light border px-4 text-muted">
                         Hủy bỏ
                     </a>
                 </div>

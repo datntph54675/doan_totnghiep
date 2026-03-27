@@ -95,6 +95,20 @@
                         </ul>
                     </div>
                 </li>
+                <!-- Booking -->
+                <li>
+                    <a href="#booking" data-bs-toggle="collapse">
+                        <i data-feather="clipboard"></i>
+                        <span> Booking </span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="booking">
+                        <ul class="nav-second-level">
+                            <li><a class='tp-link' href="{{ route('admin.bookings.index') }}">Danh sách</a></li>
+                        </ul>
+                    </div>
+                </li>
+
                 <!-- Tour -->
                 <li>
                     <a href="#tour" data-bs-toggle="collapse">
