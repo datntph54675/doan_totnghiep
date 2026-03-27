@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Booking;
 use App\Models\DepartureSchedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
@@ -18,10 +19,13 @@ class BookingController extends Controller
 
         $schedules = DepartureSchedule::where('tour_id', $tourId)
             ->where('start_date', '>=', now())
+            ->where('status', 'scheduled')
             ->orderBy('start_date', 'asc')
             ->get();
 
-        return view('user.booking', compact('tour', 'schedules'));
+        $user = Auth::user();
+
+        return view('user.booking', compact('tour', 'schedules', 'user'));
     }
 
     public function store(Request $request, $tourId)
@@ -39,6 +43,15 @@ class BookingController extends Controller
             'num_people'   => 'required|integer|min:1|max:50',
             'note'         => 'nullable|string',
         ]);
+
+        $schedule = DepartureSchedule::findOrFail($validated['schedule_id']);
+        
+        // Kiểm tra chỗ trống
+        if ($validated['num_people'] > $schedule->available_spots) {
+            return back()->withErrors([
+                'num_people' => "Rất tiếc, chỉ còn {$schedule->available_spots} chỗ trống cho ngày khởi hành này."
+            ])->withInput();
+        }
 
         // Tạo hoặc tìm customer theo phone
         $customer = Customer::firstOrCreate(
@@ -58,6 +71,7 @@ class BookingController extends Controller
             'customer_id'    => $customer->customer_id,
             'tour_id'        => $tour->tour_id,
             'schedule_id'    => $validated['schedule_id'],
+            'user_id'        => Auth::id(), // Lưu user_id nếu đã đăng nhập
             'num_people'     => $validated['num_people'],
             'total_price'    => $totalPrice,
             'booking_date'   => now(),

@@ -55,4 +55,10 @@ class DepartureSchedule extends Model
     {
         return $this->hasMany(GuideAssignment::class, 'schedule_id', 'schedule_id');
     }
+
+    public function getAvailableSpotsAttribute(): int
+    {
+        $bookedCount = $this->bookings()->where('status', '!=', 'cancelled')->sum('num_people');
+        return max(0, $this->max_people - $bookedCount);
+    }
 }
