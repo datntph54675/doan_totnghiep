@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use Illuminate\Database\Seeder;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\GuideUserSeeder;
+use Database\Seeders\TourDataSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,20 +17,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-
-        // Run specific seeders compatible with this app's schema
         $this->call([
             AdminUserSeeder::class,
             GuideUserSeeder::class,
-            CategorySeeder::class,
+            TourDataSeeder::class,
         ]);
-
-        // Run the admin user seeder
-        $this->call(AdminUserSeeder::class);
-        // Run the guide user seeder
-        $this->call(GuideUserSeeder::class);
-        // Run the tour data seeder
-        $this->call(TourDataSeeder::class);
-
     }
 }
