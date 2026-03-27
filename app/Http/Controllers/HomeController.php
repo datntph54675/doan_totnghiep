@@ -19,7 +19,7 @@ class HomeController extends Controller
         $categories = Category::orderBy('name')->get();
 
         $stats = [
-            'tours' => Tour::where('status', 'active')->count(),
+            'tours'     => Tour::where('status', 'active')->count(),
             'customers' => \App\Models\Customer::count(),
             'tours_all' => Tour::count(),
         ];
