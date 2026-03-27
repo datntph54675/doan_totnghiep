@@ -82,7 +82,7 @@
                                                 ->first();
                                         }
                                     @endphp
-                                    <span class="text-muted">{{ optional(optional($assignedGuide)->guide->user)->fullname ?? 'Chưa gán' }}</span>
+                                    <span class="text-muted">{{ $assignedGuide?->guide?->user?->fullname ?? 'Chưa gán' }}</span>
                                 </td>
                                 <td class="pe-4 text-end">
                                     <div class="btn-group">
