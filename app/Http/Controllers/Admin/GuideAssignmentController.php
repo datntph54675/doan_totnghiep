@@ -102,7 +102,7 @@ class GuideAssignmentController extends Controller
 
         $exists = GuideAssignment::where('schedule_id', $data['schedule_id'])
             ->where('guide_id', $data['guide_id'])
-            ->where('guide_assignment_id', '!=', $guideAssignment->guide_assignment_id)
+            ->where('id', '!=', $guideAssignment->id)
             ->exists();
 
         if ($exists) {
