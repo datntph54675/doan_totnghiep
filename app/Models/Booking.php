@@ -21,6 +21,7 @@ class Booking extends Model
         'num_people',
         'total_price',
         'status',
+        'admin_confirmed',
         'payment_status',
         'note',
     ];
@@ -28,6 +29,7 @@ class Booking extends Model
     protected $casts = [
         'booking_date' => 'datetime',
         'total_price' => 'decimal:2',
+        'admin_confirmed' => 'boolean',
     ];
 
     public function tour(): BelongsTo
