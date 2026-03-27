@@ -110,7 +110,9 @@
                     </a>
                     <div class="collapse" id="bookings">
                         <ul class="nav-second-level">
-                            <li><a class='tp-link' href="{{ route('admin.bookings.index') }}">Danh sách đặt tour</a></li>
+                            <li><a class='tp-link' href="{{ route('admin.bookings.index', ['status' => 'pending']) }}">Chờ xác nhận</a></li>
+                            <li><a class='tp-link' href="{{ route('admin.bookings.index', ['status' => 'confirmed']) }}">Đã xác nhận</a></li>
+                            <li><a class='tp-link' href="{{ route('admin.bookings.index', ['status' => 'all']) }}">Tất cả đơn</a></li>
                         </ul>
                     </div>
                 </li>

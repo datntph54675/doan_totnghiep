@@ -1,136 +1,116 @@
-@extends('admin.layout')
+@extends('layouts.app')
+
+@section('title', 'Quản lý Đặt tour')
 
 @section('content')
-<style>
-    .table-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 14px;
-        box-shadow: 0 8px 30px rgba(2, 6, 23, 0.06)
-    }
-
-    .table-responsive {
-        overflow: auto
-    }
-
-    table.admin-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px
-    }
-
-    table.admin-table thead th {
-        background: linear-gradient(90deg, #f3f7ff, #eef6ff);
-        color: #0b2540;
-        font-weight: 700;
-        padding: 10px;
-        text-align: left;
-        white-space: nowrap
-    }
-
-    table.admin-table tbody td {
-        padding: 10px;
-        vertical-align: middle;
-        border-top: 1px solid #f1f5f9
-    }
-
-    .muted-sm {
-        color: #6b7280;
-        font-size: 13px
-    }
-
-    .actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        justify-content: flex-end;
-        white-space: nowrap
-    }
-
-    .btn-primary {
-        background: #0f62fe;
-        color: #fff;
-        padding: 6px 10px;
-        border-radius: 8px;
-        border: 0
-    }
-
-    .btn-outline {
-        background: transparent;
-        border: 1px solid #e6eef6;
-        padding: 8px 12px;
-        border-radius: 8px
-    }
-</style>
-
-<div class="top-actions" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center">
-    <h2 style="margin:0">Đơn đặt tour</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <a href="{{ route('admin.dashboard') }}" class="btn-outline">← Quay lại</a>
+        <h2 class="fw-bold text-dark mb-1">Quản lý Đặt tour</h2>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                <li class="breadcrumb-item active">Đặt tour</li>
+            </ol>
+        </nav>
     </div>
 </div>
 
-@if(session('success'))
-<div style="padding:10px;background:#e6ffed;border:1px solid #b7f1c9;margin-bottom:12px">{{ session('success') }}</div>
-@endif
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a href="{{ route('admin.bookings.index', ['status' => 'pending']) }}"
+        class="btn {{ $status === 'pending' ? 'btn-primary' : 'btn-outline-primary' }} btn-sm">
+        Chờ xác nhận ({{ $pendingCount }})
+    </a>
+    <a href="{{ route('admin.bookings.index', ['status' => 'confirmed']) }}"
+        class="btn {{ $status === 'confirmed' ? 'btn-success' : 'btn-outline-success' }} btn-sm">
+        Đã xác nhận ({{ $confirmedCount }})
+    </a>
+    <a href="{{ route('admin.bookings.index', ['status' => 'all']) }}"
+        class="btn {{ $status === 'all' ? 'btn-dark' : 'btn-outline-dark' }} btn-sm">
+        Tất cả ({{ $pendingCount + $confirmedCount }})
+    </a>
+</div>
 
-<div class="table-card">
-    <div class="table-responsive">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th style="padding:8px">#</th>
-                    <th style="padding:8px">Booking ID</th>
-                    <th style="padding:8px">Tour</th>
-                    <th style="padding:8px">Ngày khởi hành</th>
-                    <th style="padding:8px">Khách</th>
-                    <th style="padding:8px">Số người</th>
-                    <th style="padding:8px">Tổng tiền</th>
-                    <th style="padding:8px">Đặt lúc</th>
-                    <th style="padding:8px">Trạng thái</th>
-                    <th style="text-align:center;padding:8px">Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($bookings as $b)
-                <tr>
-                    <td style="padding:8px">{{ $loop->iteration + ($bookings->currentPage()-1)*$bookings->perPage() }}</td>
-                    <td style="padding:8px">{{ $b->booking_id }}</td>
-                    <td style="padding:8px">{{ $b->tour->name ?? '—' }}</td>
-                    <td style="padding:8px">{{ $b->schedule && $b->schedule->start_date ? $b->schedule->start_date->format('d/m/Y') : '—' }}</td>
-                    <td style="padding:8px">{{ $b->customer->fullname ?? '—' }}<br><span class="muted-sm">{{ $b->customer->phone ?? '' }}</span></td>
-                    <td style="padding:8px">{{ $b->num_people }}</td>
-                    <td style="padding:8px">{{ number_format($b->total_price,0,',','.') }} ₫</td>
-                    <td style="padding:8px">{{ $b->booking_date ? $b->booking_date->format('d/m/Y H:i') : '—' }}</td>
-                    <td style="padding:8px">
-                        @if($b->admin_confirmed)
-                        <span style="display:inline-block;padding:6px 8px;border-radius:999px;background:#e6f2ff;color:#0f62fe;font-weight:700">Đã xác nhận</span>
-                        @else
-                        <span style="display:inline-block;padding:6px 8px;border-radius:999px;background:#fff1f2;color:#d6333f;font-weight:700">Chưa xác nhận</span>
-                        @endif
-                    </td>
-                    <td style="padding:8px;text-align:right">
-                        <div class="actions">
-                            @if(!$b->admin_confirmed)
-                            <form method="POST" action="{{ route('admin.bookings.confirm', $b->booking_id) }}">@csrf
-                                <button class="btn-primary" type="submit">Xác nhận</button>
-                            </form>
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase text-muted small fw-bold" style="width: 80px;">ID</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold">Tour</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold">Ngày khởi hành</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold">Khách</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold">Số người</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold">Tổng tiền</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold">Đặt lúc</th>
+                        <th class="py-3 text-uppercase text-muted small fw-bold">Trạng thái</th>
+                        <th class="pe-4 py-3 text-uppercase text-muted small fw-bold text-end">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($bookings as $b)
+                    <tr>
+                        <td class="ps-4"><span class="fw-bold text-secondary">#{{ $b->booking_id }}</span></td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ $b->tour->name ?? '—' }}</div>
+                        </td>
+                        <td>{{ $b->schedule && $b->schedule->start_date ? $b->schedule->start_date->format('d/m/Y') : '—' }}</td>
+                        <td>
+                            <div class="fw-bold text-dark">{{ $b->customer->fullname ?? '—' }}</div>
+                            <small class="text-muted">{{ $b->customer->phone ?? '' }}</small>
+                        </td>
+                        <td>{{ $b->num_people }}</td>
+                        <td><span class="fw-bold text-success">{{ number_format($b->total_price, 0, ',', '.') }} VND</span></td>
+                        <td>{{ $b->booking_date ? $b->booking_date->format('d/m/Y H:i') : '—' }}</td>
+                        <td>
+                            @if($b->admin_confirmed)
+                            <span class="badge bg-success-subtle text-success px-3 py-2">Đã xác nhận</span>
                             @else
-                            <span class="muted-sm">—</span>
+                            <span class="badge bg-warning-subtle text-warning px-3 py-2">Chờ xác nhận</span>
                             @endif
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="10" style="padding:12px">Không có đơn nào chờ xác nhận.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="btn-group">
+                                <a href="{{ route('admin.bookings.show', $b->booking_id) }}" class="btn btn-sm btn-outline-info me-2" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                @if(!$b->admin_confirmed)
+                                <form action="{{ route('admin.bookings.confirm', $b->booking_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Xác nhận đơn này?')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Xác nhận">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                @else
+                                <button type="button" class="btn btn-sm btn-outline-secondary" disabled>
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            @if($status === 'confirmed')
+                            Không có đơn nào đã xác nhận.
+                            @elseif($status === 'all')
+                            Chưa có đơn đặt tour nào.
+                            @else
+                            Không có đơn nào chờ xác nhận.
+                            @endif
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div style="margin-top:12px">{{ $bookings->links() }}</div>
+    @if($bookings instanceof \Illuminate\Pagination\LengthAwarePaginator)
+    <div class="card-footer bg-white border-top-0 py-3">
+        {{ $bookings->links() }}
+    </div>
+    @endif
 </div>
-
 @endsection

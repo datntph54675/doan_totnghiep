@@ -75,6 +75,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Bookings awaiting admin confirmation
         Route::get('bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
         Route::post('bookings/{id}/confirm', [\App\Http\Controllers\Admin\BookingController::class, 'confirm'])->name('bookings.confirm');
+        Route::get('bookings/{id}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('bookings.show');
     });
 });
 
