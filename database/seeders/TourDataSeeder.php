@@ -132,19 +132,29 @@ class TourDataSeeder extends Seeder
         ];
 
         foreach ($tours as $t) {
-            $t['status'] = 'active';
-            DB::table('tours')->insert($t);
+            try {
+                $t['status'] = 'active';
+                // max_people đã được chuyển sang bảng departure_schedule nên cần xóa khỏi array insert tours
+                unset($t['max_people']);
+                DB::table('tours')->insert($t);
+            } catch (\Exception $e) {
+                echo "Error inserting tour '{$t['name']}': " . $e->getMessage() . "\n";
+            }
         }
 
         // Tạo 10 Customer / User ngẫu nhiên nếu chưa có đủ
         for ($i = 1; $i <= 10; $i++) {
-            DB::table('customer')->insert([
-                'fullname' => 'Khách hàng số ' . $i,
-                'email' => 'khachhang'.$i.'@example.com',
-                'phone' => '09010000' . str_pad($i, 2, '0', STR_PAD_LEFT),
-                'id_number' => '0010020030' . str_pad($i, 2, '0', STR_PAD_LEFT),
-                'gender' => $i % 2 == 0 ? 'Nữ' : 'Nam',
-            ]);
+            try {
+                DB::table('customer')->insert([
+                    'fullname' => 'Khách hàng số ' . $i,
+                    'email' => 'khachhang'.$i.'@example.com',
+                    'phone' => '09010000' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                    'id_number' => '0010020030' . str_pad($i, 2, '0', STR_PAD_LEFT),
+                    'gender' => $i % 2 == 0 ? 'Nữ' : 'Nam',
+                ]);
+            } catch (\Exception $e) {
+                echo "Error inserting customer $i: " . $e->getMessage() . "\n";
+            }
         }
     }
 }
