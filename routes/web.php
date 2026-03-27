@@ -14,17 +14,20 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\TourUserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\Admin\FeedbackController;
-use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\UserAuthController;
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Auth routes for Users
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [UserAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [UserAuthController::class, 'login'])->name('login.post');
-    Route::get('/register', [UserAuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [UserAuthController::class, 'register'])->name('register.post');
+Route::controller(UserAuthController::class)->group(function () {
+    Route::middleware('guest')->group(function () {
+        Route::get('login', 'showLogin')->name('login');
+        Route::post('login', 'login')->name('login.post');
+        Route::get('register', 'showRegister')->name('register');
+        Route::post('register', 'register')->name('register.post');
+    });
+    Route::post('logout', 'logout')->name('logout');
 });
-Route::post('/logout', [UserAuthController::class, 'logout'])->name('logout');
 
 // User - public tour pages
 Route::get('/tours', [TourUserController::class, 'index'])->name('tours.index');

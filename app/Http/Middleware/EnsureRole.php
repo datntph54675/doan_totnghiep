@@ -16,7 +16,10 @@ class EnsureRole
     {
         $user = Auth::user();
         if (! $user) {
-            return redirect('/admin/login');
+            if ($request->is('admin/*') || $request->is('admin')) {
+                return redirect()->route('admin.login');
+            }
+            return redirect()->route('login');
         }
 
         $roles = array_map('trim', explode('|', $role));
