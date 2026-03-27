@@ -240,9 +240,24 @@
                 <a href="#contact"><i class="fas fa-envelope"></i> Liên Hệ</a>
             </div>
             <div class="nav-auth">
-                <a href="{{ route('admin.login') }}" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i> Đăng Nhập
-                </a>
+                @auth
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 0.85rem; color: var(--text-mid); font-weight: 600;">
+                            Chào, {{ Auth::user()->fullname }}
+                        </span>
+                        <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="login-btn" style="background: transparent; font-size: 0.8rem; padding: 6px 14px;">
+                                <i class="fas fa-sign-out-alt"></i> Thoát
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}" style="color: var(--text-mid); margin-right: 15px;">Đăng nhập</a>
+                    <a href="{{ route('register') }}" class="login-btn">
+                         Đăng ký
+                    </a>
+                @endauth
             </div>
         </div>
     </div>
