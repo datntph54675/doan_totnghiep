@@ -71,6 +71,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Feedback
         Route::get('feedback', [FeedbackController::class, 'index'])->name('feedback.index');
         Route::post('feedback/hide/{id}', [FeedbackController::class, 'hide'])->name('feedback.hide');
+
+        // Bookings awaiting admin confirmation
+        Route::get('bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
+        Route::post('bookings/{id}/confirm', [\App\Http\Controllers\Admin\BookingController::class, 'confirm'])->name('bookings.confirm');
     });
 });
 

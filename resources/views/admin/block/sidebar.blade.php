@@ -11,6 +11,9 @@
             </div>
             <!-- End Logo Box -->
 
+            @php
+            $pendingBookingsCount = \App\Models\Booking::where('admin_confirmed', false)->count();
+            @endphp
             <ul id="side-menu">
 
                 <!-- Quản trị -->
@@ -92,6 +95,22 @@
                                 <a class='tp-link' href="#">Danh sách</a>
                             </li>
 
+                        </ul>
+                    </div>
+                </li>
+                <!-- Đơn đặt tour -->
+                <li>
+                    <a href="#bookings" data-bs-toggle="collapse">
+                        <i data-feather="file-text"></i>
+                        <span> Đặt tour </span>
+                        @if($pendingBookingsCount > 0)
+                        <span style="display:inline-block;margin-left:8px;padding:2px 8px;border-radius:12px;background:#ef4444;color:#fff;font-size:12px;font-weight:700">{{ $pendingBookingsCount }}</span>
+                        @endif
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="bookings">
+                        <ul class="nav-second-level">
+                            <li><a class='tp-link' href="{{ route('admin.bookings.index') }}">Danh sách đặt tour</a></li>
                         </ul>
                     </div>
                 </li>
