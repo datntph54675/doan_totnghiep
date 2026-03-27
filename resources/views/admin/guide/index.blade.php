@@ -14,8 +14,8 @@
                 </ol>
             </nav>
         </div>
-        <a href="#" class="btn btn-primary shadow-sm px-4">
-            <i class="fas fa-plus me-2"></i> Duyệt hướng dẫn viên
+        <a href="{{ route('admin.guides.create') }}" class="btn btn-primary shadow-sm px-4">
+            <i class="fas fa-plus me-2"></i> Thêm hướng dẫn viên
         </a>
     </div>
 

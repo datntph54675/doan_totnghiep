@@ -26,7 +26,7 @@
                         <label for="fullname" class="form-label fw-bold text-secondary">Tên người dùng</label>
                         <input type="text" name="fullname" id="fullname" value="{{ old('fullname') }}"
                             class="form-control @error('fullname') is-invalid @enderror"
-                            placeholder="Nhập tên người dùng..." required>
+                            placeholder="Nhập tên người dùng...">
                         @error('fullname')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -36,10 +36,42 @@
                         <label for="email" class="form-label fw-bold text-secondary">Email</label>
                         <input type="email" name="email" id="email" value="{{ old('email') }}"
                             class="form-control @error('email') is-invalid @enderror"
-                            placeholder="Nhập email..." required>
+                            placeholder="Nhập email...">
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+
+                    
+                    <div class="col-md-6 mb-4">
+                        <label for="password" class="form-label fw-bold text-secondary">Mật Khẩu</label>
+                        <input type="password" name="password" id="password" value="{{ old('password') }}"
+                            class="form-control @error('password') is-invalid @enderror" placeholder="Nhập mật khẩu...">
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <label for="password_confirmation" class="form-label fw-bold text-secondary">Xác nhận mật khẩu</label>
+                        <input type="password" name="password_confirmation" id="password_confirmation" value="{{ old('password_confirmation') }}"
+                            class="form-control @error('password_confirmation') is-invalid @enderror" placeholder="Nhập lại mật khẩu...">
+                        @error('password_confirmation')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    
+                    <!-- phone -->
+                    <div>
+                        <div class="col-md-6 mb-4">
+                            <label for="phone" class="form-label fw-bold text-secondary">Số điện thoại</label>
+                            <input type="text" name="phone" id="phone" value="{{ old('phone') }}"
+                                class="form-control @error('phone') is-invalid @enderror"
+                                placeholder="Nhập số điện thoại...">
+                            @error('phone')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
                     </div>
 
                     <div class="col-md-6 mb-4">

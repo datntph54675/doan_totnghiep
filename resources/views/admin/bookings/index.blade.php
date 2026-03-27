@@ -8,7 +8,8 @@
             <h2 class="fw-bold text-dark mb-1">Quản lý Booking</h2>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"
+                            class="text-decoration-none">Dashboard</a></li>
                     <li class="breadcrumb-item active">Booking</li>
                 </ol>
             </nav>
@@ -40,16 +41,21 @@
                                 <td>{{ $booking->tour->name ?? 'N/A' }}</td>
                                 <td>{{ $booking->customer->fullname ?? 'N/A' }}</td>
                                 <td class="text-center">{{ $booking->num_people }}</td>
-                                <td class="text-end fw-bold text-success">{{ number_format($booking->total_price, 0, ',', '.') }} ₫</td>
+                                <td class="text-end fw-bold text-success">
+                                    {{ number_format($booking->total_price, 0, ',', '.') }} ₫</td>
                                 <td>
-                                    <span class="badge {{ $booking->status == 'upcoming' ? 'bg-info' : ($booking->status == 'ongoing' ? 'bg-primary' : ($booking->status == 'completed' ? 'bg-success' : 'bg-secondary')) }} text-white">{{ ucfirst($booking->status) }}</span>
+                                    <span
+                                        class="badge {{ $booking->status == 'upcoming' ? 'bg-info' : ($booking->status == 'ongoing' ? 'bg-primary' : ($booking->status == 'completed' ? 'bg-success' : 'bg-secondary')) }} text-white">{{ ucfirst($booking->status) }}</span>
                                 </td>
                                 <td>
-                                    <span class="badge {{ $booking->payment_status == 'unpaid' ? 'bg-danger' : ($booking->payment_status == 'deposit' ? 'bg-warning text-dark' : 'bg-success') }} text-white">{{ ucfirst($booking->payment_status) }}</span>
+                                    <span
+                                        class="badge {{ $booking->payment_status == 'unpaid' ? 'bg-danger' : ($booking->payment_status == 'deposit' ? 'bg-warning text-dark' : 'bg-success') }} text-white">{{ ucfirst($booking->payment_status) }}</span>
                                 </td>
                                 <td class="pe-4 text-end">
                                     <div class="btn-group" role="group">
-                                        <a href="{{ route('admin.bookings.show', $booking) }}" class="btn btn-sm btn-outline-info" title="Chi tiết"><i class="fas fa-eye"></i></a>
+                                        <a href="{{ route('admin.bookings.show', $booking) }}"
+                                            class="btn btn-sm btn-outline-info" title="Chi tiết"><i
+                                                class="fas fa-eye"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -62,7 +68,7 @@
                 </table>
             </div>
         </div>
-        @if($bookings instanceof \Illuminate\Pagination\LengthAwarePaginator)
+        @if ($bookings instanceof \Illuminate\Pagination\LengthAwarePaginator)
             <div class="card-footer bg-white border-top-0 py-3">
                 {{ $bookings->links() }}
             </div>
