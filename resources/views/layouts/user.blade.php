@@ -163,7 +163,7 @@
         .tour-card-name {
             font-size: 1rem; font-weight: 700; color: var(--text-dark);
             margin-bottom: 10px; line-height: 1.4;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
         .tour-card-meta {
             display: flex; gap: 14px; margin-bottom: 14px;
@@ -218,6 +218,7 @@
     </style>
 
     @yield('styles')
+    @stack('styles')
 </head>
 <body>
 
@@ -330,5 +331,6 @@
 </footer>
 
 @yield('scripts')
+@stack('scripts')
 </body>
 </html>
