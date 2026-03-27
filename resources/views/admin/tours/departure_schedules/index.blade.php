@@ -63,11 +63,22 @@
                                     <span class="text-muted">{{ $schedule->meeting_point ?: '---' }}</span>
                                 </td>
                                 <td>
-                                    @if($schedule->status == 'active' || $schedule->status == 1)
-                                        <span class="badge bg-success-subtle text-success px-3 py-2">Đang hoạt động</span>
-                                    @else
-                                        <span class="badge bg-secondary-subtle text-secondary px-3 py-2">Tạm ẩn</span>
-                                    @endif
+                                    @switch($schedule->status)
+                                        @case('scheduled')
+                                            <span class="badge bg-primary-subtle text-primary px-3 py-2">Đã lên lịch</span>
+                                            @break
+                                        @case('ongoing')
+                                            <span class="badge bg-success-subtle text-success px-3 py-2">Đang diễn ra</span>
+                                            @break
+                                        @case('completed')
+                                            <span class="badge bg-info-subtle text-info px-3 py-2">Hoàn thành</span>
+                                            @break
+                                        @case('cancelled')
+                                            <span class="badge bg-danger-subtle text-danger px-3 py-2">Đã hủy</span>
+                                            @break
+                                        @default
+                                            <span class="badge bg-secondary-subtle text-secondary px-3 py-2">Không xác định</span>
+                                    @endswitch
                                 </td>
                                 <td>
                                     @php
