@@ -28,6 +28,12 @@ Route::controller(UserAuthController::class)->group(function () {
         Route::post('register', 'register')->name('register.post');
     });
     Route::post('logout', 'logout')->name('logout');
+
+    // Password Reset Routes
+    Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('password/reset/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
 // User - public tour pages
@@ -36,6 +42,13 @@ Route::get('/tours/{id}', [TourUserController::class, 'show'])->name('tours.show
 Route::get('/tours/{id}/booking', [BookingController::class, 'create'])->name('user.booking');
 Route::post('/tours/{id}/booking', [BookingController::class, 'store'])->name('user.booking.store');
 Route::get('/booking/{bookingId}/success', [BookingController::class, 'success'])->name('user.booking.success');
+
+// User Profile & Settings
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [App\Http\Controllers\UserProfileController::class, 'edit'])->name('user.profile');
+    Route::put('/profile', [App\Http\Controllers\UserProfileController::class, 'updateProfile'])->name('user.profile.update');
+    Route::put('/profile/password', [App\Http\Controllers\UserProfileController::class, 'updatePassword'])->name('user.password.update');
+});
 
 // Admin auth
 Route::prefix('admin')->name('admin.')->group(function () {

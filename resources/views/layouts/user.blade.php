@@ -243,9 +243,10 @@
             <div class="nav-auth">
                 @auth
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <span style="font-size: 0.85rem; color: var(--text-mid); font-weight: 600;">
-                            Chào, {{ Auth::user()->fullname }}
-                        </span>
+                        <a href="{{ route('user.profile') }}" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-dark); font-weight: 700; transition: color 0.3s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-dark)'">
+                             <i class="fas fa-user-circle" style="font-size: 1.1rem; color: var(--primary);"></i>
+                             {{ Auth::user()->fullname }}
+                        </a>
                         <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                             @csrf
                             <button type="submit" class="login-btn" style="background: transparent; font-size: 0.8rem; padding: 6px 14px;">

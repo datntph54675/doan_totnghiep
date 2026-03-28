@@ -158,7 +158,7 @@
                 <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-mid); cursor: pointer;">
                     <input type="checkbox" name="remember" style="width: 16px; height: 16px;"> Nhớ đăng nhập
                 </label>
-                <a href="#" style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">Quên mật khẩu?</a>
+                <a href="{{ route('password.request') }}" style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">Quên mật khẩu?</a>
             </div>
 
             <button type="submit" class="btn-auth">Đăng nhập ngay</button>
