@@ -237,8 +237,12 @@
                 <a href="{{ route('tours.index') }}" class="{{ request()->routeIs('tours.*') ? 'active' : '' }}">
                     <i class="fas fa-map-marked-alt"></i> Danh Sách Tour
                 </a>
-                <a href="#about"><i class="fas fa-info-circle"></i> Giới Thiệu</a>
-                <a href="#contact"><i class="fas fa-envelope"></i> Liên Hệ</a>
+                <a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">
+                    <i class="fas fa-info-circle"></i> Giới Thiệu
+                </a>
+                <a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">
+                    <i class="fas fa-envelope"></i> Liên Hệ
+                </a>
             </div>
             <div class="nav-auth">
                 @auth
@@ -284,7 +288,7 @@
 </main>
 
 <!-- FOOTER -->
-<footer class="footer" id="contact">
+<footer class="footer" id="footer-contact">
     <div class="container">
         <div class="footer-grid">
             <div>
@@ -309,7 +313,8 @@
             <div>
                 <div class="footer-title">Hỗ Trợ</div>
                 <div class="footer-links">
-                    <a href="#about">Giới thiệu</a>
+                    <a href="{{ route('about') }}">Giới thiệu</a>
+                    <a href="{{ route('contact') }}">Liên hệ</a>
                     <a href="#">Chính sách hoàn tiền</a>
                     <a href="#">Điều khoản sử dụng</a>
                     <a href="#">FAQs</a>
@@ -320,6 +325,7 @@
                 <div class="footer-links">
                     <a href="tel:1900xxxx"><i class="fas fa-phone"></i> 1900 xxxx</a>
                     <a href="mailto:info@viettour.vn"><i class="fas fa-envelope"></i> info@viettour.vn</a>
+                    <a href="{{ route('contact') }}"><i class="fas fa-paper-plane"></i> Gửi tin nhắn</a>
                     <a href="#"><i class="fas fa-map-marker-alt"></i> Hà Nội, Việt Nam</a>
                 </div>
             </div>

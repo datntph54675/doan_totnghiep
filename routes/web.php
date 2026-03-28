@@ -16,8 +16,13 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\UserAuthController;
+use App\Http\Controllers\PageController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/gioi-thieu', [PageController::class, 'about'])->name('about');
+Route::get('/lien-he', [PageController::class, 'contact'])->name('contact');
+Route::post('/lien-he', [PageController::class, 'contactSubmit'])->name('contact.submit');
 
 // Auth routes for Users
 Route::controller(UserAuthController::class)->group(function () {
