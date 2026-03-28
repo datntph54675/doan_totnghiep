@@ -77,6 +77,7 @@ class PaymentController extends Controller
                 // Thanh toán thành công
                 $booking->update([
                     'payment_status' => 'paid',
+                    'admin_confirmed' => false,
                     'payment_method' => 'vnpay',
                     'vnp_transaction_no' => $vnp_TransactionNo,
                 ]);
@@ -138,6 +139,7 @@ class PaymentController extends Controller
 
         $booking->update([
             'payment_status' => 'paid',
+            'admin_confirmed' => false,
             'payment_method' => 'vietqr',
         ]);
 
@@ -184,17 +186,17 @@ class PaymentController extends Controller
 
         // Neu request khong co du lieu orderId
         if (!isset($inputData['orderId'])) {
-             return redirect()->route('home')->with('error', 'Dữ liệu không hợp lệ từ MoMo.');
+            return redirect()->route('home')->with('error', 'Dữ liệu không hợp lệ từ MoMo.');
         }
 
         $momoService = new MomoService();
 
         // 1. Kiểm tra tính toàn vẹn chữ ký MoMo gửi về (validate hash)
         if ($momoService->validateSignature($inputData)) {
-            
+
             $resultCode = $inputData['resultCode'] ?? '';
             $orderId = $inputData['orderId'] ?? '';
-            
+
             // Format orderId gửi lên là: {booking_id}_{timestamp}
             $bookingId = explode('_', $orderId)[0];
             $booking = Booking::find($bookingId);
@@ -205,6 +207,7 @@ class PaymentController extends Controller
                     // Thanh toán thành công -> confirm trên DB
                     $booking->update([
                         'payment_status' => 'paid',
+                        'admin_confirmed' => false,
                         'payment_method' => 'momo',
                         // Mượn cột vnp_transaction_no để lưu mã gd MoMo (transId)
                         'vnp_transaction_no' => $inputData['transId'] ?? null,
