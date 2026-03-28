@@ -14,8 +14,8 @@ class BookingController extends Controller
 {
     public function create($tourId)
     {
-        $tour = Tour::with(['category', 'departureSchedules'])
-            ->where('status', 'active')
+        $tour = Tour::visibleToUsers()
+            ->with(['category', 'departureSchedules'])
             ->findOrFail($tourId);
 
         $schedules = DepartureSchedule::where('tour_id', $tourId)
@@ -31,7 +31,7 @@ class BookingController extends Controller
 
     public function store(Request $request, $tourId)
     {
-        $tour = Tour::findOrFail($tourId);
+        $tour = Tour::visibleToUsers()->findOrFail($tourId);
 
         $validated = $request->validate([
             'schedule_id'  => 'required|exists:departure_schedule,schedule_id',
@@ -45,7 +45,17 @@ class BookingController extends Controller
             'note'         => 'nullable|string',
         ]);
 
-        $schedule = DepartureSchedule::findOrFail($validated['schedule_id']);
+        $schedule = DepartureSchedule::where('schedule_id', $validated['schedule_id'])
+            ->where('tour_id', $tour->tour_id)
+            ->where('status', 'scheduled')
+            ->whereDate('start_date', '>=', Carbon::today())
+            ->first();
+
+        if (!$schedule) {
+            return back()->withErrors([
+                'schedule_id' => 'Lịch khởi hành không hợp lệ hoặc không còn khả dụng.'
+            ])->withInput();
+        }
 
         // Kiểm tra chỗ trống
         if ($validated['num_people'] > $schedule->available_spots) {
