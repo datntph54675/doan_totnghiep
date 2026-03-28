@@ -55,6 +55,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [App\Http\Controllers\UserProfileController::class, 'updatePassword'])->name('user.password.update');
 });
 
+// Payment Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/booking/{id}/payment', [App\Http\Controllers\PaymentController::class, 'chooseMethod'])->name('payment.choose');
+    Route::post('/booking/{id}/pay-vnpay', [App\Http\Controllers\PaymentController::class, 'payVnpay'])->name('payment.vnpay');
+    Route::get('/booking/{id}/pay-vietqr', [App\Http\Controllers\PaymentController::class, 'payVietqr'])->name('payment.vietqr');
+    Route::post('/booking/{id}/vietqr-confirm', [App\Http\Controllers\PaymentController::class, 'vietqrConfirm'])->name('payment.vietqr.confirm');
+});
+Route::get('/payment/vnpay-return', [App\Http\Controllers\PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
+
 // Admin auth
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');

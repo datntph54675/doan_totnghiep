@@ -23,6 +23,8 @@ class Booking extends Model
         'status',
         'admin_confirmed',
         'payment_status',
+        'payment_method',
+        'vnp_transaction_no',
         'note',
     ];
 
