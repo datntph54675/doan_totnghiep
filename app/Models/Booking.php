@@ -64,7 +64,9 @@ class Booking extends Model
 
     public const PAYMENT_STATUS = [
         'unpaid' => 'Chưa thanh toán',
+        'deposit' => 'Đặt cọc',
         'paid' => 'Đã thanh toán',
+        'refunded' => 'Đã hoàn tiền',
     ];
 
     public function isCancelled(): bool
@@ -82,5 +84,10 @@ class Booking extends Model
 
         return $startDate instanceof CarbonInterface
             && $startDate->copy()->startOfDay()->greaterThanOrEqualTo(now()->startOfDay());
+    }
+
+    public function canBeRefundedByAdmin(): bool
+    {
+        return $this->status === 'cancelled' && $this->payment_status === 'paid';
     }
 }

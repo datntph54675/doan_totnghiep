@@ -81,6 +81,16 @@
                 </form>
                 @endif
 
+                @if ($booking->canBeRefundedByAdmin())
+                <form action="{{ route('admin.bookings.refund', $booking) }}" method="POST" class="mb-3"
+                    onsubmit="return confirm('Đánh dấu đã hoàn tiền cho booking này?')">
+                    @csrf
+                    <button type="submit" class="btn btn-warning text-dark">
+                        <i class="fas fa-money-bill-wave me-1"></i> Xác nhận đã hoàn tiền
+                    </button>
+                </form>
+                @endif
+
                 <h5 class="mb-3">Cập nhật trạng thái</h5>
                 <form action="{{ route('admin.bookings.update', $booking) }}" method="POST">
                     @csrf

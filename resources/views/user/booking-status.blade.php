@@ -134,7 +134,8 @@
     .status-confirmed,
     .status-pending,
     .status-unpaid,
-    .status-cancelled {
+    .status-cancelled,
+    .status-refunded {
         border-radius: 999px;
         padding: 5px 12px;
         font-size: 12px;
@@ -159,6 +160,11 @@
     .status-cancelled {
         background: #fee2e2;
         color: #991b1b;
+    }
+
+    .status-refunded {
+        background: #ede9fe;
+        color: #5b21b6;
     }
 
     .booking-meta {
@@ -388,14 +394,27 @@
                             <div>Mã booking: #{{ $booking->booking_id }}</div>
                             <div>Ngày đặt: {{ optional($booking->booking_date)->format('d/m/Y H:i') }}</div>
                             <div>Khởi hành: {{ optional(optional($booking->schedule)->start_date)->format('d/m/Y') ?? '-' }}</div>
-                            <div>Thanh toán: {{ $booking->payment_status === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán' }}</div>
+                            <div>Thanh toán:
+                                @if ($booking->payment_status === 'refunded')
+                                Đã hoàn tiền
+                                @elseif($booking->payment_status === 'paid')
+                                Đã thanh toán
+                                @else
+                                Chưa thanh toán
+                                @endif
+                            </div>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div class="booking-price">{{ number_format($booking->total_price, 0, ',', '.') }} ₫</div>
-                            @if ($booking->tour_id)
-                            <a class="booking-link" href="{{ route('tours.show', $booking->tour_id) }}">Xem tour</a>
-                            @endif
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                @if ($booking->payment_status === 'refunded')
+                                <span class="status-refunded">Đã hoàn tiền</span>
+                                @endif
+                                @if ($booking->tour_id)
+                                <a class="booking-link" href="{{ route('tours.show', $booking->tour_id) }}">Xem tour</a>
+                                @endif
+                            </div>
                         </div>
                     </article>
                     @endforeach

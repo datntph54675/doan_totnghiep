@@ -30,6 +30,12 @@
                 Chờ xác nhận ({{ $pendingConfirmationCount ?? 0 }})
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($activeTab ?? 'all') === 'pending-refund' ? 'active' : '' }}"
+                href="{{ route('admin.bookings.index', ['tab' => 'pending-refund']) }}">
+                Chờ hoàn tiền ({{ $pendingRefundCount ?? 0 }})
+            </a>
+        </li>
     </ul>
 </div>
 
@@ -106,7 +112,7 @@
                         </td>
                         <td>
                             <span
-                                class="badge {{ $booking->payment_status == 'unpaid' ? 'bg-danger' : ($booking->payment_status == 'deposit' ? 'bg-warning text-dark' : 'bg-success') }} text-white">{{ \App\Models\Booking::PAYMENT_STATUS[$booking->payment_status] ?? ucfirst($booking->payment_status) }}</span>
+                                class="badge {{ $booking->payment_status == 'unpaid' ? 'bg-danger' : ($booking->payment_status == 'deposit' ? 'bg-warning text-dark' : ($booking->payment_status == 'refunded' ? 'bg-secondary' : 'bg-success')) }} text-white">{{ \App\Models\Booking::PAYMENT_STATUS[$booking->payment_status] ?? ucfirst($booking->payment_status) }}</span>
                         </td>
                         <td>
                             @if ($booking->admin_confirmed)
@@ -126,6 +132,16 @@
                                     <button type="submit" class="btn btn-sm btn-outline-success"
                                         title="Xác nhận booking">
                                         <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                @endif
+                                @if ($booking->canBeRefundedByAdmin())
+                                <form action="{{ route('admin.bookings.refund', $booking) }}" method="POST"
+                                    onsubmit="return confirm('Đánh dấu đã hoàn tiền cho booking này?')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-warning"
+                                        title="Xác nhận hoàn tiền">
+                                        <i class="fas fa-money-bill-wave"></i>
                                     </button>
                                 </form>
                                 @endif

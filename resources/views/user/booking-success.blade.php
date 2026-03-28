@@ -213,7 +213,9 @@
         <div class="info-row">
             <span class="label">Thanh toán</span>
             <span class="value">
-                @if($booking->payment_status === 'paid')
+                @if($booking->payment_status === 'refunded')
+                <span class="badge-upcoming" style="background:#ede9fe;color:#5b21b6">↩ Đã hoàn tiền</span>
+                @elseif($booking->payment_status === 'paid')
                 <span class="badge-paid">✅ Đã thanh toán</span>
                 @else
                 <span class="badge-unpaid">Chưa thanh toán</span>
@@ -266,7 +268,11 @@
         @endif
     </div>
 
-    @if($booking->status === 'cancelled')
+    @if($booking->status === 'cancelled' && $booking->payment_status === 'refunded')
+    <div class="notice" style="background:#ede9fe;border-color:#c4b5fd;color:#5b21b6;">
+        Booking này đã được hủy và admin đã xác nhận hoàn tiền cho bạn.
+    </div>
+    @elseif($booking->status === 'cancelled')
     <div class="notice" style="background:#fff5f5;border-color:#fca5a5;color:#991b1b;">
         Booking này đã được hủy. @if($booking->payment_status === 'paid') Bộ phận hỗ trợ sẽ liên hệ với bạn về phần thanh toán đã thực hiện. @endif
     </div>
