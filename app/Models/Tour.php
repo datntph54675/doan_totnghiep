@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Tour extends Model
@@ -47,5 +48,16 @@ class Tour extends Model
     public function feedbacks()
     {
         return $this->hasMany(Feedback::class, 'tour_id', 'tour_id');
+    }
+
+    public function scopeVisibleToUsers(Builder $query): Builder
+    {
+        return $query->where('status', 'active')
+            ->where(function (Builder $subQuery) {
+                $subQuery->whereNull('category_id')
+                    ->orWhereHas('category', function (Builder $categoryQuery) {
+                        $categoryQuery->where('status', 'active');
+                    });
+            });
     }
 }

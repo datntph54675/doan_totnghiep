@@ -11,14 +11,17 @@ class TourUserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Tour::where('status', 'active')->with('category');
+        $query = Tour::visibleToUsers()->with('category');
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
+            $query->whereHas('category', function ($categoryQuery) use ($request) {
+                $categoryQuery->where('status', 'active')
+                    ->where('category_id', $request->category);
+            });
         }
 
         if ($request->filled('min_price')) {
@@ -34,14 +37,15 @@ class TourUserController extends Controller
         }
 
         $tours = $query->orderBy('tour_id', 'desc')->paginate(9)->withQueryString();
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::where('status', 'active')->orderBy('name')->get();
 
         return view('tours.index', compact('tours', 'categories'));
     }
 
     public function show($id)
     {
-        $tour = Tour::with(['category', 'itineraries', 'departureSchedules'])
+        $tour = Tour::visibleToUsers()
+            ->with(['category', 'itineraries', 'departureSchedules'])
             ->findOrFail($id);
 
         $schedules = DepartureSchedule::where('tour_id', $id)
@@ -50,7 +54,7 @@ class TourUserController extends Controller
             ->orderBy('start_date')
             ->get();
 
-        $relatedTours = Tour::where('status', 'active')
+        $relatedTours = Tour::visibleToUsers()
             ->where('category_id', $tour->category_id)
             ->where('tour_id', '!=', $id)
             ->take(4)
