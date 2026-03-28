@@ -56,8 +56,10 @@ Route::get('/booking/{bookingId}/success', [BookingController::class, 'success']
 // User Profile & Settings
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [App\Http\Controllers\UserProfileController::class, 'edit'])->name('user.profile');
+    Route::get('/profile/bookings', [App\Http\Controllers\UserProfileController::class, 'bookings'])->name('user.bookings');
     Route::put('/profile', [App\Http\Controllers\UserProfileController::class, 'updateProfile'])->name('user.profile.update');
     Route::put('/profile/password', [App\Http\Controllers\UserProfileController::class, 'updatePassword'])->name('user.password.update');
+    Route::post('/booking/{bookingId}/cancel', [BookingController::class, 'cancel'])->name('user.booking.cancel');
 });
 
 // Payment Routes
@@ -105,16 +107,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('tours/{tour}/departure-schedules/{schedule}', [DepartureScheduleController::class, 'destroy'])->name('tours.departure-schedules.destroy');
 
         // Booking
-        Route::resource('bookings', AdminBookingController::class)->only(['index', 'show', 'update', 'destroy']);
+        Route::resource('bookings', AdminBookingController::class)->only(['index', 'show', 'update']);
+        Route::post('bookings/{id}/confirm', [AdminBookingController::class, 'confirm'])->name('bookings.confirm');
 
         // Feedback
         Route::get('feedback', [FeedbackController::class, 'index'])->name('feedback.index');
         Route::post('feedback/hide/{id}', [FeedbackController::class, 'hide'])->name('feedback.hide');
-
-        // Bookings awaiting admin confirmation
-        Route::get('bookings', [\App\Http\Controllers\Admin\BookingController::class, 'index'])->name('bookings.index');
-        Route::post('bookings/{id}/confirm', [\App\Http\Controllers\Admin\BookingController::class, 'confirm'])->name('bookings.confirm');
-        Route::get('bookings/{id}', [\App\Http\Controllers\Admin\BookingController::class, 'show'])->name('bookings.show');
     });
 });
 

@@ -99,4 +99,38 @@ class BookingController extends Controller
         $booking = Booking::with(['tour', 'schedule', 'customer'])->findOrFail($bookingId);
         return view('user.booking-success', compact('booking'));
     }
+
+    public function cancel($bookingId)
+    {
+        $booking = Booking::with(['schedule'])->findOrFail($bookingId);
+
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($booking->isCancelled()) {
+            return redirect()->to(route('user.profile') . '#bookings')
+                ->with('success', 'Booking này đã được hủy trước đó.');
+        }
+
+        if (!$booking->canBeCancelledByUser()) {
+            return redirect()->to(route('user.profile') . '#bookings')
+                ->with('error', 'Booking này không còn đủ điều kiện để hủy.');
+        }
+
+        $note = trim((string) $booking->note);
+        $cancelNote = 'Khách hàng đã hủy booking vào ' . now()->format('d/m/Y H:i');
+
+        $booking->update([
+            'status' => 'cancelled',
+            'admin_confirmed' => false,
+            'note' => $note !== '' ? $note . PHP_EOL . $cancelNote : $cancelNote,
+        ]);
+
+        $message = $booking->payment_status === 'paid'
+            ? 'Đã hủy booking. Bộ phận hỗ trợ sẽ liên hệ với bạn về phần thanh toán đã thực hiện.'
+            : 'Đã hủy booking thành công.';
+
+        return redirect()->to(route('user.profile') . '#bookings')->with('success', $message);
+    }
 }

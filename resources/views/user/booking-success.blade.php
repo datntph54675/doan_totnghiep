@@ -144,6 +144,23 @@
         margin-bottom: 24px;
         text-align: left;
     }
+
+    .btn-cancel {
+        display: inline-block;
+        padding: 12px 24px;
+        border: 1px solid #fca5a5;
+        background: #fff5f5;
+        color: #b91c1c;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .btn-cancel:hover {
+        background: #fee2e2;
+    }
 </style>
 @endpush
 
@@ -184,7 +201,9 @@
         <div class="info-row">
             <span class="label">Trạng thái</span>
             <span class="value">
-                @if($booking->admin_confirmed)
+                @if($booking->status === 'cancelled')
+                <span class="badge-unpaid" style="background:#fee2e2;color:#991b1b">Đã hủy</span>
+                @elseif($booking->admin_confirmed)
                 <span class="badge-upcoming">Đã xác nhận bởi Admin</span>
                 @else
                 <span class="badge-unpaid" style="background:#fff0f6;color:#9f1239">Chờ xác nhận từ Admin</span>
@@ -195,9 +214,9 @@
             <span class="label">Thanh toán</span>
             <span class="value">
                 @if($booking->payment_status === 'paid')
-                    <span class="badge-paid">✅ Đã thanh toán</span>
+                <span class="badge-paid">✅ Đã thanh toán</span>
                 @else
-                    <span class="badge-unpaid">Chưa thanh toán</span>
+                <span class="badge-unpaid">Chưa thanh toán</span>
                 @endif
             </span>
         </div>
@@ -206,11 +225,11 @@
             <span class="label">Phương thức</span>
             <span class="value">
                 @if($booking->payment_method === 'vnpay')
-                    <span class="badge-upcoming">💳 VNPAY</span>
+                <span class="badge-upcoming">💳 VNPAY</span>
                 @elseif($booking->payment_method === 'vietqr')
-                    <span class="badge-upcoming">📱 VietQR</span>
+                <span class="badge-upcoming">📱 VietQR</span>
                 @elseif($booking->payment_method === 'momo')
-                    <span class="badge-upcoming" style="background:#fdf0f7;color:#ae2070">💜 MoMo</span>
+                <span class="badge-upcoming" style="background:#fdf0f7;color:#ae2070">💜 MoMo</span>
                 @endif
             </span>
         </div>
@@ -247,7 +266,11 @@
         @endif
     </div>
 
-    @if($booking->payment_status === 'paid' && $booking->payment_method === 'vietqr')
+    @if($booking->status === 'cancelled')
+    <div class="notice" style="background:#fff5f5;border-color:#fca5a5;color:#991b1b;">
+        Booking này đã được hủy. @if($booking->payment_status === 'paid') Bộ phận hỗ trợ sẽ liên hệ với bạn về phần thanh toán đã thực hiện. @endif
+    </div>
+    @elseif($booking->payment_status === 'paid' && $booking->payment_method === 'vietqr')
     <div class="notice">
         ⏳ Bạn đã xác nhận chuyển khoản. Admin sẽ kiểm tra và xác nhận đơn hàng trong thời gian sớm nhất.
     </div>
@@ -262,6 +285,13 @@
     @endif
 
     <a href="{{ route('tours.index') }}" class="btn-outline">← Xem thêm tour</a>
+    @if($booking->canBeCancelledByUser())
+    <form action="{{ route('user.booking.cancel', $booking->booking_id) }}" method="POST" style="display:inline-block;margin-right:12px;"
+        onsubmit="return confirm('Bạn có chắc muốn hủy booking này không?')">
+        @csrf
+        <button type="submit" class="btn-cancel">Hủy booking</button>
+    </form>
+    @endif
     <a href="{{ route('tours.show', $booking->tour_id) }}" class="btn-home">Xem lại tour</a>
 </div>
 @endsection
