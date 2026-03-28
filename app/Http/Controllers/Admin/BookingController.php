@@ -22,6 +22,9 @@ class BookingController extends Controller
             $query->where('payment_status', 'paid')
                 ->where('status', '!=', 'cancelled')
                 ->where('admin_confirmed', false);
+        } elseif ($activeTab === 'pending-refund') {
+            $query->where('status', 'cancelled')
+                ->where('payment_status', 'paid');
         }
 
         if (!empty($tourId)) {
@@ -47,6 +50,10 @@ class BookingController extends Controller
             ->where('admin_confirmed', false)
             ->count();
 
+        $pendingRefundCount = Booking::where('status', 'cancelled')
+            ->where('payment_status', 'paid')
+            ->count();
+
         $tours = Tour::orderBy('name')->get(['tour_id', 'name']);
 
         return view('admin.bookings.index', compact(
@@ -54,6 +61,7 @@ class BookingController extends Controller
             'activeTab',
             'allCount',
             'pendingConfirmationCount',
+            'pendingRefundCount',
             'tours',
             'tourId',
             'dateFrom',
@@ -92,6 +100,25 @@ class BookingController extends Controller
         return redirect()->back()->with('success', 'Đã xác nhận booking cho khách thành công.');
     }
 
+    public function refund($id)
+    {
+        $booking = Booking::findOrFail($id);
+
+        if (!$booking->canBeRefundedByAdmin()) {
+            return redirect()->back()->with('error', 'Booking này không thuộc diện cần hoàn tiền.');
+        }
+
+        $note = trim((string) $booking->note);
+        $refundNote = 'Admin đã xác nhận hoàn tiền vào ' . now()->format('d/m/Y H:i');
+
+        $booking->update([
+            'payment_status' => 'refunded',
+            'note' => $note !== '' ? $note . PHP_EOL . $refundNote : $refundNote,
+        ]);
+
+        return redirect()->back()->with('success', 'Đã đánh dấu hoàn tiền cho booking này.');
+    }
+
     public function update(Request $request, $id)
     {
         $booking = Booking::findOrFail($id);
@@ -101,7 +128,7 @@ class BookingController extends Controller
 
         $data = $request->validate([
             'status' => 'required|in:upcoming,ongoing,completed,cancelled',
-            'payment_status' => 'required|in:unpaid,deposit,paid',
+            'payment_status' => 'required|in:unpaid,deposit,paid,refunded',
             'note' => 'nullable|string',
         ], [
             'status.required' => 'Trạng thái là bắt buộc.',

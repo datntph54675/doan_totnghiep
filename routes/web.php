@@ -109,6 +109,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Booking
         Route::resource('bookings', AdminBookingController::class)->only(['index', 'show', 'update']);
         Route::post('bookings/{id}/confirm', [AdminBookingController::class, 'confirm'])->name('bookings.confirm');
+        Route::post('bookings/{id}/refund', [AdminBookingController::class, 'refund'])->name('bookings.refund');
 
         // Feedback
         Route::get('feedback', [FeedbackController::class, 'index'])->name('feedback.index');
