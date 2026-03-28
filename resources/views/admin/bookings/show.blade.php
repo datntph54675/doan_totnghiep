@@ -68,12 +68,15 @@
                             <label class="col-sm-3 col-form-label">Trạng thái</label>
                             <div class="col-sm-9">
                                 <select name="status" class="form-select" required>
-                                    @foreach (['upcoming' => 'Sắp khởi hành', 'ongoing' => 'Đang diễn ra', 'completed' => 'Hoàn thành', 'cancelled' => 'Huỷ'] as $value => $label)
+                                    @foreach (\App\Models\Booking::STATUS as $value => $label)
                                         <option value="{{ $value }}"
-                                            {{ $booking->status === $value ? 'selected' : '' }}>{{ $label }}
-                                        </option>
+                                            {{ $booking->status === $value ? 'selected' : '' }}>
+                                            {{ $label }}</option>
                                     @endforeach
                                 </select>
+                                @error('status')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
@@ -81,7 +84,7 @@
                             <label class="col-sm-3 col-form-label">Thanh toán</label>
                             <div class="col-sm-9">
                                 <select name="payment_status" class="form-select" required>
-                                    @foreach (['unpaid' => 'Chưa thanh toán', 'deposit' => 'Đã cọc', 'paid' => 'Đã thanh toán'] as $value => $label)
+                                    @foreach (\App\Models\Booking::PAYMENT_STATUS as $value => $label)
                                         <option value="{{ $value }}"
                                             {{ $booking->payment_status === $value ? 'selected' : '' }}>
                                             {{ $label }}</option>

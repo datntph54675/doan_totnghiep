@@ -29,6 +29,9 @@ class BookingController extends Controller
     {
         $booking = Booking::findOrFail($id);
 
+        $currentStatus = $booking->status;
+        $currentPayment = $booking->payment_status;
+
         $data = $request->validate([
             'status' => 'required|in:upcoming,ongoing,completed,cancelled',
             'payment_status' => 'required|in:unpaid,deposit,paid',
@@ -40,8 +43,27 @@ class BookingController extends Controller
             'payment_status.in' => 'Trạng thái thanh toán không hợp lệ.',
         ]);
 
+        // Chưa thanh toán thì chưa đươc phép thay đổi trạng thái
+        if ($currentPayment === 'unpaid' && $data['status'] !== $currentStatus) {
+            return back()->withErrors(['status' => 'Không thể thay đổi trạng thái khi chưa thanh toán.']);
+        }
+
+        // Trạng thái không được đổi tùy tiện phải theo quy trình
+        if ($data['status'] !== $currentStatus) {
+            $allowedTransitions = [
+                'upcoming' => ['ongoing', 'cancelled'],
+                'ongoing' => ['completed'],
+                'completed' => [],
+                'cancelled' => [],
+            ];
+
+            if (!in_array($data['status'], $allowedTransitions[$currentStatus] ?? [])) {
+                return back()->withErrors(['status' => 'Không thể chuyển trạng thái này.']);
+            }
+        }
+
         $booking->update($data);
 
-        return redirect()->route('admin.bookings.show', $booking)->with('success', 'Booking đã được cập nhật.');
+        return redirect()->route('admin.bookings.index', $booking)->with('success', 'Booking đã được cập nhật.');
     }
 }

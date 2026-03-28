@@ -51,4 +51,16 @@ class Booking extends Model
     {
         return $this->hasMany(Feedback::class, 'booking_id', 'booking_id');
     }
+
+    public const STATUS = [
+        'upcoming' => 'Sắp khởi hành',
+        'ongoing' => 'Đang diễn ra',
+        'completed' => 'Hoàn thành',
+        'cancelled' => 'Huỷ',
+    ];
+
+    public const PAYMENT_STATUS = [
+        'unpaid' => 'Chưa thanh toán',
+        'paid' => 'Đã thanh toán',
+    ];
 }
