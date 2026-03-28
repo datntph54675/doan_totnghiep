@@ -91,6 +91,15 @@
         font-weight: 600;
     }
 
+    .badge-paid {
+        background: #d1fae5;
+        color: #065f46;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
     .btn-home {
         display: inline-block;
         padding: 12px 32px;
@@ -184,8 +193,32 @@
         </div>
         <div class="info-row">
             <span class="label">Thanh toán</span>
-            <span class="value"><span class="badge-unpaid">Chưa thanh toán</span></span>
+            <span class="value">
+                @if($booking->payment_status === 'paid')
+                    <span class="badge-paid">✅ Đã thanh toán</span>
+                @else
+                    <span class="badge-unpaid">Chưa thanh toán</span>
+                @endif
+            </span>
         </div>
+        @if($booking->payment_method)
+        <div class="info-row">
+            <span class="label">Phương thức</span>
+            <span class="value">
+                @if($booking->payment_method === 'vnpay')
+                    <span class="badge-upcoming">💳 VNPAY</span>
+                @elseif($booking->payment_method === 'vietqr')
+                    <span class="badge-upcoming">📱 VietQR</span>
+                @endif
+            </span>
+        </div>
+        @endif
+        @if($booking->vnp_transaction_no)
+        <div class="info-row">
+            <span class="label">Mã giao dịch</span>
+            <span class="value">{{ $booking->vnp_transaction_no }}</span>
+        </div>
+        @endif
     </div>
 
     <div class="booking-card">
@@ -212,9 +245,19 @@
         @endif
     </div>
 
+    @if($booking->payment_status === 'paid' && $booking->payment_method === 'vietqr')
     <div class="notice">
-        📞 Nhân viên sẽ liên hệ qua số <strong>{{ $booking->customer->phone }}</strong> để xác nhận và hướng dẫn thanh toán.
+        ⏳ Bạn đã xác nhận chuyển khoản. Admin sẽ kiểm tra và xác nhận đơn hàng trong thời gian sớm nhất.
     </div>
+    @elseif($booking->payment_status === 'paid')
+    <div class="notice" style="background: #d1fae5; border-color: #6ee7b7; color: #065f46;">
+        ✅ Thanh toán thành công! Vé tour đã được xác nhận. Chúc bạn có chuyến đi vui vẻ!
+    </div>
+    @else
+    <div class="notice">
+        📞 Nhân viên sẽ liên hệ qua số <strong>{{ $booking->customer->phone }}</strong> để xác nhận.
+    </div>
+    @endif
 
     <a href="{{ route('tours.index') }}" class="btn-outline">← Xem thêm tour</a>
     <a href="{{ route('tours.show', $booking->tour_id) }}" class="btn-home">Xem lại tour</a>

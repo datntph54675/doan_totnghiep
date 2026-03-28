@@ -81,7 +81,7 @@ class BookingController extends Controller
             'note'           => $validated['note'] ?? null,
         ]);
 
-        return redirect()->route('user.booking.success', $booking->booking_id);
+        return redirect()->route('payment.choose', $booking->booking_id);
     }
 
     public function success($bookingId)
