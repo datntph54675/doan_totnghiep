@@ -45,11 +45,11 @@
                                     {{ number_format($booking->total_price, 0, ',', '.') }} ₫</td>
                                 <td>
                                     <span
-                                        class="badge {{ $booking->status == 'upcoming' ? 'bg-info' : ($booking->status == 'ongoing' ? 'bg-primary' : ($booking->status == 'completed' ? 'bg-success' : 'bg-secondary')) }} text-white">{{ ucfirst($booking->status) }}</span>
+                                        class="badge {{ $booking->status == 'upcoming' ? 'bg-info' : ($booking->status == 'ongoing' ? 'bg-primary' : ($booking->status == 'completed' ? 'bg-success' : 'bg-secondary')) }} text-white">{{ \App\Models\Booking::STATUS[$booking->status] ?? ucfirst($booking->status) }}</span>
                                 </td>
                                 <td>
                                     <span
-                                        class="badge {{ $booking->payment_status == 'unpaid' ? 'bg-danger' : ($booking->payment_status == 'deposit' ? 'bg-warning text-dark' : 'bg-success') }} text-white">{{ ucfirst($booking->payment_status) }}</span>
+                                        class="badge {{ $booking->payment_status == 'unpaid' ? 'bg-danger' : ($booking->payment_status == 'deposit' ? 'bg-warning text-dark' : 'bg-success') }} text-white">{{ \App\Models\Booking::PAYMENT_STATUS[$booking->payment_status] ?? ucfirst($booking->payment_status) }}</span>
                                 </td>
                                 <td class="pe-4 text-end">
                                     <div class="btn-group" role="group">
