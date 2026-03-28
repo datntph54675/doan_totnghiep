@@ -5,8 +5,12 @@
         <div id="sidebar-menu">
             <!-- Logo Box -->
             <div class="logo-box">
-                <a href="index.html">
-                    <img src="#" alt="logo" style="width:160px; height:70px;">
+                <a href="{{ route('home') }}">
+                    @if(Route::is('momo.mock'))
+                        <img src="https://developers.momo.vn/v2/images/logo.png" alt="logo" style="width:70px; height:70px; padding: 5px;">
+                    @else
+                        <img src="{{ asset('assets/admin/images/logo-dark.png') }}" alt="logo" style="width:160px; height:70px;">
+                    @endif
                 </a>
             </div>
             <!-- End Logo Box -->
