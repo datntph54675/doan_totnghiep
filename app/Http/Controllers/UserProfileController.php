@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,22 @@ class UserProfileController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        return view('user.profile', compact('user'));
+
+        $pendingBookings = Booking::with(['tour', 'schedule'])
+            ->where('user_id', $user->user_id)
+            ->where('payment_status', 'paid')
+            ->where('admin_confirmed', false)
+            ->orderByDesc('booking_date')
+            ->get();
+
+        $confirmedBookings = Booking::with(['tour', 'schedule'])
+            ->where('user_id', $user->user_id)
+            ->where('payment_status', 'paid')
+            ->where('admin_confirmed', true)
+            ->orderByDesc('booking_date')
+            ->get();
+
+        return view('user.profile', compact('user', 'pendingBookings', 'confirmedBookings'));
     }
 
     /**
