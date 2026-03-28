@@ -219,87 +219,32 @@
         border: 1px solid #feb2b2;
     }
 
-    .booking-list {
-        display: grid;
-        gap: 16px;
-    }
-
-    .booking-item {
+    .quick-link-card {
         border: 1px solid #e9eef5;
-        border-radius: 14px;
-        padding: 16px;
-        background: #fcfdff;
+        border-radius: 16px;
+        padding: 24px;
+        background: linear-gradient(135deg, #f8fbff 0%, #eef6ff 100%);
     }
 
-    .booking-item-head {
-        display: flex;
-        justify-content: space-between;
+    .quick-link-card p {
+        color: var(--text-gray);
+        margin-bottom: 16px;
+    }
+
+    .quick-link-btn {
+        display: inline-flex;
         align-items: center;
         gap: 10px;
-        margin-bottom: 8px;
-        flex-wrap: wrap;
-    }
-
-    .booking-title {
-        margin: 0;
-        font-size: 17px;
-        color: var(--text-dark);
-        font-weight: 700;
-    }
-
-    .status-confirmed {
-        background: #dcfce7;
-        color: #166534;
-        border-radius: 999px;
-        padding: 5px 12px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .status-pending {
-        background: #fef3c7;
-        color: #92400e;
-        border-radius: 999px;
-        padding: 5px 12px;
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .booking-section-title {
-        margin: 14px 0;
-        font-size: 16px;
-        font-weight: 800;
-        color: var(--text-dark);
-    }
-
-    .booking-meta {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px 16px;
-        color: var(--text-gray);
-        font-size: 14px;
-        margin: 8px 0 12px;
-    }
-
-    .booking-price {
-        font-size: 18px;
-        font-weight: 800;
-        color: var(--primary-blue);
-    }
-
-    .booking-link {
-        text-decoration: none;
-        font-weight: 600;
-        color: var(--primary-blue);
-    }
-
-    .empty-state {
-        border: 1px dashed #d8deea;
-        background: #fbfcfe;
-        padding: 20px;
+        padding: 12px 18px;
         border-radius: 12px;
-        color: var(--text-gray);
-        font-size: 14px;
+        background: var(--primary-blue);
+        color: var(--white);
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .quick-link-btn:hover {
+        background: var(--secondary-blue);
     }
 
     /* Responsive */
@@ -312,9 +257,6 @@
             display: none;
         }
 
-        .booking-meta {
-            grid-template-columns: 1fr;
-        }
     }
 </style>
 @endsection
@@ -341,7 +283,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#bookings" class="nav-link">
+                        <a href="{{ route('user.bookings') }}" class="nav-link">
                             <i class="fa-solid fa-clock-rotate-left"></i>
                             Lịch sử đặt tour
                         </a>
@@ -451,76 +393,15 @@
                 <div class="content-card" id="bookings">
                     <h2 class="card-title">
                         <i class="fa-solid fa-circle-check"></i>
-                        Trạng thái booking của bạn
+                        Trạng thái booking
                     </h2>
-
-                    <h3 class="booking-section-title">
-                        Chờ admin xác nhận ({{ ($pendingBookings ?? collect())->count() }})
-                    </h3>
-                    @if (($pendingBookings ?? collect())->isEmpty())
-                    <div class="empty-state">
-                        Hiện không có booking nào đang chờ admin xác nhận.
+                    <div class="quick-link-card">
+                        <p>Theo dõi toàn bộ booking của bạn tại một trang riêng, gồm các nhóm chờ thanh toán, chờ admin xác nhận, đã xác nhận và đã hủy.</p>
+                        <a href="{{ route('user.bookings') }}" class="quick-link-btn">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            Mở trang trạng thái booking
+                        </a>
                     </div>
-                    @else
-                    <div class="booking-list">
-                        @foreach ($pendingBookings as $booking)
-                        <article class="booking-item">
-                            <div class="booking-item-head">
-                                <h3 class="booking-title">{{ $booking->tour->name ?? 'Tour không xác định' }}</h3>
-                                <span class="status-pending">Chờ xác nhận</span>
-                            </div>
-
-                            <div class="booking-meta">
-                                <div>Mã booking: #{{ $booking->booking_id }}</div>
-                                <div>Ngày đặt: {{ optional($booking->booking_date)->format('d/m/Y H:i') }}</div>
-                                <div>Khởi hành: {{ optional(optional($booking->schedule)->start_date)->format('d/m/Y') ?? '-' }}</div>
-                                <div>Số người: {{ $booking->num_people }} người</div>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <div class="booking-price">{{ number_format($booking->total_price, 0, ',', '.') }} ₫</div>
-                                @if ($booking->tour_id)
-                                <a class="booking-link" href="{{ route('tours.show', $booking->tour_id) }}">Xem tour</a>
-                                @endif
-                            </div>
-                        </article>
-                        @endforeach
-                    </div>
-                    @endif
-
-                    <h3 class="booking-section-title">
-                        Đã admin xác nhận ({{ ($confirmedBookings ?? collect())->count() }})
-                    </h3>
-                    @if (($confirmedBookings ?? collect())->isEmpty())
-                    <div class="empty-state">
-                        Hiện chưa có tour nào được admin xác nhận. Sau khi admin duyệt booking đã thanh toán, tour sẽ hiển thị tại đây.
-                    </div>
-                    @else
-                    <div class="booking-list">
-                        @foreach ($confirmedBookings as $booking)
-                        <article class="booking-item">
-                            <div class="booking-item-head">
-                                <h3 class="booking-title">{{ $booking->tour->name ?? 'Tour không xác định' }}</h3>
-                                <span class="status-confirmed">Đã xác nhận</span>
-                            </div>
-
-                            <div class="booking-meta">
-                                <div>Mã booking: #{{ $booking->booking_id }}</div>
-                                <div>Ngày đặt: {{ optional($booking->booking_date)->format('d/m/Y H:i') }}</div>
-                                <div>Khởi hành: {{ optional(optional($booking->schedule)->start_date)->format('d/m/Y') ?? '-' }}</div>
-                                <div>Số người: {{ $booking->num_people }} người</div>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <div class="booking-price">{{ number_format($booking->total_price, 0, ',', '.') }} ₫</div>
-                                @if ($booking->tour_id)
-                                <a class="booking-link" href="{{ route('tours.show', $booking->tour_id) }}">Xem tour</a>
-                                @endif
-                            </div>
-                        </article>
-                        @endforeach
-                    </div>
-                    @endif
                 </div>
             </div>
         </div>

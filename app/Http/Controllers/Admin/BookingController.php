@@ -20,6 +20,7 @@ class BookingController extends Controller
 
         if ($activeTab === 'pending-confirmation') {
             $query->where('payment_status', 'paid')
+                ->where('status', '!=', 'cancelled')
                 ->where('admin_confirmed', false);
         }
 
@@ -42,6 +43,7 @@ class BookingController extends Controller
 
         $allCount = Booking::count();
         $pendingConfirmationCount = Booking::where('payment_status', 'paid')
+            ->where('status', '!=', 'cancelled')
             ->where('admin_confirmed', false)
             ->count();
 
@@ -70,6 +72,10 @@ class BookingController extends Controller
     public function confirm($id)
     {
         $booking = Booking::findOrFail($id);
+
+        if ($booking->isCancelled()) {
+            return redirect()->back()->with('error', 'Booking đã bị hủy nên không thể xác nhận.');
+        }
 
         if ($booking->payment_status !== 'paid') {
             return redirect()->back()->with('error', 'Booking chưa thanh toán đủ nên chưa thể xác nhận.');

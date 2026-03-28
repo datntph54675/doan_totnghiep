@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -65,4 +66,21 @@ class Booking extends Model
         'unpaid' => 'Chưa thanh toán',
         'paid' => 'Đã thanh toán',
     ];
+
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
+    }
+
+    public function canBeCancelledByUser(): bool
+    {
+        if ($this->status !== 'upcoming') {
+            return false;
+        }
+
+        $startDate = $this->schedule?->start_date;
+
+        return $startDate instanceof CarbonInterface
+            && $startDate->copy()->startOfDay()->greaterThanOrEqualTo(now()->startOfDay());
+    }
 }

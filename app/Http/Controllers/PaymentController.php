@@ -22,6 +22,11 @@ class PaymentController extends Controller
             abort(403);
         }
 
+        if ($booking->isCancelled()) {
+            return redirect()->to(route('user.profile') . '#bookings')
+                ->with('error', 'Booking này đã bị hủy nên không thể thanh toán.');
+        }
+
         // Nếu đã thanh toán rồi thì chuyển thẳng trang thành công
         if ($booking->payment_status === 'paid') {
             return redirect()->route('user.booking.success', $bookingId);
@@ -39,6 +44,11 @@ class PaymentController extends Controller
 
         if ($booking->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        if ($booking->isCancelled()) {
+            return redirect()->to(route('user.profile') . '#bookings')
+                ->with('error', 'Booking này đã bị hủy nên không thể thanh toán.');
         }
 
         // Cập nhật phương thức thanh toán
@@ -73,6 +83,11 @@ class PaymentController extends Controller
             $bookingId = explode('_', $vnp_TxnRef)[0];
             $booking = Booking::find($bookingId);
 
+            if ($booking && $booking->isCancelled()) {
+                return redirect()->route('home')
+                    ->with('error', 'Booking đã bị hủy nên giao dịch này không còn hợp lệ.');
+            }
+
             if ($booking && $vnp_ResponseCode === '00') {
                 // Thanh toán thành công
                 $booking->update([
@@ -103,6 +118,11 @@ class PaymentController extends Controller
 
         if ($booking->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        if ($booking->isCancelled()) {
+            return redirect()->to(route('user.profile') . '#bookings')
+                ->with('error', 'Booking này đã bị hủy nên không thể thanh toán.');
         }
 
         // Cập nhật phương thức thanh toán
@@ -137,6 +157,11 @@ class PaymentController extends Controller
             abort(403);
         }
 
+        if ($booking->isCancelled()) {
+            return redirect()->to(route('user.profile') . '#bookings')
+                ->with('error', 'Booking này đã bị hủy nên không thể xác nhận thanh toán.');
+        }
+
         $booking->update([
             'payment_status' => 'paid',
             'admin_confirmed' => false,
@@ -156,6 +181,11 @@ class PaymentController extends Controller
 
         if ($booking->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        if ($booking->isCancelled()) {
+            return redirect()->to(route('user.profile') . '#bookings')
+                ->with('error', 'Booking này đã bị hủy nên không thể thanh toán.');
         }
 
         // Đánh dấu là chọn MoMo
@@ -202,6 +232,11 @@ class PaymentController extends Controller
             $booking = Booking::find($bookingId);
 
             if ($booking) {
+                if ($booking->isCancelled()) {
+                    return redirect()->route('home')
+                        ->with('error', 'Booking đã bị hủy nên giao dịch này không còn hợp lệ.');
+                }
+
                 // resultCode == 0 nghĩa là giao dịch thành công theo chuẩn MoMo
                 if ($resultCode == 0) {
                     // Thanh toán thành công -> confirm trên DB

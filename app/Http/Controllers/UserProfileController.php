@@ -19,21 +19,52 @@ class UserProfileController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        return view('user.profile', compact('user'));
+    }
+
+    public function bookings()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        return view('user.booking-status', [
+            'user' => $user,
+            ...$this->getBookingStatusData($user->user_id),
+        ]);
+    }
+
+    private function getBookingStatusData(int $userId): array
+    {
+        $unpaidBookings = Booking::with(['tour', 'schedule'])
+            ->where('user_id', $userId)
+            ->where('payment_status', 'unpaid')
+            ->where('status', '!=', 'cancelled')
+            ->orderByDesc('booking_date')
+            ->get();
+
         $pendingBookings = Booking::with(['tour', 'schedule'])
-            ->where('user_id', $user->user_id)
+            ->where('user_id', $userId)
             ->where('payment_status', 'paid')
+            ->where('status', '!=', 'cancelled')
             ->where('admin_confirmed', false)
             ->orderByDesc('booking_date')
             ->get();
 
         $confirmedBookings = Booking::with(['tour', 'schedule'])
-            ->where('user_id', $user->user_id)
+            ->where('user_id', $userId)
             ->where('payment_status', 'paid')
+            ->where('status', '!=', 'cancelled')
             ->where('admin_confirmed', true)
             ->orderByDesc('booking_date')
             ->get();
 
-        return view('user.profile', compact('user', 'pendingBookings', 'confirmedBookings'));
+        $cancelledBookings = Booking::with(['tour', 'schedule'])
+            ->where('user_id', $userId)
+            ->where('status', 'cancelled')
+            ->orderByDesc('booking_date')
+            ->get();
+
+        return compact('unpaidBookings', 'pendingBookings', 'confirmedBookings', 'cancelledBookings');
     }
 
     /**
