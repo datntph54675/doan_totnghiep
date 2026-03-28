@@ -81,7 +81,7 @@
 
     .methods-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr;
         gap: 25px;
         margin-bottom: 30px;
     }
@@ -131,6 +131,10 @@
     }
     .method-icon.vietqr {
         background: linear-gradient(135deg, #0066cc, #00aaff);
+        color: #fff;
+    }
+    .method-icon.momo {
+        background: linear-gradient(135deg, #ae2070, #d82d8b);
         color: #fff;
     }
 
@@ -195,6 +199,13 @@
         box-shadow: 0 8px 20px rgba(0,102,204,0.3);
         transform: translateY(-2px);
     }
+    .btn-pay.momo-btn {
+        background: linear-gradient(135deg, #ae2070, #d82d8b);
+    }
+    .btn-pay.momo-btn:hover {
+        box-shadow: 0 8px 20px rgba(174,32,112,0.3);
+        transform: translateY(-2px);
+    }
 
     .security-badge {
         text-align: center;
@@ -207,6 +218,9 @@
     }
     .security-badge i { color: #00b894; }
 
+    @media (max-width: 992px) {
+        .methods-grid { grid-template-columns: 1fr 1fr; }
+    }
     @media (max-width: 768px) {
         .methods-grid { grid-template-columns: 1fr; }
         .summary-grid { grid-template-columns: 1fr; }
@@ -295,6 +309,27 @@
                     <i class="fa-solid fa-qrcode"></i>
                     Chuyển khoản QR
                 </a>
+            </div>
+
+            <!-- MoMo -->
+            <div class="method-card">
+                <div class="method-icon momo">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div class="method-name">MoMo</div>
+                <div class="method-desc">Thanh toán qua ví điện tử MoMo - Nhanh chóng, tiện lợi</div>
+                <ul class="method-features">
+                    <li><i class="fa-solid fa-check"></i> Quét QR bằng app MoMo</li>
+                    <li><i class="fa-solid fa-check"></i> Chuyển tiền chỉ trong vài giây</li>
+                    <li><i class="fa-solid fa-check"></i> Phổ biến nhất Việt Nam</li>
+                </ul>
+                <form action="{{ route('payment.momo', $booking->booking_id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn-pay momo-btn">
+                        <i class="fa-solid fa-wallet"></i>
+                        Thanh toán MoMo
+                    </button>
+                </form>
             </div>
         </div>
 

@@ -209,6 +209,8 @@
                     <span class="badge-upcoming">💳 VNPAY</span>
                 @elseif($booking->payment_method === 'vietqr')
                     <span class="badge-upcoming">📱 VietQR</span>
+                @elseif($booking->payment_method === 'momo')
+                    <span class="badge-upcoming" style="background:#fdf0f7;color:#ae2070">💜 MoMo</span>
                 @endif
             </span>
         </div>

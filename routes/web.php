@@ -61,8 +61,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/booking/{id}/pay-vnpay', [App\Http\Controllers\PaymentController::class, 'payVnpay'])->name('payment.vnpay');
     Route::get('/booking/{id}/pay-vietqr', [App\Http\Controllers\PaymentController::class, 'payVietqr'])->name('payment.vietqr');
     Route::post('/booking/{id}/vietqr-confirm', [App\Http\Controllers\PaymentController::class, 'vietqrConfirm'])->name('payment.vietqr.confirm');
+    Route::post('/booking/{id}/pay-momo', [App\Http\Controllers\PaymentController::class, 'payMomo'])->name('payment.momo');
+    Route::get('/payment/momo/mock/{booking_id}', [App\Http\Controllers\PaymentController::class, 'momoMock'])->name('momo.mock');
 });
 Route::get('/payment/vnpay-return', [App\Http\Controllers\PaymentController::class, 'vnpayReturn'])->name('payment.vnpay.return');
+Route::get('/payment/momo-return', [App\Http\Controllers\PaymentController::class, 'momoReturn'])->name('payment.momo.return');
 
 // Admin auth
 Route::prefix('admin')->name('admin.')->group(function () {

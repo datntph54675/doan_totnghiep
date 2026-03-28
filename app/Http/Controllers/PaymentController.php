@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Services\VnpayService;
+use App\Services\MomoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -142,5 +143,92 @@ class PaymentController extends Controller
 
         return redirect()->route('user.booking.success', $bookingId)
             ->with('success', 'Xác nhận chuyển khoản thành công! Admin sẽ kiểm tra và xác nhận đơn hàng của bạn.');
+    }
+
+    /**
+     * Khởi tạo quá trình thanh toán MoMo API.
+     */
+    public function payMomo(Request $request, $bookingId)
+    {
+        $booking = Booking::findOrFail($bookingId);
+
+        if ($booking->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Đánh dấu là chọn MoMo
+        $booking->update(['payment_method' => 'momo']);
+
+        $momoService = new MomoService();
+
+        $paymentUrl = $momoService->createPaymentUrl([
+            'booking_id' => $booking->booking_id,
+            'amount' => (int) $booking->total_price,
+            'ip_address' => $request->ip(),
+        ]);
+
+        if ($paymentUrl) {
+            return redirect()->away($paymentUrl);
+        }
+
+        return redirect()->back()->with('error', 'Không thể khởi tạo thanh toán MoMo lúc này. Vui lòng thử lại.');
+    }
+
+    /**
+     * MoMo Return URL - Xử lý redirect khi thanh toán xong trên cổng MoMo.
+     * Vì dev k dùng Ngrok IPN, ta sẽ check kết quả ở đây luôn.
+     */
+    public function momoReturn(Request $request)
+    {
+        $inputData = $request->all();
+
+        // Neu request khong co du lieu orderId
+        if (!isset($inputData['orderId'])) {
+             return redirect()->route('home')->with('error', 'Dữ liệu không hợp lệ từ MoMo.');
+        }
+
+        $momoService = new MomoService();
+
+        // 1. Kiểm tra tính toàn vẹn chữ ký MoMo gửi về (validate hash)
+        if ($momoService->validateSignature($inputData)) {
+            
+            $resultCode = $inputData['resultCode'] ?? '';
+            $orderId = $inputData['orderId'] ?? '';
+            
+            // Format orderId gửi lên là: {booking_id}_{timestamp}
+            $bookingId = explode('_', $orderId)[0];
+            $booking = Booking::find($bookingId);
+
+            if ($booking) {
+                // resultCode == 0 nghĩa là giao dịch thành công theo chuẩn MoMo
+                if ($resultCode == 0) {
+                    // Thanh toán thành công -> confirm trên DB
+                    $booking->update([
+                        'payment_status' => 'paid',
+                        'payment_method' => 'momo',
+                        // Mượn cột vnp_transaction_no để lưu mã gd MoMo (transId)
+                        'vnp_transaction_no' => $inputData['transId'] ?? null,
+                    ]);
+
+                    return redirect()->route('user.booking.success', $bookingId)
+                        ->with('success', 'Thanh toán MoMo tự động thành công!');
+                } else {
+                    return redirect()->route('payment.choose', $bookingId)
+                        ->with('error', 'Thanh toán MoMo thất bại/huỷ bỏ. Mã: ' . $resultCode . ' - ' . ($inputData['message'] ?? ''));
+                }
+            }
+        }
+
+        // Chữ ký sai lệch
+        return redirect()->route('home')->with('error', 'Cảnh báo: Chữ ký xác thực MoMo không hợp lệ!');
+    }
+
+    /**
+     * Hiển thị trang giả lập thanh toán MoMo (Mock Mode)
+     */
+    public function momoMock($booking_id)
+    {
+        $booking = \App\Models\Booking::findOrFail($booking_id);
+        return view('user.payment-momo-mock', compact('booking'));
     }
 }
