@@ -7,11 +7,19 @@ use App\Models\DepartureSchedule;
 use App\Models\Attendance;
 use App\Models\Itinerary;
 use App\Models\Feedback;
+use App\Models\GuideAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GuideController extends Controller
 {
+    private function assignedScheduleIds(int $guideId)
+    {
+        return GuideAssignment::where('guide_id', $guideId)
+            ->where('status', '!=', 'cancelled')
+            ->pluck('schedule_id');
+    }
+
     public function dashboard()
     {
         $user = Auth::user();
@@ -26,19 +34,21 @@ class GuideController extends Controller
             ]);
         }
 
-        $upcomingTours = DepartureSchedule::where('guide_id', $guide->guide_id)
+        $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
+
+        $upcomingTours = DepartureSchedule::whereIn('schedule_id', $assignedScheduleIds)
             ->where('start_date', '>=', now())
             ->with(['tour', 'bookings'])
             ->orderBy('start_date', 'asc')
             ->get();
 
-        $ongoingTours = DepartureSchedule::where('guide_id', $guide->guide_id)
+        $ongoingTours = DepartureSchedule::whereIn('schedule_id', $assignedScheduleIds)
             ->where('start_date', '<=', now())
             ->where('end_date', '>=', now())
             ->with(['tour', 'bookings'])
             ->get();
 
-        $completedTours = DepartureSchedule::where('guide_id', $guide->guide_id)
+        $completedTours = DepartureSchedule::whereIn('schedule_id', $assignedScheduleIds)
             ->where('end_date', '<', now())
             ->with(['tour', 'bookings'])
             ->orderBy('end_date', 'desc')
@@ -52,10 +62,11 @@ class GuideController extends Controller
     {
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
+        $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
 
         $schedule = DepartureSchedule::with(['tour', 'bookings.customer'])
             ->where('schedule_id', $scheduleId)
-            ->where('guide_id', $guide->guide_id)
+            ->whereIn('schedule_id', $assignedScheduleIds)
             ->firstOrFail();
 
         // Lấy itinerary của tour
@@ -75,10 +86,11 @@ class GuideController extends Controller
     {
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
+        $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
 
         $schedule = DepartureSchedule::with(['tour', 'bookings.customer'])
             ->where('schedule_id', $scheduleId)
-            ->where('guide_id', $guide->guide_id)
+            ->whereIn('schedule_id', $assignedScheduleIds)
             ->firstOrFail();
 
         // Lấy danh sách điểm danh
@@ -94,6 +106,11 @@ class GuideController extends Controller
     {
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
+
+        $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
+        DepartureSchedule::where('schedule_id', $scheduleId)
+            ->whereIn('schedule_id', $assignedScheduleIds)
+            ->firstOrFail();
 
         $validated = $request->validate([
             'customer_id' => 'required|exists:customer,customer_id',
@@ -118,10 +135,11 @@ class GuideController extends Controller
     {
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
+        $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
 
         $schedule = DepartureSchedule::with('tour')
             ->where('schedule_id', $scheduleId)
-            ->where('guide_id', $guide->guide_id)
+            ->whereIn('schedule_id', $assignedScheduleIds)
             ->firstOrFail();
 
         $itineraries = Itinerary::where('tour_id', $schedule->tour_id)
@@ -163,14 +181,18 @@ class GuideController extends Controller
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
 
+        $assignedScheduleIds = $guide
+            ? $this->assignedScheduleIds($guide->guide_id)
+            : collect();
+
         $totalTours = $guide
-            ? DepartureSchedule::where('guide_id', $guide->guide_id)->where('end_date', '<', now())->count()
+            ? DepartureSchedule::whereIn('schedule_id', $assignedScheduleIds)->where('end_date', '<', now())->count()
             : 0;
 
         $totalCustomers = $guide
             ? \App\Models\Booking::whereIn(
                 'schedule_id',
-                DepartureSchedule::where('guide_id', $guide->guide_id)->pluck('schedule_id')
+                $assignedScheduleIds
             )->distinct('customer_id')->count('customer_id')
             : 0;
 
@@ -225,9 +247,11 @@ class GuideController extends Controller
             return view('guide.customer-list', ['customers' => collect()]);
         }
 
+        $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
+
         // Lấy danh sách khách hàng từ các tour của hướng dẫn viên
         $customers = \App\Models\Booking::with('customer')
-            ->whereIn('schedule_id', DepartureSchedule::where('guide_id', $guide->guide_id)->pluck('schedule_id'))
+            ->whereIn('schedule_id', $assignedScheduleIds)
             ->get()
             ->map(function ($booking) {
                 return $booking->customer;

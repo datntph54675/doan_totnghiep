@@ -10,16 +10,16 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $featuredTours = Tour::where('status', 'active')
+        $featuredTours = Tour::visibleToUsers()
             ->with('category')
             ->orderBy('tour_id', 'desc')
             ->take(8)
             ->get();
 
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::where('status', 'active')->orderBy('name')->get();
 
         $stats = [
-            'tours'     => Tour::where('status', 'active')->count(),
+            'tours'     => Tour::visibleToUsers()->count(),
             'customers' => \App\Models\Customer::count(),
             'tours_all' => Tour::count(),
         ];
