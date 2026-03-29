@@ -49,17 +49,17 @@ Route::controller(UserAuthController::class)->group(function () {
 // User - public tour pages
 Route::get('/tours', [TourUserController::class, 'index'])->name('tours.index');
 Route::get('/tours/{id}', [TourUserController::class, 'show'])->name('tours.show');
-Route::get('/tours/{id}/booking', [BookingController::class, 'create'])->name('user.booking');
-Route::post('/tours/{id}/booking', [BookingController::class, 'store'])->name('user.booking.store');
-Route::get('/booking/{bookingId}/success', [BookingController::class, 'success'])->name('user.booking.success');
-
-// User Profile & Settings
+// User Profile, Booking & Payments
 Route::middleware('auth')->group(function () {
+    Route::get('/tours/{id}/booking', [BookingController::class, 'create'])->name('user.booking');
+    Route::post('/tours/{id}/booking', [BookingController::class, 'store'])->name('user.booking.store');
+    
     Route::get('/profile', [App\Http\Controllers\UserProfileController::class, 'edit'])->name('user.profile');
     Route::get('/profile/bookings', [App\Http\Controllers\UserProfileController::class, 'bookings'])->name('user.bookings');
     Route::put('/profile', [App\Http\Controllers\UserProfileController::class, 'updateProfile'])->name('user.profile.update');
     Route::put('/profile/password', [App\Http\Controllers\UserProfileController::class, 'updatePassword'])->name('user.password.update');
     Route::post('/booking/{bookingId}/cancel', [BookingController::class, 'cancel'])->name('user.booking.cancel');
+    Route::get('/booking/{bookingId}/success', [BookingController::class, 'success'])->name('user.booking.success');
 });
 
 // Payment Routes

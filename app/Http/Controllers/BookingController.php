@@ -97,6 +97,12 @@ class BookingController extends Controller
     public function success($bookingId)
     {
         $booking = Booking::with(['tour', 'schedule', 'customer'])->findOrFail($bookingId);
+
+        // Security check: only the owner can see the success page
+        if ($booking->user_id !== Auth::id()) {
+            abort(403, 'Bạn không có quyền xem thông tin này.');
+        }
+
         return view('user.booking-success', compact('booking'));
     }
 
