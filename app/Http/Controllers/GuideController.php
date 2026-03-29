@@ -16,7 +16,7 @@ class GuideController extends Controller
     private function assignedScheduleIds(int $guideId)
     {
         return GuideAssignment::where('guide_id', $guideId)
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['accepted', 'completed'])
             ->pluck('schedule_id');
     }
 
@@ -258,5 +258,99 @@ class GuideController extends Controller
             });
 
         return view('guide.customer-list', compact('customers'));
+    }
+
+    /**
+     * Hiển thị danh sách tour chưa được xác nhận (pending)
+     */
+    public function assignmentList()
+    {
+        $user = Auth::user();
+        $guide = Guide::where('user_id', $user->user_id)->first();
+
+        if (!$guide) {
+            return view('guide.assignment-list', ['assignments' => collect()]);
+        }
+
+        // Lấy danh sách assignment chờ xác nhận và từ chối
+        $assignments = GuideAssignment::where('guide_id', $guide->guide_id)
+            ->whereIn('status', ['pending', 'rejected'])
+            ->with(['schedule.tour', 'assigner'])
+            ->orderBy('assigned_at', 'desc')
+            ->get();
+
+        return view('guide.assignment-list', compact('assignments', 'guide'));
+    }
+
+    /**
+     * Guide xác nhận nhận tour
+     */
+    public function acceptAssignment(Request $request, $assignmentId)
+    {
+        $assignment = GuideAssignment::findOrFail($assignmentId);
+        $user = Auth::user();
+        $guide = Guide::where('user_id', $user->user_id)->first();
+
+        if (!$guide) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin hướng dẫn viên');
+        }
+
+        // Kiểm tra xem assignment có thuộc về guide đang đăng nhập không
+        if ($assignment->guide_id !== $guide->guide_id) {
+            return redirect()->back()->with('error', 'Không có quyền truy cập');
+        }
+
+        // Kiểm tra xem assignment ở trạng thái pending hoặc rejected
+        if (!in_array($assignment->status, ['pending', 'rejected'])) {
+            return redirect()->back()->with('error', 'Không thể xác nhận tour này');
+        }
+
+        $assignment->update([
+            'status' => 'accepted',
+            'confirmed_at' => now(),
+            'rejection_reason' => null, // Xóa lý do từ chối nếu có
+        ]);
+
+        return redirect()->route('guide.assignments')->with('success', 'Bạn đã xác nhận nhận tour thành công');
+    }
+
+    /**
+     * Guide từ chối nhận tour
+     */
+    public function rejectAssignment(Request $request, $assignmentId)
+    {
+        $request->validate([
+            'rejection_reason' => 'required|string|min:5|max:500',
+        ], [
+            'rejection_reason.required' => 'Vui lòng nhập lý do từ chối',
+            'rejection_reason.min' => 'Lý do từ chối phải ít nhất 5 ký tự',
+            'rejection_reason.max' => 'Lý do từ chối không được vượt quá 500 ký tự',
+        ]);
+
+        $assignment = GuideAssignment::findOrFail($assignmentId);
+        $user = Auth::user();
+        $guide = Guide::where('user_id', $user->user_id)->first();
+
+        if (!$guide) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin hướng dẫn viên');
+        }
+
+        // Kiểm tra xem assignment có thuộc về guide đang đăng nhập không
+        if ($assignment->guide_id !== $guide->guide_id) {
+            return redirect()->back()->with('error', 'Không có quyền truy cập');
+        }
+
+        // Kiểm tra xem assignment ở trạng thái pending hoặc accepted
+        if (!in_array($assignment->status, ['pending', 'accepted'])) {
+            return redirect()->back()->with('error', 'Không thể từ chối tour này');
+        }
+
+        $assignment->update([
+            'status' => 'rejected',
+            'confirmed_at' => now(),
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+
+        return redirect()->route('guide.assignments')->with('success', 'Bạn đã từ chối tour. Admin sẽ thấy lý do của bạn');
     }
 }

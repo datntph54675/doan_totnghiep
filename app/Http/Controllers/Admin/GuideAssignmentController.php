@@ -44,12 +44,12 @@ class GuideAssignmentController extends Controller
         $data = $request->validate([
             'schedule_id' => 'required|exists:departure_schedule,schedule_id',
             'guide_id' => 'required|exists:guide,guide_id',
-            'status' => 'required|in:active,cancelled,completed',
             'note' => 'nullable|string',
         ]);
 
         $data['assigned_by'] = Auth::id() ?? (Auth::user()->user_id ?? null);
         $data['assigned_at'] = now();
+        $data['status'] = 'pending'; // Khởi tạo trạng thái là chờ xác nhận
 
         $exists = GuideAssignment::where('schedule_id', $data['schedule_id'])
             ->where('guide_id', $data['guide_id'])
@@ -96,7 +96,6 @@ class GuideAssignmentController extends Controller
         $data = $request->validate([
             'schedule_id' => 'required|exists:departure_schedule,schedule_id',
             'guide_id' => 'required|exists:guide,guide_id',
-            'status' => 'required|in:active,cancelled,completed',
             'note' => 'nullable|string',
         ]);
 

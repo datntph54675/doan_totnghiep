@@ -15,12 +15,15 @@ class GuideAssignment extends Model
         'guide_id',
         'assigned_by',
         'assigned_at',
+        'confirmed_at',
         'status',
         'note',
+        'rejection_reason',
     ];
 
     protected $casts = [
         'assigned_at' => 'datetime',
+        'confirmed_at' => 'datetime',
     ];
 
     public function schedule(): BelongsTo
