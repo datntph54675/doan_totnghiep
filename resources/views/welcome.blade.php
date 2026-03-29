@@ -1,6 +1,6 @@
 @extends('layouts.user')
 
-@section('title', 'VietTour - Khám Phá Việt Nam Cùng Chúng Tôi')
+@section('title', 'GoTour - Khám Phá Việt Nam Cùng Chúng Tôi')
 
 @section('styles')
 <style>
@@ -368,7 +368,7 @@
     <div class="container">
         <div style="text-align:center; margin-bottom:48px;">
             <span class="badge badge-blue" style="margin-bottom:12px;display:inline-block">💎 UY TÍN</span>
-            <h2 class="section-title" style="color:#fff">Tại Sao Chọn VietTour?</h2>
+            <h2 class="section-title" style="color:#fff">Tại Sao Chọn GoTour?</h2>
             <p style="color:#718096">Chúng tôi cam kết mang lại trải nghiệm tuyệt vời nhất cho bạn</p>
         </div>
         <div class="why-grid">

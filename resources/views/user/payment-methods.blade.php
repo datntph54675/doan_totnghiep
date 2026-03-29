@@ -1,6 +1,6 @@
 @extends('layouts.user')
 
-@section('title', 'Chọn phương thức thanh toán - VietTour')
+@section('title', 'Chọn phương thức thanh toán - GoTour')
 
 @push('styles')
 <style>

@@ -1,6 +1,6 @@
 @extends('layouts.user')
 
-@section('title', 'Đăng nhập - VietTour')
+@section('title', 'Đăng nhập - GoTour')
 
 @section('styles')
 <style>
@@ -179,7 +179,7 @@
     <div class="auth-card">
         <div class="auth-header">
             <h1>Đăng nhập</h1>
-            <p>Mừng bạn quay trở lại với VietTour</p>
+            <p>Mừng bạn quay trở lại với GoTour</p>
         </div>
 
         <form action="{{ route('login.post') }}" method="POST">

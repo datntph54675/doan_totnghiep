@@ -29,7 +29,7 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Dịch vụ:</span>
-                            <span class="fw-bold">VietTour Booking Center</span>
+                            <span class="fw-bold">GoTour Booking Center</span>
                         </div>
                     </div>
 
@@ -50,7 +50,7 @@
                         <input type="hidden" name="orderId" value="{{ $booking->booking_id }}_{{ time() }}">
                         <input type="hidden" name="requestId" value="{{ time() }}">
                         <input type="hidden" name="amount" value="{{ $booking->total_price }}">
-                        <input type="hidden" name="orderInfo" value="Thanh toan VietTour #{{ $booking->booking_id }}">
+                        <input type="hidden" name="orderInfo" value="Thanh toan GoTour #{{ $booking->booking_id }}">
                         <input type="hidden" name="orderType" value="momo_wallet">
                         <input type="hidden" name="transId" value="{{ time() . rand(100, 999) }}">
                         <input type="hidden" name="resultCode" value="0">

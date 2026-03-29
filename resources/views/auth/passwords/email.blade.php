@@ -1,6 +1,6 @@
 @extends('layouts.user')
 
-@section('title', 'Quên mật khẩu - VietTour')
+@section('title', 'Quên mật khẩu - GoTour')
 
 @section('styles')
 <style>

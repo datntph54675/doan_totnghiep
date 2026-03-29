@@ -1,6 +1,6 @@
 @extends('layouts.user')
 
-@section('title', 'Chuyển khoản VietQR - VietTour')
+@section('title', 'Chuyển khoản VietQR - GoTour')
 
 @push('styles')
 <style>
@@ -267,7 +267,7 @@
                 <div class="qr-layout">
                     <!-- Mã QR -->
                     <div class="qr-image-wrap">
-                        <img src="{{ $qrUrl }}" alt="Mã QR Chuyển khoản VietTour">
+                        <img src="{{ $qrUrl }}" alt="Mã QR Chuyển khoản GoTour">
                         <div class="qr-scan-text">Mở app ngân hàng → Quét mã QR</div>
                     </div>
 

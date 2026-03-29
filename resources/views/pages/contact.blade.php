@@ -1,7 +1,7 @@
 @extends('layouts.user')
 
-@section('title', 'Liên hệ - VietTour')
-@section('meta_description', 'Liên hệ VietTour — hotline, email và form gửi tin nhắn. Chúng tôi phản hồi nhanh trong giờ
+@section('title', 'Liên hệ - GoTour')
+@section('meta_description', 'Liên hệ GoTour — hotline, email và form gửi tin nhắn. Chúng tôi phản hồi nhanh trong giờ
     hành chính.')
 
 @section('styles')
@@ -305,7 +305,7 @@
             <div class="contact-hero-inner">
                 <div class="eyebrow"><i class="fas fa-paper-plane"></i> Liên hệ</div>
                 <h1>Chúng tôi luôn sẵn sàng lắng nghe bạn</h1>
-                <p>Gửi câu hỏi về tour, yêu cầu tư vấn lịch trình hoặc phản hồi dịch vụ — đội ngũ VietTour sẽ phản hồi trong
+                <p>Gửi câu hỏi về tour, yêu cầu tư vấn lịch trình hoặc phản hồi dịch vụ — đội ngũ GoTour sẽ phản hồi trong
                     thời gian sớm nhất có thể.</p>
             </div>
         </div>
@@ -326,7 +326,7 @@
                         <div class="contact-card-icon"><i class="fas fa-envelope"></i></div>
                         <div>
                             <h3>Email</h3>
-                            <p><a href="mailto:info@viettour.vn">info@viettour.vn</a><br>Hỗ trợ đặt tour &amp; hợp tác</p>
+                            <p><a href="mailto:info@GoTour.vn">info@GoTour.vn</a><br>Hỗ trợ đặt tour &amp; hợp tác</p>
                         </div>
                     </div>
                     <div class="contact-card">

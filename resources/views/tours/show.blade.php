@@ -1,6 +1,6 @@
 @extends('layouts.user')
 
-@section('title', $tour->name . ' - VietTour')
+@section('title', $tour->name . ' - GoTour')
 @section('meta_description', $tour->description ?? 'Chi tiết tour ' . $tour->name)
 
 @section('styles')

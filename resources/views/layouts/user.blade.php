@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'VietTour - Khám Phá Việt Nam')</title>
+    <title>@yield('title', 'GoTour - Khám Phá Việt Nam')</title>
     <meta name="description" content="@yield('meta_description', 'Đặt tour du lịch Việt Nam uy tín, giá tốt. Hàng trăm tour hấp dẫn đang chờ bạn!')">
 
     <!-- Google Fonts -->
@@ -228,7 +228,7 @@
         <div class="navbar-inner">
             <a href="{{ route('home') }}" class="logo">
                 <div class="logo-icon"><i class="fas fa-plane"></i></div>
-                VietTour
+                GoTour
             </a>
             <div class="nav-links">
                 <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">
@@ -293,7 +293,7 @@
     <div class="container">
         <div class="footer-grid">
             <div>
-                <div class="footer-brand-name">✈ VietTour</div>
+                <div class="footer-brand-name">✈ GoTour</div>
                 <p class="footer-desc">Chúng tôi mang đến những hành trình đáng nhớ khắp mọi miền Việt Nam. Uy tín - Chất lượng - Giá tốt.</p>
                 <div class="footer-social">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -325,14 +325,14 @@
                 <div class="footer-title">Liên Hệ</div>
                 <div class="footer-links">
                     <a href="tel:1900xxxx"><i class="fas fa-phone"></i> 1900 xxxx</a>
-                    <a href="mailto:info@viettour.vn"><i class="fas fa-envelope"></i> info@viettour.vn</a>
+                    <a href="mailto:info@GoTour.vn"><i class="fas fa-envelope"></i> info@GoTour.vn</a>
                     <a href="{{ route('contact') }}"><i class="fas fa-paper-plane"></i> Gửi tin nhắn</a>
                     <a href="#"><i class="fas fa-map-marker-alt"></i> Hà Nội, Việt Nam</a>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2026 VietTour. Đồ án tốt nghiệp - Website Đặt Tour Du Lịch.</p>
+            <p>© 2026 GoTour. Đồ án tốt nghiệp - Website Đặt Tour Du Lịch.</p>
         </div>
     </div>
 </footer>

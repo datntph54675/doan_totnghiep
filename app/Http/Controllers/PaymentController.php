@@ -134,7 +134,7 @@ class PaymentController extends Controller
             'account_name' => env('VIETQR_ACCOUNT_NAME', 'HOANG DUC TIEN'),
         ];
 
-        $transferContent = 'VIETTOUR ' . $booking->booking_id;
+        $transferContent = 'GoTour ' . $booking->booking_id;
         $amount = (int) $booking->total_price;
 
         // Tạo URL QR từ VietQR API
