@@ -757,7 +757,7 @@
             <div class="policy-note">
                 <i class="fa-solid fa-shield-halved" style="font-size:18px; margin-top:2px; flex-shrink:0"></i>
                 <div>
-                    <strong>Chính sách đặt tour:</strong> Sau khi xác nhận đặt, đội ngũ VietTour sẽ liên hệ với bạn trong vòng 2 giờ để xác nhận lịch trình và hướng dẫn thanh toán.
+                    <strong>Chính sách đặt tour:</strong> Sau khi xác nhận đặt, đội ngũ GoTour sẽ liên hệ với bạn trong vòng 2 giờ để xác nhận lịch trình và hướng dẫn thanh toán.
                 </div>
             </div>
 

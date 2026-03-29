@@ -20,7 +20,7 @@ class MomoService
         $accessKey = config('momo.access_key');
         $secretKey = config('momo.secret_key');
         
-        $orderInfo = "Thanh toan don hang VietTour #" . $data['booking_id'];
+        $orderInfo = "Thanh toan don hang GoTour #" . $data['booking_id'];
         $amount = (string)$data['amount'];
         $orderId = (string)$data['booking_id'] . '_' . time(); 
         $requestId = $orderId;

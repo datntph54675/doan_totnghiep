@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đặt lại mật khẩu VietTour</title>
+    <title>Đặt lại mật khẩu GoTour</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -101,14 +101,14 @@
             <!-- Header -->
             <div class="email-header">
                 <div class="logo-icon">✈</div>
-                <h1>VietTour</h1>
+                <h1>GoTour</h1>
             </div>
 
             <!-- Body -->
             <div class="email-body">
                 <div class="greeting">Xin chào!</div>
                 <div class="message">
-                    Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản VietTour của bạn. Đừng lo lắng, hãy nhấp vào nút bên dưới để tạo mật khẩu cực kỳ bảo mật mới.
+                    Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản GoTour của bạn. Đừng lo lắng, hãy nhấp vào nút bên dưới để tạo mật khẩu cực kỳ bảo mật mới.
                 </div>
 
                 <div class="cta-wrapper">
@@ -129,7 +129,7 @@
                 Nếu bạn gặp khó khăn khi nhấp vào nút "Đặt lại mật khẩu ngay", hãy sao chép và dán địa chỉ URL sau vào trình duyệt web của bạn:<br><br>
                 <a href="{{ $url }}" class="link-alt">{{ $url }}</a>
                 <br><br>
-                © 2026 VietTour. Khám phá hành trình di sản Việt Nam.<br>
+                © 2026 GoTour. Khám phá hành trình di sản Việt Nam.<br>
                 Hỗ trợ khách hàng: 1900 xxxx
             </div>
         </div>

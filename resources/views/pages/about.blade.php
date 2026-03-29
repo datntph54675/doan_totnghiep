@@ -1,7 +1,7 @@
 @extends('layouts.user')
 
-@section('title', 'Giới thiệu - VietTour')
-@section('meta_description', 'VietTour - Đồng hành cùng bạn khám phá Việt Nam. Sứ mệnh, giá trị và cam kết chất lượng dịch vụ du lịch.')
+@section('title', 'Giới thiệu - GoTour')
+@section('meta_description', 'GoTour - Đồng hành cùng bạn khám phá Việt Nam. Sứ mệnh, giá trị và cam kết chất lượng dịch vụ du lịch.')
 
 @section('styles')
 <style>
@@ -158,7 +158,7 @@
     <div class="container page-hero-inner">
         <div class="eyebrow"><i class="fas fa-compass"></i> Về chúng tôi</div>
         <h1>Đồng hành cùng bạn <span>khám phá Việt Nam</span></h1>
-        <p>VietTour ra đời từ niềm đam mê du lịch và mong muốn mang đến những hành trình trọn vẹn — an toàn, chân thực và đáng nhớ cho mọi người.</p>
+        <p>GoTour ra đời từ niềm đam mê du lịch và mong muốn mang đến những hành trình trọn vẹn — an toàn, chân thực và đáng nhớ cho mọi người.</p>
     </div>
 </section>
 
@@ -170,9 +170,9 @@
             </div>
             <div class="story-content">
                 <span class="badge badge-blue" style="margin-bottom:12px;display:inline-block">Câu chuyện</span>
-                <h2>Sứ mệnh của VietTour</h2>
+                <h2>Sứ mệnh của GoTour</h2>
                 <p>Chúng tôi tin rằng mỗi chuyến đi không chỉ là điểm đến, mà là khoảnh khắc kết nối con người với thiên nhiên, văn hóa và cộng đồng địa phương.</p>
-                <p>VietTour kết nối khách hàng với các tour được tuyển chọn kỹ, hướng dẫn viên chuyên nghiệp và quy trình đặt chỗ minh bạch — giúp bạn yên tâm từ lúc lên kế hoạch đến khi trở về.</p>
+                <p>GoTour kết nối khách hàng với các tour được tuyển chọn kỹ, hướng dẫn viên chuyên nghiệp và quy trình đặt chỗ minh bạch — giúp bạn yên tâm từ lúc lên kế hoạch đến khi trở về.</p>
                 <p style="margin-bottom:0">Đội ngũ của chúng tôi luôn lắng nghe phản hồi để không ngừng cải thiện trải nghiệm, xứng đáng với niềm tin bạn đặt vào chúng tôi.</p>
             </div>
         </div>
@@ -184,7 +184,7 @@
         <div class="values-header">
             <span class="badge badge-orange" style="margin-bottom:10px;display:inline-block">Giá trị cốt lõi</span>
             <h2 class="section-title">Điều chúng tôi cam kết</h2>
-            <p class="section-sub" style="margin-bottom:0">Bốn trụ cột định hình mọi dịch vụ tại VietTour</p>
+            <p class="section-sub" style="margin-bottom:0">Bốn trụ cột định hình mọi dịch vụ tại GoTour</p>
         </div>
         <div class="values-grid">
             <div class="value-card">
@@ -245,7 +245,7 @@
             <div class="timeline-item">
                 <span class="timeline-year">Khởi đầu</span>
                 <h3>Thành lập &amp; định hướng</h3>
-                <p>VietTour bắt đầu từ nhóm bạn đam mê du lịch, tập trung các tour nội địa chất lượng và dịch vụ tận tâm.</p>
+                <p>GoTour bắt đầu từ nhóm bạn đam mê du lịch, tập trung các tour nội địa chất lượng và dịch vụ tận tâm.</p>
             </div>
             <div class="timeline-item">
                 <span class="timeline-year">Mở rộng</span>

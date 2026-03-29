@@ -35,7 +35,7 @@ class TourDataSeeder extends Seeder
                 'category_id' => $catIds['Tour Miền Bắc'], 'name' => 'Hà Nội - Hạ Long - Sapa 5N4Đ',
                 'description' => 'Khám phá vẻ đẹp di sản Vịnh Hạ Long và đỉnh Fansipan Sapa mờ sương. Trọn gói vé tham quan, khách sạn 4 sao.',
                 'policy' => 'Hoàn 100% nếu hủy trước 7 ngày. Phụ thu phòng đơn: 1.500.000 VNĐ.',
-                'supplier' => 'VietTour', 'price' => 5500000, 'max_people' => 25, 'duration' => 5,
+                'supplier' => 'GoTour', 'price' => 5500000, 'max_people' => 25, 'duration' => 5,
             ],
             [
                 'category_id' => $catIds['Tour Miền Bắc'], 'name' => 'Mộc Châu - Mai Châu 2N1Đ - Mùa Hoa Mận',
@@ -53,7 +53,7 @@ class TourDataSeeder extends Seeder
                 'category_id' => $catIds['Tour Miền Bắc'], 'name' => 'Ninh Bình - Tràng An - Bái Đính 1 Ngày',
                 'description' => 'Tour trong ngày khám phá Tràng An non nước hữu tình và chùa Bái Đính đồ sộ.',
                 'policy' => 'Miễn phí hủy trước 24h.',
-                'supplier' => 'VietTour', 'price' => 850000, 'max_people' => 40, 'duration' => 1,
+                'supplier' => 'GoTour', 'price' => 850000, 'max_people' => 40, 'duration' => 1,
             ],
 
             // Miền Trung
@@ -61,7 +61,7 @@ class TourDataSeeder extends Seeder
                 'category_id' => $catIds['Tour Miền Trung'], 'name' => 'Đà Nẵng - Hội An - Bà Nà 4N3Đ',
                 'description' => 'Trọn vẹn miền Trung: Phố cổ Hội An lung linh, Bà Nà Hills bồng lai tiên cảnh và biển Đà Nẵng.',
                 'policy' => 'Đã bao gồm vé cáp treo Bà Nà. Hủy mất cọc.',
-                'supplier' => 'VietTour', 'price' => 6250000, 'max_people' => 30, 'duration' => 4,
+                'supplier' => 'GoTour', 'price' => 6250000, 'max_people' => 30, 'duration' => 4,
             ],
             [
                 'category_id' => $catIds['Tour Miền Trung'], 'name' => 'Huế - Lăng tẩm - Cố Đô 3N2Đ',
@@ -87,7 +87,7 @@ class TourDataSeeder extends Seeder
                 'category_id' => $catIds['Tour Miền Nam'], 'name' => 'Khám phá Sài Gòn 1 Ngày',
                 'description' => 'Tham quan Dinh Độc Lập, Bưu điện Trung tâm, và dạo thuyền trên sông Sài Gòn tối.',
                 'policy' => 'Hủy trước 24h hoàn tiền 100%.',
-                'supplier' => 'VietTour', 'price' => 750000, 'max_people' => 40, 'duration' => 1,
+                'supplier' => 'GoTour', 'price' => 750000, 'max_people' => 40, 'duration' => 1,
             ],
             [
                 'category_id' => $catIds['Tour Miền Nam'], 'name' => 'Tây Ninh - Núi Bà Đen 1 Ngày',
@@ -101,7 +101,7 @@ class TourDataSeeder extends Seeder
                 'category_id' => $catIds['Tour Biển Đảo'], 'name' => 'Phú Quốc - Grand World - Hòn Thơm 4N3Đ',
                 'description' => 'Nghỉ dưỡng trọn gói tại Đảo Ngọc. Trải nghiệm cáp treo Hòn Thơm và Thành phố không ngủ.',
                 'policy' => 'Đã gồm vé máy bay khứ hồi từ HN/HCM. Không hoàn hủy.',
-                'supplier' => 'VietTour', 'price' => 8900000, 'max_people' => 30, 'duration' => 4,
+                'supplier' => 'GoTour', 'price' => 8900000, 'max_people' => 30, 'duration' => 4,
             ],
             [
                 'category_id' => $catIds['Tour Biển Đảo'], 'name' => 'Nha Trang - VinWonders - Đảo Yến 3N2Đ',
@@ -121,7 +121,7 @@ class TourDataSeeder extends Seeder
                 'category_id' => $catIds['Tour Sinh Thái'], 'name' => 'Trekking Tà Năng - Phan Dũng 2N1Đ',
                 'description' => 'Cung đường trekking đẹp nhất Việt Nam đi qua 3 tỉnh Lâm Đồng - Ninh Thuận - Bình Thuận.',
                 'policy' => 'Yêu cầu khách có thể lực tốt. Không nhận trẻ dưới 16 tuổi.',
-                'supplier' => 'VietTour', 'price' => 2800000, 'max_people' => 15, 'duration' => 2,
+                'supplier' => 'GoTour', 'price' => 2800000, 'max_people' => 15, 'duration' => 2,
             ],
             [
                 'category_id' => $catIds['Tour Quốc Tế'], 'name' => 'Thái Lan - Bangkok - Pattaya 5N4Đ',

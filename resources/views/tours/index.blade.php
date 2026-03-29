@@ -1,6 +1,6 @@
 @extends('layouts.user')
 
-@section('title', 'Danh Sách Tour - VietTour')
+@section('title', 'Danh Sách Tour - GoTour')
 @section('meta_description', 'Tìm kiếm và đặt tour du lịch Việt Nam uy tín, giá tốt. Filter theo danh mục, giá, thời gian.')
 
 @section('styles')

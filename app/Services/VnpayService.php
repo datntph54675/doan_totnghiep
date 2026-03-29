@@ -24,7 +24,7 @@ class VnpayService
             "vnp_CurrCode" => "VND",
             "vnp_IpAddr" => $data['ip_address'],
             "vnp_Locale" => "vn",
-            "vnp_OrderInfo" => "Thanh toan don hang VietTour #" . $data['booking_id'],
+            "vnp_OrderInfo" => "Thanh toan don hang GoTour #" . $data['booking_id'],
             "vnp_OrderType" => "billpayment",
             "vnp_ReturnUrl" => $vnp_Returnurl,
             "vnp_TxnRef" => $data['booking_id'] . '_' . time(),

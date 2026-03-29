@@ -42,7 +42,7 @@ class ResetPasswordNotification extends Notification
         ], false));
 
         return (new MailMessage)
-            ->subject('Đặt lại mật khẩu tài khoản VietTour')
+            ->subject('Đặt lại mật khẩu tài khoản GoTour')
             ->view('emails.reset-password', ['url' => $url]);
     }
 

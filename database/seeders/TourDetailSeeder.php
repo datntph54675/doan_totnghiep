@@ -21,7 +21,7 @@ class TourDetailSeeder extends Seeder
                     'end_date' => Carbon::now()->addDays(rand(16, 20)),
                     'max_people' => 20,
                     'status' => 'scheduled',
-                    'meeting_point' => 'Văn phòng VietTour - Hà Nội',
+                    'meeting_point' => 'Văn phòng GoTour - Hà Nội',
                     'created_at' => now(),
                     'updated_at' => now(),
                 ],

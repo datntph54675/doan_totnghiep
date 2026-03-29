@@ -1,8 +1,10 @@
 ## Lấy code về chạy:
 1. git pull origin main
-2. composer install
-3. npm run dev
-4. php artisan serve
+2. php artisan migrate
+3. php artisan db:seed
+4. composer install
+5. npm run dev
+6. php artisan serve
 * dùng chung laragon, php8.3
 
 
