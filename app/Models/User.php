@@ -38,6 +38,7 @@ class User extends Authenticatable
         'status',
         'google_id',
         'avatar',
+        'is_blacklisted',
     ];
 
     protected $hidden = [

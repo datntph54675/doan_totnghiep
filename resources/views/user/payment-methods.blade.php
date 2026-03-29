@@ -218,6 +218,41 @@
     }
     .security-badge i { color: #00b894; }
 
+    .countdown-timer {
+        background: #fff8e1;
+        border: 1px solid #ffe082;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 25px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+    .countdown-timer .timer-label {
+        font-size: 13px;
+        color: #856404;
+        font-weight: 600;
+    }
+    .countdown-timer .timer-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #d32f2f;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    .expired-notice {
+        display: none;
+        background: #ffebee;
+        border: 1px solid #ffcdd2;
+        color: #c62828;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 700;
+    }
+
     @media (max-width: 992px) {
         .methods-grid { grid-template-columns: 1fr 1fr; }
     }
@@ -235,6 +270,17 @@
             <h1>💳 Chọn phương thức thanh toán</h1>
             <p>Hoàn tất thanh toán để xác nhận đặt tour của bạn</p>
         </div>
+
+        @if($booking->payment_status === 'unpaid' && $booking->status === 'upcoming' && $booking->expires_at)
+            <div id="countdown-container" class="countdown-timer">
+                <span class="timer-label"><i class="fa-solid fa-clock"></i> Đơn hàng của bạn sẽ hết hạn trong:</span>
+                <span id="timer" class="timer-value">03:00</span>
+            </div>
+            <div id="expired-container" class="expired-notice">
+                <i class="fa-solid fa-circle-xmark"></i>
+                Đơn hàng của bạn đã hết hạn. Vui lòng quay lại tìm tour để đặt chỗ mới.
+            </div>
+        @endif
 
         @if(session('error'))
             <div style="background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; padding: 15px 20px; border-radius: 14px; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; font-size: 14px;">
@@ -340,3 +386,54 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const expiresAt = new Date("{{ $booking->expires_at ? $booking->expires_at->toIso8601String() : '' }}").getTime();
+        const timerDisplay = document.getElementById('timer');
+        const countdownContainer = document.getElementById('countdown-container');
+        const expiredContainer = document.getElementById('expired-container');
+        const paymentButtons = document.querySelectorAll('.btn-pay');
+        const methodCards = document.querySelectorAll('.method-card');
+
+        if (!expiresAt || !timerDisplay) return;
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = expiresAt - now;
+
+            if (distance < 0) {
+                clearInterval(interval);
+                timerDisplay.innerHTML = "00:00";
+                countdownContainer.style.display = 'none';
+                expiredContainer.style.display = 'block';
+                
+                // Vô hiệu hóa các nút thanh toán
+                paymentButtons.forEach(btn => {
+                    btn.style.opacity = '0.5';
+                    btn.style.pointerEvents = 'none';
+                    btn.innerHTML = '<i class="fa-solid fa-ban"></i> Đã hết hạn';
+                });
+                methodCards.forEach(card => card.style.opacity = '0.7');
+                return;
+            }
+
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            timerDisplay.innerHTML = 
+                (minutes < 10 ? "0" + minutes : minutes) + ":" + 
+                (seconds < 10 ? "0" + seconds : seconds);
+            
+            // Đổi màu đỏ khi còn dưới 3 phút
+            if (minutes < 3) {
+                timerDisplay.style.color = "#ff0000";
+            }
+        }
+
+        const interval = setInterval(updateTimer, 1000);
+        updateTimer();
+    });
+</script>
+@endpush

@@ -4,14 +4,17 @@ namespace App\Models;
 
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Booking extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'booking';
     protected $primaryKey = 'booking_id';
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'schedule_id',
@@ -27,12 +30,15 @@ class Booking extends Model
         'payment_method',
         'vnp_transaction_no',
         'note',
+        'expires_at',
     ];
 
     protected $casts = [
         'booking_date' => 'datetime',
         'total_price' => 'decimal:2',
         'admin_confirmed' => 'boolean',
+        'expires_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function tour(): BelongsTo
@@ -76,7 +82,7 @@ class Booking extends Model
 
     public function canBeCancelledByUser(): bool
     {
-        if ($this->status !== 'upcoming') {
+        if ($this->status !== 'upcoming' || $this->payment_status !== 'unpaid') {
             return false;
         }
 

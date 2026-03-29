@@ -69,4 +69,21 @@ class UserController extends Controller
         $message = $user->status === 'active' ? 'Hiển thị người dùng thành công.' : 'Ẩn người dùng thành công.';
         return redirect(url('admin/users'))->with('success', $message);
     }
+
+    /**
+     * Toggle the blacklist status of the specified user.
+     */
+    public function toggleBlacklist($id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->is_blacklisted = !$user->is_blacklisted;
+        $user->save();
+
+        $message = $user->is_blacklisted
+            ? "Đã đưa người dùng {$user->fullname} vào Blacklist."
+            : "Đã gỡ người dùng {$user->fullname} khỏi Blacklist.";
+
+        return redirect(url('admin/users'))->with('success', $message);
+    }
 }
