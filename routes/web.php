@@ -53,7 +53,7 @@ Route::get('/tours/{id}', [TourUserController::class, 'show'])->name('tours.show
 Route::middleware('auth')->group(function () {
     Route::get('/tours/{id}/booking', [BookingController::class, 'create'])->name('user.booking');
     Route::post('/tours/{id}/booking', [BookingController::class, 'store'])->name('user.booking.store');
-    
+
     Route::get('/profile', [App\Http\Controllers\UserProfileController::class, 'edit'])->name('user.profile');
     Route::get('/profile/bookings', [App\Http\Controllers\UserProfileController::class, 'bookings'])->name('user.bookings');
     Route::put('/profile', [App\Http\Controllers\UserProfileController::class, 'updateProfile'])->name('user.profile.update');
@@ -117,7 +117,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-// Guide auth
 Route::prefix('guide')->group(function () {
     Route::get('login', [GuideAuthController::class, 'showLogin'])->name('guide.login');
     Route::post('login', [GuideAuthController::class, 'login'])->name('guide.login.post');
@@ -125,6 +124,12 @@ Route::prefix('guide')->group(function () {
     Route::middleware(['auth', EnsureRole::class . ':tour_guide'])->group(function () {
         Route::post('logout', [GuideAuthController::class, 'logout'])->name('guide.logout');
         Route::get('dashboard', [\App\Http\Controllers\GuideController::class, 'dashboard'])->name('guide.dashboard');
+
+        // Assignment confirmation routes
+        Route::get('assignments', [\App\Http\Controllers\GuideController::class, 'assignmentList'])->name('guide.assignments');
+        Route::post('assignments/{id}/accept', [\App\Http\Controllers\GuideController::class, 'acceptAssignment'])->name('guide.assignments.accept');
+        Route::post('assignments/{id}/reject', [\App\Http\Controllers\GuideController::class, 'rejectAssignment'])->name('guide.assignments.reject');
+
         Route::get('tour/{scheduleId}', [\App\Http\Controllers\GuideController::class, 'tourDetail'])->name('guide.tour.detail');
         Route::get('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'attendance'])->name('guide.attendance');
         Route::post('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'markAttendance'])->name('guide.attendance.mark');

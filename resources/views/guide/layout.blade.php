@@ -752,6 +752,12 @@
                 <span class="nav-icon">🏠</span> Dashboard
             </a>
 
+            <div class="nav-label">Phân công tour</div>
+            <a href="{{ route('guide.assignments') }}"
+                class="nav-item {{ request()->routeIs('guide.assignments') ? 'active' : '' }}">
+                <span class="nav-icon">📋</span> Danh sách tour gán
+            </a>
+
             <div class="nav-label">Tour của tôi</div>
             <a href="{{ route('guide.dashboard') }}#upcoming" class="nav-item">
                 <span class="nav-icon">📅</span> Tour sắp tới
@@ -794,12 +800,16 @@
             </div>
             <div class="topbar-right">
                 <span style="font-size:13px; color:var(--text-muted)">{{ now()->format('d/m/Y') }}</span>
+                <form method="POST" action="{{ route('guide.logout') }}" style="margin:0;">
+                    @csrf
+                    <button type="submit" class="btn btn-outline btn-sm">Đăng xuất</button>
+                </form>
             </div>
         </header>
 
         <main class="content">
             @if(session('success'))
-                <div class="alert alert-success">✅ {{ session('success') }}</div>
+            <div class="alert alert-success">✅ {{ session('success') }}</div>
             @endif
 
             @yield('content')

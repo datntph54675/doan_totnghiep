@@ -20,14 +20,14 @@
                 <select name="schedule_id" id="schedule_id" class="form-select @error('schedule_id') is-invalid @enderror" required>
                     <option value="">-- Chọn lịch khởi hành --</option>
                     @foreach($schedules as $schedule)
-                        <option value="{{ $schedule->schedule_id }}" @selected($guideAssignment->schedule_id == $schedule->schedule_id)>
-                            {{ $schedule->tour->name }} - 
-                            {{ \Illuminate\Support\Carbon::parse($schedule->start_date)->format('d/m/Y') }} đến {{ \Illuminate\Support\Carbon::parse($schedule->end_date)->format('d/m/Y') }}
-                        </option>
+                    <option value="{{ $schedule->schedule_id }}" @selected($guideAssignment->schedule_id == $schedule->schedule_id)>
+                        {{ $schedule->tour->name }} -
+                        {{ \Illuminate\Support\Carbon::parse($schedule->start_date)->format('d/m/Y') }} đến {{ \Illuminate\Support\Carbon::parse($schedule->end_date)->format('d/m/Y') }}
+                    </option>
                     @endforeach
                 </select>
                 @error('schedule_id')
-                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                <span class="invalid-feedback d-block">{{ $message }}</span>
                 @enderror
             </div>
 
@@ -36,27 +36,13 @@
                 <select name="guide_id" id="guide_id" class="form-select @error('guide_id') is-invalid @enderror" required>
                     <option value="">-- Chọn hướng dẫn viên --</option>
                     @foreach($guides as $guide)
-                        <option value="{{ $guide->guide_id }}" @selected($guideAssignment->guide_id == $guide->guide_id)>
-                            {{ $guide->user->fullname }} ({{ $guide->user->phone ?? 'N/A' }})
-                        </option>
+                    <option value="{{ $guide->guide_id }}" @selected($guideAssignment->guide_id == $guide->guide_id)>
+                        {{ $guide->user->fullname }} ({{ $guide->user->phone ?? 'N/A' }})
+                    </option>
                     @endforeach
                 </select>
                 @error('guide_id')
-                    <span class="invalid-feedback d-block">{{ $message }}</span>
-                @enderror
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
-                <select name="status" id="status" class="form-select @error('status') is-invalid @enderror" required>
-                    <option value="active" @selected($guideAssignment->status == 'active')>Hoạt động</option>
-                    <option value="cancelled" @selected($guideAssignment->status == 'cancelled')>Hủy</option>
-                    <option value="completed" @selected($guideAssignment->status == 'completed')>Hoàn thành</option>
-                </select>
-                @error('status')
-                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                <span class="invalid-feedback d-block">{{ $message }}</span>
                 @enderror
             </div>
         </div>
@@ -65,7 +51,7 @@
             <label for="note" class="form-label">Ghi chú</label>
             <textarea name="note" id="note" class="form-control @error('note') is-invalid @enderror" rows="3" placeholder="Nhập ghi chú nếu có...">{{ old('note', $guideAssignment->note) }}</textarea>
             @error('note')
-                <span class="invalid-feedback d-block">{{ $message }}</span>
+            <span class="invalid-feedback d-block">{{ $message }}</span>
             @enderror
         </div>
 
@@ -74,6 +60,29 @@
             <ul class="mb-0">
                 <li>Phân công bởi: <strong>{{ $guideAssignment->assigner->fullname ?? 'N/A' }}</strong></li>
                 <li>Ngày phân công: <strong>{{ $guideAssignment->assigned_at->format('d/m/Y H:i') }}</strong></li>
+            </ul>
+        </div>
+
+        <div class="alert alert-secondary">
+            <small><strong>Trạng thái xác nhận từ HDV:</strong></small>
+            <ul class="mb-0">
+                <li>Trạng thái: <strong>
+                        @if($guideAssignment->status == 'pending')
+                        <span class="badge bg-warning">Chờ xác nhận</span>
+                        @elseif($guideAssignment->status == 'accepted')
+                        <span class="badge bg-success">Đã chấp nhận</span>
+                        @elseif($guideAssignment->status == 'rejected')
+                        <span class="badge bg-danger">Từ chối</span>
+                        @else
+                        <span class="badge bg-secondary">{{ $guideAssignment->status }}</span>
+                        @endif
+                    </strong></li>
+                @if($guideAssignment->confirmed_at)
+                <li>Xác nhận lúc: <strong>{{ $guideAssignment->confirmed_at->format('d/m/Y H:i') }}</strong></li>
+                @endif
+                @if($guideAssignment->rejection_reason)
+                <li>Lý do từ chối: <strong>{{ $guideAssignment->rejection_reason }}</strong></li>
+                @endif
             </ul>
         </div>
 
