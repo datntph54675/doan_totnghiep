@@ -539,6 +539,22 @@
     </div>
 </section>
 
+{{-- ALERTS --}}
+<div class="container" style="margin-top: 20px;">
+    @if(session('error'))
+        <div style="background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; padding: 18px 24px; border-radius: 16px; margin-bottom: 0; display: flex; align-items: flex-start; gap: 14px; font-size: 15px; box-shadow: 0 4px 12px rgba(229, 62, 62, 0.08);">
+            <i class="fa-solid fa-circle-exclamation" style="margin-top: 3px; font-size: 18px;"></i>
+            <div>
+                <strong style="display: block; margin-bottom: 4px;">Thông báo hệ thống</strong>
+                {{ session('error') }}
+                @if(str_contains(session('error'), 'đơn hàng chờ thanh toán'))
+                    <a href="{{ route('user.bookings') }}" style="display: inline-block; margin-top: 8px; color: #c53030; font-weight: 700; text-decoration: underline;">Xem đơn hàng của bạn</a>
+                @endif
+            </div>
+        </div>
+    @endif
+</div>
+
 {{-- STEPS --}}
 <div class="booking-steps">
     <div class="booking-steps-inner">

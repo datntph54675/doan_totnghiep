@@ -27,10 +27,42 @@ class UserProfileController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        // Tự động kiểm tra và hủy các đơn hàng hết hạn ngay khi xem trang (Lazy Cleanup)
+        $this->expireOldBookings($user->user_id);
+
         return view('user.booking-status', [
             'user' => $user,
             ...$this->getBookingStatusData($user->user_id),
         ]);
+    }
+
+    private function expireOldBookings(int $userId)
+    {
+        $expiredBookings = Booking::where('user_id', $userId)
+            ->where('status', 'upcoming')
+            ->where('payment_status', 'unpaid')
+            ->where('expires_at', '<', now())
+            ->get();
+
+        /** @var Booking $booking */
+        foreach ($expiredBookings as $booking) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($booking) {
+                $booking->update([
+                    'status' => 'cancelled',
+                    'note' => ($booking->note ? $booking->note . PHP_EOL : '') . 'Hệ thống tự động hủy do quá hạn thanh toán.'
+                ]);
+
+                if ($booking->schedule) {
+                    $booking->schedule()->increment('available_spots', $booking->num_people);
+                }
+                
+                // Gửi thông báo
+                $user = \App\Models\User::find($booking->user_id);
+                if ($user) {
+                    $user->notify(new \App\Notifications\BookingExpiredNotification($booking));
+                }
+            });
+        }
     }
 
     private function getBookingStatusData(int $userId): array

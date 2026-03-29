@@ -25,9 +25,9 @@
                             <th class="ps-4 py-3 text-uppercase text-muted small fw-bold" style="width: 80px;">ID</th>
                             <th class="py-3 text-uppercase text-muted small fw-bold">Tên</th>
                             <th class="py-3 text-uppercase text-muted small fw-bold">Email</th>
-                            <th class="py-3 text-uppercase text-muted small fw-bold">Vai trò</th>
-                            <th class="py-3 text-uppercase text-muted small fw-bold">Ngày tạo</th>
-                            <th class="pe-4 py-3 text-uppercase text-muted small fw-bold text-end">Hành động</th>
+                            <th class="py-3 text-uppercase text-muted small fw-bold">Trạng thái</th>
+                            <th class="py-3 text-uppercase text-muted small fw-bold">Blacklist</th>
+                            <th class="py-3 text-uppercase text-muted small fw-bold text-end pe-4">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,24 +38,44 @@
                                 </td>
                                 <td>
                                     <div class="fw-bold text-dark">{{ $user->fullname }}</div>
+                                    <small class="text-muted">{{ optional($user->created_at)->format('d/m/Y') }}</small>
                                 </td>
                                 <td>
                                     <span class="text-muted">{{ $user->email }}</span>
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $user->role }}</span>
+                                    @if($user->status === 'active')
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Hoạt động</span>
+                                    @else
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Đang ẩn</span>
+                                    @endif
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ optional($user->created_at)->format('d/m/Y') }}</span>
+                                    @if($user->is_blacklisted)
+                                        <span class="badge bg-danger rounded-pill"><i class="fas fa-shield-alt me-1"></i> Bị khóa</span>
+                                    @else
+                                        <span class="badge bg-light text-muted border rounded-pill">Bình thường</span>
+                                    @endif
                                 </td>
                                 <td class="pe-4 text-end">
                                     <div class="btn-group">
+                                        {{-- Toggle Blacklist --}}
+                                        <form action="{{ route('admin.users.toggle-blacklist', $user->user_id) }}" method="POST"
+                                            class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn {{ $user->is_blacklisted ? 'gỡ' : 'đưa' }} người dùng này khỏi Blacklist?')">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-sm {{ $user->is_blacklisted ? 'btn-danger' : 'btn-outline-secondary' }} me-2" title="{{ $user->is_blacklisted ? 'Gỡ Blacklist' : 'Đưa vào Blacklist' }}">
+                                                <i class="fas fa-shield-alt"></i>
+                                            </button>
+                                        </form>
+
                                         <a href="{{ url('admin/users/' . $user->user_id . '/edit') }}"
                                             class="btn btn-sm btn-outline-warning me-2" title="Chỉnh sửa">
                                             <i class="fas fa-edit"></i>
                                         </a>
+
                                         <form action="{{ route('admin.users.toggle-status', $user->user_id) }}" method="POST"
-                                            class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái?')">
+                                            class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái hiển thị?')">
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit" class="btn btn-sm {{ $user->status === 'active' ? 'btn-outline-danger' : 'btn-outline-success' }}" title="{{ $user->status === 'active' ? 'Ẩn' : 'Hiện' }}">

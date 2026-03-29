@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Models\DepartureSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class BookingController extends Controller
@@ -31,6 +32,23 @@ class BookingController extends Controller
 
     public function store(Request $request, $tourId)
     {
+        $user = Auth::user();
+
+        // 1. Kiểm tra Blacklist
+        if ($user->is_blacklisted) {
+            return back()->with('error', 'Tài khoản của bạn đã bị khóa tính năng đặt chỗ do vi phạm chính sách thanh toán nhiều lần. Vui lòng liên hệ Admin để được hỗ trợ.')->withInput();
+        }
+
+        // 2. Kiểm tra giới hạn 1 đơn chờ thanh toán
+        $hasPending = Booking::where('user_id', $user->user_id)
+            ->where('payment_status', 'unpaid')
+            ->where('status', 'upcoming')
+            ->exists();
+
+        if ($hasPending) {
+            return back()->with('error', 'Bạn đang có một đơn hàng chờ thanh toán. Vui lòng hoàn tất thanh toán hoặc hủy đơn cũ trước khi đặt tour mới.')->withInput();
+        }
+
         $tour = Tour::visibleToUsers()->findOrFail($tourId);
 
         $validated = $request->validate([
@@ -45,53 +63,62 @@ class BookingController extends Controller
             'note'         => 'nullable|string',
         ]);
 
-        $schedule = DepartureSchedule::where('schedule_id', $validated['schedule_id'])
-            ->where('tour_id', $tour->tour_id)
-            ->where('status', 'scheduled')
-            ->whereDate('start_date', '>=', Carbon::today())
-            ->first();
+        try {
+            return DB::transaction(function () use ($validated, $tour, $user) {
+                // 3. Sử dụng lockForUpdate để tránh Race Condition (Tranh chấp vé)
+                $schedule = DepartureSchedule::where('schedule_id', $validated['schedule_id'])
+                    ->where('tour_id', $tour->tour_id)
+                    ->where('status', 'scheduled')
+                    ->whereDate('start_date', '>=', Carbon::today())
+                    ->lockForUpdate()
+                    ->first();
 
-        if (!$schedule) {
-            return back()->withErrors([
-                'schedule_id' => 'Lịch khởi hành không hợp lệ hoặc không còn khả dụng.'
-            ])->withInput();
+                if (!$schedule) {
+                    throw new \Exception('Lịch khởi hành không hợp lệ hoặc không còn khả dụng.');
+                }
+
+                // 4. Kiểm tra chỗ trống thực tế trong DB sau khi đã Lock
+                if ($validated['num_people'] > $schedule->available_spots) {
+                    throw new \Exception("Rất tiếc, chỉ còn {$schedule->available_spots} chỗ trống cho ngày khởi hành này.");
+                }
+
+                // Tạo hoặc tìm customer theo phone
+                $customer = Customer::firstOrCreate(
+                    ['phone' => $validated['phone']],
+                    [
+                        'fullname'   => $validated['fullname'],
+                        'gender'     => $validated['gender'],
+                        'birthdate'  => $validated['birthdate'] ?? null,
+                        'email'      => $validated['email'] ?? null,
+                        'id_number'  => $validated['id_number'] ?? null,
+                    ]
+                );
+
+                $totalPrice = $tour->price * $validated['num_people'];
+
+                // 5. Tạo Booking với thời hạn 3 phút
+                $booking = Booking::create([
+                    'customer_id'    => $customer->customer_id,
+                    'tour_id'        => $tour->tour_id,
+                    'schedule_id'    => $validated['schedule_id'],
+                    'user_id'        => $user->user_id,
+                    'num_people'     => $validated['num_people'],
+                    'total_price'    => $totalPrice,
+                    'booking_date'   => now(),
+                    'status'         => 'upcoming',
+                    'payment_status' => 'unpaid',
+                    'note'           => $validated['note'] ?? null,
+                    'expires_at'     => now()->addMinutes(3),
+                ]);
+
+                // 6. Trừ vé ngay lập tức để giữ chỗ (Giai đoạn 1)
+                $schedule->decrement('available_spots', $validated['num_people']);
+
+                return redirect()->route('payment.choose', $booking->booking_id);
+            });
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage())->withInput();
         }
-
-        // Kiểm tra chỗ trống
-        if ($validated['num_people'] > $schedule->available_spots) {
-            return back()->withErrors([
-                'num_people' => "Rất tiếc, chỉ còn {$schedule->available_spots} chỗ trống cho ngày khởi hành này."
-            ])->withInput();
-        }
-
-        // Tạo hoặc tìm customer theo phone
-        $customer = Customer::firstOrCreate(
-            ['phone' => $validated['phone']],
-            [
-                'fullname'   => $validated['fullname'],
-                'gender'     => $validated['gender'],
-                'birthdate'  => $validated['birthdate'] ?? null,
-                'email'      => $validated['email'] ?? null,
-                'id_number'  => $validated['id_number'] ?? null,
-            ]
-        );
-
-        $totalPrice = $tour->price * $validated['num_people'];
-
-        $booking = Booking::create([
-            'customer_id'    => $customer->customer_id,
-            'tour_id'        => $tour->tour_id,
-            'schedule_id'    => $validated['schedule_id'],
-            'user_id'        => Auth::id(), // Lưu user_id nếu đã đăng nhập
-            'num_people'     => $validated['num_people'],
-            'total_price'    => $totalPrice,
-            'booking_date'   => now(),
-            'status'         => 'upcoming',
-            'payment_status' => 'unpaid',
-            'note'           => $validated['note'] ?? null,
-        ]);
-
-        return redirect()->route('payment.choose', $booking->booking_id);
     }
 
     public function success($bookingId)
@@ -114,6 +141,12 @@ class BookingController extends Controller
             abort(403);
         }
 
+        // Logic hủy mới: Chỉ cho phép tự hủy nếu CHƯA thanh toán
+        if ($booking->payment_status !== 'unpaid') {
+            return redirect()->to(route('user.profile') . '#bookings')
+                ->with('error', 'Booking đã thanh toán không thể tự hủy. Vui lòng liên hệ hỗ trợ.');
+        }
+
         if ($booking->isCancelled()) {
             return redirect()->to(route('user.profile') . '#bookings')
                 ->with('success', 'Booking này đã được hủy trước đó.');
@@ -124,19 +157,36 @@ class BookingController extends Controller
                 ->with('error', 'Booking này không còn đủ điều kiện để hủy.');
         }
 
-        $note = trim((string) $booking->note);
-        $cancelNote = 'Khách hàng đã hủy booking vào ' . now()->format('d/m/Y H:i');
+        return DB::transaction(function () use ($booking) {
+            $user = Auth::user();
+            $note = trim((string) $booking->note);
+            $cancelNote = 'Khách hàng đã hủy booking vào ' . now()->format('d/m/Y H:i');
 
-        $booking->update([
-            'status' => 'cancelled',
-            'admin_confirmed' => false,
-            'note' => $note !== '' ? $note . PHP_EOL . $cancelNote : $cancelNote,
-        ]);
+            // Cập nhật ghi chú trước khi xóa mềm
+            $booking->update([
+                'status' => 'cancelled',
+                'admin_confirmed' => false,
+                'note' => $note !== '' ? $note . PHP_EOL . $cancelNote : $cancelNote,
+            ]);
 
-        $message = $booking->payment_status === 'paid'
-            ? 'Đã hủy booking. Bộ phận hỗ trợ sẽ liên hệ với bạn về phần thanh toán đã thực hiện.'
-            : 'Đã hủy booking thành công.';
+            // Trả lại vé vào kho khi khách chủ động hủy
+            $booking->schedule()->increment('available_spots', $booking->num_people);
 
-        return redirect()->to(route('user.profile') . '#bookings')->with('success', $message);
+            // 7. KIỂM TRA BLACKLIST (Quy tắc 2: 3 lần Hủy thủ công trong 1 giờ)
+            // Sử dụng withTrashed() để đếm cả các đơn đã bị xóa mềm
+            $manualCancelCount = Booking::withTrashed()
+                ->where('user_id', $user->user_id)
+                ->where('status', 'cancelled')
+                ->where('note', 'like', 'Khách hàng đã hủy booking vào%')
+                ->where('updated_at', '>=', now()->subHour())
+                ->count();
+
+            if ($manualCancelCount >= 3) {
+                \App\Models\User::where('user_id', $user->user_id)->update(['is_blacklisted' => true]);
+            }
+
+            return redirect()->back()
+                ->with('success', 'Đã hủy và xóa đơn đặt tour thành công.');
+        });
     }
 }

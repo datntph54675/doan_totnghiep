@@ -17,6 +17,7 @@ class DepartureSchedule extends Model
         'start_date',
         'end_date',
         'max_people',
+        'available_spots',
         'meeting_point',
         'guide_id',
         'driver_id',
@@ -29,6 +30,7 @@ class DepartureSchedule extends Model
         'start_date' => 'date',
         'end_date' => 'date',
         'max_people' => 'integer',
+        'available_spots' => 'integer',
     ];
 
     public function tour(): BelongsTo
@@ -54,11 +56,5 @@ class DepartureSchedule extends Model
     public function guideAssignments(): HasMany
     {
         return $this->hasMany(GuideAssignment::class, 'schedule_id', 'schedule_id');
-    }
-
-    public function getAvailableSpotsAttribute(): int
-    {
-        $bookedCount = $this->bookings()->where('status', '!=', 'cancelled')->sum('num_people');
-        return max(0, $this->max_people - $bookedCount);
     }
 }
