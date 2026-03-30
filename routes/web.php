@@ -16,6 +16,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\GuideFeedbackController as AdminGuideFeedbackController;
+use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\GoogleAuthController;
@@ -123,6 +124,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('guide-feedback', AdminGuideFeedbackController::class)->only(['index', 'show']);
         Route::patch('guide-feedback/{id}/status', [AdminGuideFeedbackController::class, 'updateStatus'])->name('guide-feedback.updateStatus');
         Route::delete('guide-feedback/{id}', [AdminGuideFeedbackController::class, 'destroy'])->name('guide-feedback.destroy');
+
+        // Contacts
+        Route::resource('contacts', ContactController::class)->only(['index', 'show', 'update', 'destroy']);
     });
 });
 
@@ -154,15 +158,4 @@ Route::prefix('guide')->group(function () {
         Route::get('feedback', [GuideFeedbackController::class, 'list'])->name('guide.feedback.list');
         Route::get('feedback/{id}', [GuideFeedbackController::class, 'show'])->name('guide.feedback.show');
     });
-});
-// Test email route
-Route::get('/test-email', function () {
-    try {
-        \Illuminate\Support\Facades\Mail::raw('Test email from GoTour', function ($message) {
-            $message->to('shurima5k@gmail.com')->subject('Test Email');
-        });
-        return 'Email sent successfully!';
-    } catch (\Exception $e) {
-        return 'Error: ' . $e->getMessage();
-    }
 });

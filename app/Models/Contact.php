@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Contact extends Model
+{
+    protected $fillable = [
+        'fullname',
+        'email',
+        'phone',
+        'subject',
+        'message',
+        'status',
+        'replied_at',
+    ];
+
+    protected $casts = [
+        'replied_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+}

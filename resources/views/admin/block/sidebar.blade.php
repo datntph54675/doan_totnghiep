@@ -85,6 +85,22 @@
                     </div>
                 </li>
 
+                {{-- Liên hệ --}}
+                <li>
+                    <a href="#lienhes" data-bs-toggle="collapse">
+                        <i class="fa fa-phone"></i>
+                        <span> Liên hệ </span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="lienhes">
+                        <ul class="nav-second-level">
+                            <li>
+                                <a class='tp-link' href="{{ route('admin.contacts.index') }}">Danh sách</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
                 {{-- Hóa đơn --}}
                 <li>
                     <a href='#hoadons' data-bs-toggle="collapse">
@@ -209,7 +225,7 @@
                 </li>
 
                 <!-- Khuyến mãi -->
-                <li>
+                {{-- <li>
                     <a href="#promotionSection" data-bs-toggle="collapse">
                         <i class="fas fa-tag"></i>
                         <span> Khuyến mãi </span>
@@ -222,7 +238,7 @@
                             <li><a class='tp-link' href="#">Thùng rác <i class="fas fa-trash-alt"></i> </a></li>
                         </ul>
                     </div>
-                </li>
+                </li> --}}
 
                 <!-- Đánh giá -->
                 <li>
@@ -251,26 +267,6 @@
                         </ul>
                     </div>
                 </li>
-
-                {{-- Liên hệ --}}
-                <li>
-
-                    <a href="#lienhes" data-bs-toggle="collapse">
-                        <i class="fa fa-phone"></i>
-                        <span> Liên hệ </span>
-                        <span class="menu-arrow"></span>
-                    </a>
-                    <div class="collapse" id="lienhes">
-                        <ul class="nav-second-level">
-                            <li>
-                                <a class='tp-link' href="#">Danh sách</a>
-                            </li>
-
-                        </ul>
-                    </div>
-                </li>
-
-
             </ul>
         </div>
         <!-- End Sidebar -->
