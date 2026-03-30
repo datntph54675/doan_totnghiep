@@ -61,6 +61,11 @@ class Booking extends Model
         return $this->hasMany(Feedback::class, 'booking_id', 'booking_id');
     }
 
+    public function getParticipantCountAttribute(): int
+    {
+        return max(1, (int) $this->num_people);
+    }
+
     public const STATUS = [
         'upcoming' => 'Sắp khởi hành',
         'ongoing' => 'Đang diễn ra',

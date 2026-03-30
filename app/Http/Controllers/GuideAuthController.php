@@ -25,6 +25,16 @@ class GuideAuthController extends Controller
 
             $user = Auth::user();
             if ($user && $user->isGuide()) {
+                if (! $user->guide()->exists()) {
+                    Auth::logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+
+                    return back()->withErrors([
+                        'username' => 'Tài khoản hướng dẫn viên chưa được liên kết hồ sơ guide.',
+                    ]);
+                }
+
                 return redirect()->intended('/guide/dashboard');
             }
 
