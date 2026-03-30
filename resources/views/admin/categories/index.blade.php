@@ -47,7 +47,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    @if($category->status == 'active' || $category->status == 1)
+                                    @if($category->status == 'active')
                                         <span class="badge bg-success-subtle text-success px-3 py-2">Đang hoạt động</span>
                                     @else
                                         <span class="badge bg-secondary-subtle text-secondary px-3 py-2">Tạm ẩn</span>
@@ -63,14 +63,25 @@
                                             class="btn btn-sm btn-outline-warning me-2" title="Chỉnh sửa">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('admin.categories.destroy', $category) }}" method="POST"
-                                            class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        @if($category->status == 'active')
+                                            <form action="{{ route('admin.categories.destroy', $category) }}" method="POST"
+                                                class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn ẩn danh mục này?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Ẩn" {{ $category->has_tours ? 'disabled' : '' }}>
+                                                    <i class="fas fa-eye-slash"></i>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('admin.categories.unhide', $category) }}" method="POST"
+                                                class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn hiện danh mục này?')">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Hiện">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

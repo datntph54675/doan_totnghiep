@@ -11,6 +11,10 @@ class CategoryController extends Controller
    public function index()
     {
         $categories = Category::all();
+        // Thêm thông tin có tour hay không cho mỗi category
+        foreach ($categories as $category) {
+            $category->has_tours = $category->tours()->exists();
+        }
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -28,7 +32,7 @@ class CategoryController extends Controller
 
         Category::create($request->all());
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category created successfully.');
+        return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được ẩn.');
     }
 
     public function show(Category $category)
@@ -38,6 +42,7 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
+        $category->has_tours = $category->tours()->exists();
         return view('admin.categories.edit', compact('category'));
     }
 
@@ -48,15 +53,32 @@ class CategoryController extends Controller
             'description' => 'nullable|string',
         ]);
 
+        // Kiểm tra nếu danh mục có tour thì không cho phép thay đổi status
+        if ($category->tours()->exists() && $request->status != $category->status) {
+            return redirect()->back()->with('error', 'Không thể thay đổi trạng thái danh mục đã có tour.');
+        }
+
         $category->update($request->all());
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
+        return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được cập nhật.');
     }
 
     public function destroy(Category $category)
     {
-        $category->delete();
+        // Kiểm tra nếu danh mục có tour thì không cho phép ẩn
+        if ($category->tours()->exists()) {
+            return redirect()->back()->with('error', 'Không thể ẩn danh mục này vì đã có tour liên kết.');
+        }
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully.');
+        $category->update(['status' => 'inactive']);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được ẩn.');
+    }
+
+    public function unhide(Category $category)
+    {
+        $category->update(['status' => 'active']);
+
+        return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được hiện.');
     }
 }
