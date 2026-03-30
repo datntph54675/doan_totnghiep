@@ -49,7 +49,7 @@ Route::controller(UserAuthController::class)->group(function () {
 // User - public tour pages
 Route::get('/tours', [TourUserController::class, 'index'])->name('tours.index');
 Route::get('/tours/{id}', [TourUserController::class, 'show'])->name('tours.show');
-// User Profile, Booking & Payments
+
 Route::middleware('auth')->group(function () {
     Route::get('/tours/{id}/booking', [BookingController::class, 'create'])->name('user.booking');
     Route::post('/tours/{id}/booking', [BookingController::class, 'store'])->name('user.booking.store');
@@ -141,4 +141,15 @@ Route::prefix('guide')->group(function () {
         Route::put('profile', [\App\Http\Controllers\GuideController::class, 'updateProfile'])->name('guide.profile.update');
         Route::get('customers', [\App\Http\Controllers\GuideController::class, 'customerList'])->name('guide.customers');
     });
+});
+// Test email route
+Route::get('/test-email', function () {
+    try {
+        \Illuminate\Support\Facades\Mail::raw('Test email from GoTour', function ($message) {
+            $message->to('shurima5k@gmail.com')->subject('Test Email');
+        });
+        return 'Email sent successfully!';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
 });
