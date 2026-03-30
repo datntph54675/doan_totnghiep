@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Tour;
+use App\Mail\ContactFormMail;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
@@ -39,7 +42,17 @@ class PageController extends Controller
             'message.required'  => 'Vui lòng nhập nội dung tin nhắn.',
         ]);
 
-        // Có thể gửi mail hoặc lưu DB sau; hiện chỉ xác nhận đã nhận
+        // Gửi email
+        $to = env('MAIL_TO', 'admin@gotour.vn');
+        try {
+            Mail::to($to)->send(new ContactFormMail($validated));
+        } catch (\Exception $e) {
+            Log::error('Contact form mail fail: ' . $e->getMessage(), ['payload' => $validated]);
+            return redirect()
+                ->route('contact')
+                ->with('error', 'Gửi mail thất bại: ' . $e->getMessage());
+        }
+
         return redirect()
             ->route('contact')
             ->with('success', 'Cảm ơn bạn, ' . $validated['fullname'] . '! Chúng tôi đã nhận tin nhắn và sẽ phản hồi trong thời gian sớm nhất.');
