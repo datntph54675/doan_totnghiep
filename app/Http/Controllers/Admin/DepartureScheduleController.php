@@ -30,6 +30,8 @@ class DepartureScheduleController extends Controller
         ]);
 
         $data['tour_id'] = $tour->tour_id;
+        // Khởi tạo số chỗ trống bằng sức chứa tối đa khi tạo mới
+        $data['available_spots'] = $data['max_people'];
 
         DepartureSchedule::create($data);
 
@@ -58,6 +60,19 @@ class DepartureScheduleController extends Controller
             'status' => 'required|in:scheduled,ongoing,completed,cancelled',
             'notes' => 'nullable|string',
         ]);
+
+        // Tính toán lại available_spots khi max_people thay đổi
+        // Lấy số vé đã đặt (không tính đơn đã hủy)
+        $bookedCount = \App\Models\Booking::where('schedule_id', $scheduleId)
+            ->where('status', '!=', 'cancelled')
+            ->sum('num_people');
+
+        $data['available_spots'] = $data['max_people'] - $bookedCount;
+
+        // Kiểm tra nếu max_people mới nhỏ hơn số vé đã đặt
+        if ($data['available_spots'] < 0) {
+            return back()->with('error', 'Không thể giảm sức chứa xuống dưới số lượng vé đã được đặt (' . $bookedCount . ' vé).')->withInput();
+        }
 
         $schedule->update($data);
 
