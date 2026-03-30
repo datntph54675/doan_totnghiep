@@ -84,6 +84,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [AdminAuthController::class, 'dashboard'])->name('dashboard');
 
         Route::resource('categories', CategoryController::class);
+        Route::patch('categories/{category}/unhide', [CategoryController::class, 'unhide'])->name('categories.unhide');
 
         Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
         Route::patch('users/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');

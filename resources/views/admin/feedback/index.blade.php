@@ -67,7 +67,7 @@
                                     </div>
                                 </td>
                                 <td class="text-end pe-4">
-                                    @if ($feedback->type !== 'hidden')
+                                    @if ($feedback->type !== 'an')
                                         <form action="{{ route('admin.feedback.hide', $feedback->id) }}" method="POST"
                                             class="d-inline-block">
                                             @csrf

@@ -35,12 +35,15 @@
 
                     <div class="col-md-4 mb-4">
                         <label for="status" class="form-label fw-bold text-secondary">Trạng thái</label>
-                        <select name="status" id="status" class="form-select">
+                        <select name="status" id="status" class="form-select" {{ $category->has_tours ? 'disabled' : '' }}>
                             <option value="active" {{ $category->status == 'active' ? 'selected' : '' }}>Hiện (Active)
                             </option>
-                            <option value="inactive" {{ $category->status == 'inactive' ? 'selected' : '' }}>Ẩn (Inactive)
+                            <option value="hidden" {{ $category->status == 'hidden' ? 'selected' : '' }}>Ẩn (Hidden)
                             </option>
                         </select>
+                        @if($category->has_tours)
+                            <small class="text-danger mt-1 d-block">Danh mục đã có tour, không được sửa trạng thái</small>
+                        @endif
                     </div>
 
                     <div class="col-12 mb-4">

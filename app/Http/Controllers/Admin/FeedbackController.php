@@ -19,7 +19,7 @@ class FeedbackController extends Controller
     public function hide($id)
     {
         $feedback = Feedback::findOrFail($id); // Tìm feedback theo ID
-        $feedback->update(['type' => 'hidden']); // Cập nhật trạng thái thành "hidden"
+        $feedback->update(['type' => 'an']); // Cập nhật trạng thái thành "an"
         return redirect()->back()->with('success', 'Feedback đã được ẩn.');
     }
 
