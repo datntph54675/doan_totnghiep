@@ -15,9 +15,11 @@ use App\Http\Controllers\TourUserController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\Admin\GuideFeedbackController as AdminGuideFeedbackController;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\GuideFeedbackController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -116,6 +118,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Feedback
         Route::get('feedback', [FeedbackController::class, 'index'])->name('feedback.index');
         Route::post('feedback/hide/{id}', [FeedbackController::class, 'hide'])->name('feedback.hide');
+
+        // Guide Feedback
+        Route::resource('guide-feedback', AdminGuideFeedbackController::class)->only(['index', 'show']);
+        Route::patch('guide-feedback/{id}/status', [AdminGuideFeedbackController::class, 'updateStatus'])->name('guide-feedback.updateStatus');
+        Route::delete('guide-feedback/{id}', [AdminGuideFeedbackController::class, 'destroy'])->name('guide-feedback.destroy');
     });
 });
 
@@ -140,6 +147,12 @@ Route::prefix('guide')->group(function () {
         Route::get('profile', [\App\Http\Controllers\GuideController::class, 'profile'])->name('guide.profile');
         Route::put('profile', [\App\Http\Controllers\GuideController::class, 'updateProfile'])->name('guide.profile.update');
         Route::get('customers', [\App\Http\Controllers\GuideController::class, 'customerList'])->name('guide.customers');
+
+        // Guide Feedback routes
+        Route::get('feedback/create', [GuideFeedbackController::class, 'create'])->name('guide.feedback.create');
+        Route::post('feedback', [GuideFeedbackController::class, 'store'])->name('guide.feedback.store');
+        Route::get('feedback', [GuideFeedbackController::class, 'list'])->name('guide.feedback.list');
+        Route::get('feedback/{id}', [GuideFeedbackController::class, 'show'])->name('guide.feedback.show');
     });
 });
 // Test email route

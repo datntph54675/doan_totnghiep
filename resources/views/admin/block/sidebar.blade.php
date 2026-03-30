@@ -7,9 +7,11 @@
             <div class="logo-box">
                 <a href="{{ route('home') }}">
                     @if(Route::is('momo.mock'))
-                        <img src="https://developers.momo.vn/v2/images/logo.png" alt="logo" style="width:70px; height:70px; padding: 5px;">
+                        <img src="https://developers.momo.vn/v2/images/logo.png" alt="logo"
+                            style="width:70px; height:70px; padding: 5px;">
                     @else
-                        <img src="{{ asset('assets/admin/images/logo-dark.png') }}" alt="logo" style="width:160px; height:70px;">
+                        <img src="{{ asset('assets/admin/images/logo-dark.png') }}" alt="logo"
+                            style="width:160px; height:70px;">
                     @endif
                 </a>
             </div>
@@ -232,6 +234,20 @@
                     <div class="collapse" id="feedbackSection">
                         <ul class="nav-second-level">
                             <li><a class='tp-link' href="{{ route('admin.feedback.index') }}">Danh sách</a></li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Phản Hồi Từ HDV -->
+                <li>
+                    <a href="#guideFeedbackSection" data-bs-toggle="collapse">
+                        <i class="fa-solid fa-comments"></i>
+                        <span> Phản Hồi HDV </span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="collapse" id="guideFeedbackSection">
+                        <ul class="nav-second-level">
+                            <li><a class='tp-link' href="{{ route('admin.guide-feedback.index') }}">Danh sách</a></li>
                         </ul>
                     </div>
                 </li>

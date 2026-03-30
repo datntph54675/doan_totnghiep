@@ -775,6 +775,13 @@
                 <span>Danh sách khách hàng</span>
             </a>
 
+            <div class="nav-label">Phản hồi</div>
+            <a href="{{ route('guide.feedback.list') }}"
+                class="nav-item {{ request()->routeIs('guide.feedback.*') ? 'active' : '' }}">
+                <span class="nav-icon">💬</span>
+                <span>Guide Feedback</span>
+            </a>
+
             <div class="nav-label">Tài khoản</div>
             <a href="{{ route('guide.profile') }}"
                 class="nav-item {{ request()->routeIs('guide.profile') ? 'active' : '' }}">
@@ -809,7 +816,7 @@
 
         <main class="content">
             @if(session('success'))
-            <div class="alert alert-success">✅ {{ session('success') }}</div>
+                <div class="alert alert-success">✅ {{ session('success') }}</div>
             @endif
 
             @yield('content')
