@@ -10,26 +10,38 @@
 
 {{-- STATS --}}
 @php
-    $present = $attendances->where('status','present')->count();
-    $absent  = $attendances->where('status','absent')->count();
-    $total   = $schedule->bookings->count();
+$present = $attendances->where('status','present')->count();
+$absent = $attendances->where('status','absent')->count();
+$total = $totalPassengers;
 @endphp
 <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px">
     <div class="stat-card">
         <div class="stat-icon blue">👥</div>
-        <div><div class="stat-value">{{ $total }}</div><div class="stat-label">Tổng khách</div></div>
+        <div>
+            <div class="stat-value">{{ $total }}</div>
+            <div class="stat-label">Tổng khách</div>
+        </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon green">✅</div>
-        <div><div class="stat-value">{{ $present }}</div><div class="stat-label">Có mặt</div></div>
+        <div>
+            <div class="stat-value">{{ $present }}</div>
+            <div class="stat-label">Có mặt</div>
+        </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon orange">❌</div>
-        <div><div class="stat-value">{{ $absent }}</div><div class="stat-label">Vắng mặt</div></div>
+        <div>
+            <div class="stat-value">{{ $absent }}</div>
+            <div class="stat-label">Vắng mặt</div>
+        </div>
     </div>
     <div class="stat-card">
         <div class="stat-icon purple">❓</div>
-        <div><div class="stat-value">{{ $total - $present - $absent }}</div><div class="stat-label">Chưa điểm danh</div></div>
+        <div>
+            <div class="stat-value">{{ $total - $present - $absent }}</div>
+            <div class="stat-label">Chưa điểm danh</div>
+        </div>
     </div>
 </div>
 
@@ -42,8 +54,8 @@
         @forelse($schedule->bookings as $booking)
         @php $latest = $attendances->where('customer_id', $booking->customer->customer_id)->first(); @endphp
         <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;border-radius:10px;border:1px solid var(--border);background:#fafafa;margin-bottom:10px;transition:all .2s"
-             onmouseover="this.style.borderColor='#10b981';this.style.background='#ecfdf5'"
-             onmouseout="this.style.borderColor='var(--border)';this.style.background='#fafafa'">
+            onmouseover="this.style.borderColor='#10b981';this.style.background='#ecfdf5'"
+            onmouseout="this.style.borderColor='var(--border)';this.style.background='#fafafa'">
             <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">
                 <div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0">
                     {{ strtoupper(substr($booking->customer->fullname ?? 'K', 0, 1)) }}
@@ -55,14 +67,19 @@
                         @if($booking->customer->phone && $booking->customer->email) · @endif
                         {{ $booking->customer->email ?? '' }}
                     </div>
+                    @if($booking->participant_count > 1)
+                    <div style="margin-top:6px">
+                        <span class="badge badge-info">Đại diện nhóm {{ $booking->participant_count }} người</span>
+                    </div>
+                    @endif
                     @if($latest)
                     <div style="margin-top:6px">
                         @if($latest->status == 'present')
-                            <span class="badge badge-success">✓ Có mặt</span>
+                        <span class="badge badge-success">✓ Có mặt</span>
                         @elseif($latest->status == 'absent')
-                            <span class="badge badge-danger">✗ Vắng mặt</span>
+                        <span class="badge badge-danger">✗ Vắng mặt</span>
                         @else
-                            <span class="badge badge-warning">? Chưa rõ</span>
+                        <span class="badge badge-warning">? Chưa rõ</span>
                         @endif
                         <span style="font-size:11px;color:var(--text-muted);margin-left:6px">{{ $latest->marked_at->format('H:i d/m') }}</span>
                         @if($latest->note)
@@ -112,11 +129,11 @@
                         <td style="font-weight:600">{{ $att->customer->fullname ?? '—' }}</td>
                         <td>
                             @if($att->status == 'present')
-                                <span class="badge badge-success">✓ Có mặt</span>
+                            <span class="badge badge-success">✓ Có mặt</span>
                             @elseif($att->status == 'absent')
-                                <span class="badge badge-danger">✗ Vắng mặt</span>
+                            <span class="badge badge-danger">✗ Vắng mặt</span>
                             @else
-                                <span class="badge badge-warning">? Chưa rõ</span>
+                            <span class="badge badge-warning">? Chưa rõ</span>
                             @endif
                         </td>
                         <td style="color:var(--text-muted);font-size:13px">{{ $att->note ?? '—' }}</td>
@@ -146,21 +163,21 @@
                     <label style="flex:1;min-width:100px">
                         <input type="radio" name="status" value="present" checked style="display:none" id="r-present">
                         <div class="status-btn" data-for="r-present" onclick="selectStatus(this,'present')"
-                             style="padding:12px;border-radius:10px;border:2px solid #10b981;background:#d1fae5;color:#065f46;text-align:center;cursor:pointer;font-weight:600;font-size:14px">
+                            style="padding:12px;border-radius:10px;border:2px solid #10b981;background:#d1fae5;color:#065f46;text-align:center;cursor:pointer;font-weight:600;font-size:14px">
                             ✓ Có mặt
                         </div>
                     </label>
                     <label style="flex:1;min-width:100px">
                         <input type="radio" name="status" value="absent" style="display:none" id="r-absent">
                         <div class="status-btn" data-for="r-absent" onclick="selectStatus(this,'absent')"
-                             style="padding:12px;border-radius:10px;border:2px solid var(--border);background:#f8fafc;color:var(--text-muted);text-align:center;cursor:pointer;font-weight:600;font-size:14px">
+                            style="padding:12px;border-radius:10px;border:2px solid var(--border);background:#f8fafc;color:var(--text-muted);text-align:center;cursor:pointer;font-weight:600;font-size:14px">
                             ✗ Vắng mặt
                         </div>
                     </label>
                     <label style="flex:1;min-width:100px">
                         <input type="radio" name="status" value="unknown" style="display:none" id="r-unknown">
                         <div class="status-btn" data-for="r-unknown" onclick="selectStatus(this,'unknown')"
-                             style="padding:12px;border-radius:10px;border:2px solid var(--border);background:#f8fafc;color:var(--text-muted);text-align:center;cursor:pointer;font-weight:600;font-size:14px">
+                            style="padding:12px;border-radius:10px;border:2px solid var(--border);background:#f8fafc;color:var(--text-muted);text-align:center;cursor:pointer;font-weight:600;font-size:14px">
                             ? Chưa rõ
                         </div>
                     </label>
@@ -184,33 +201,45 @@
 
 @push('scripts')
 <script>
-function openModal(id, name) {
-    document.getElementById('customerId').value = id;
-    document.getElementById('modalName').textContent = 'Khách hàng: ' + name;
-    document.getElementById('modal').classList.add('active');
-    // reset
-    selectStatus(document.querySelector('[data-for="r-present"]'), 'present');
-    document.getElementById('note').value = '';
-}
+    function openModal(id, name) {
+        document.getElementById('customerId').value = id;
+        document.getElementById('modalName').textContent = 'Khách hàng: ' + name;
+        document.getElementById('modal').classList.add('active');
+        // reset
+        selectStatus(document.querySelector('[data-for="r-present"]'), 'present');
+        document.getElementById('note').value = '';
+    }
 
-function closeModal() {
-    document.getElementById('modal').classList.remove('active');
-}
+    function closeModal() {
+        document.getElementById('modal').classList.remove('active');
+    }
 
-function selectStatus(el, val) {
-    document.querySelectorAll('.status-btn').forEach(b => {
-        b.style.borderColor = 'var(--border)';
-        b.style.background = '#f8fafc';
-        b.style.color = 'var(--text-muted)';
+    function selectStatus(el, val) {
+        document.querySelectorAll('.status-btn').forEach(b => {
+            b.style.borderColor = 'var(--border)';
+            b.style.background = '#f8fafc';
+            b.style.color = 'var(--text-muted)';
+        });
+        if (val === 'present') {
+            el.style.borderColor = '#10b981';
+            el.style.background = '#d1fae5';
+            el.style.color = '#065f46';
+        }
+        if (val === 'absent') {
+            el.style.borderColor = '#ef4444';
+            el.style.background = '#fee2e2';
+            el.style.color = '#991b1b';
+        }
+        if (val === 'unknown') {
+            el.style.borderColor = '#f59e0b';
+            el.style.background = '#fef3c7';
+            el.style.color = '#92400e';
+        }
+        document.getElementById('r-' + val).checked = true;
+    }
+
+    document.getElementById('modal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
     });
-    if (val === 'present') { el.style.borderColor='#10b981'; el.style.background='#d1fae5'; el.style.color='#065f46'; }
-    if (val === 'absent')  { el.style.borderColor='#ef4444'; el.style.background='#fee2e2'; el.style.color='#991b1b'; }
-    if (val === 'unknown') { el.style.borderColor='#f59e0b'; el.style.background='#fef3c7'; el.style.color='#92400e'; }
-    document.getElementById('r-' + val).checked = true;
-}
-
-document.getElementById('modal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-});
 </script>
 @endpush

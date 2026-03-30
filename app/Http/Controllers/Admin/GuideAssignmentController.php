@@ -110,10 +110,26 @@ class GuideAssignmentController extends Controller
                 ->withErrors(['guide_id' => 'HDV này đã được phân công cho lịch trình đã chọn.']);
         }
 
+        $isReassigned = (int) $guideAssignment->guide_id !== (int) $data['guide_id']
+            || (int) $guideAssignment->schedule_id !== (int) $data['schedule_id'];
+
+        if ($isReassigned) {
+            $data['status'] = 'pending';
+            $data['confirmed_at'] = null;
+            $data['rejection_reason'] = null;
+            $data['assigned_at'] = now();
+            $data['assigned_by'] = Auth::id() ?? (Auth::user()->user_id ?? null);
+        }
+
         $guideAssignment->update($data);
 
         return redirect()->route('admin.guide-assignments.index')
-            ->with('success', 'Cập nhật phân công HDV thành công');
+            ->with(
+                'success',
+                $isReassigned
+                    ? 'Đã phân công lại HDV. Trạng thái xác nhận đã được đặt lại về chờ xác nhận.'
+                    : 'Cập nhật phân công HDV thành công'
+            );
     }
 
     /**

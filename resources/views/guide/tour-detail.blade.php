@@ -13,12 +13,12 @@
     <div class="card-header">
         <div class="card-title">📋 Thông tin chuyến đi</div>
         @if($schedule->start_date > now())
-            <span class="badge badge-info">📅 Sắp diễn ra</span>
+        <span class="badge badge-info">📅 Sắp diễn ra</span>
         @elseif($schedule->end_date < now())
             <span class="badge badge-gray">✅ Đã hoàn thành</span>
-        @else
+            @else
             <span class="badge badge-success">🚀 Đang diễn ra</span>
-        @endif
+            @endif
     </div>
     <div class="card-body">
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px">
@@ -36,7 +36,7 @@
             </div>
             <div>
                 <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Số khách</div>
-                <div style="font-size:16px;font-weight:600">{{ $schedule->bookings->count() }} người</div>
+                <div style="font-size:16px;font-weight:600">{{ $totalPassengers }} người</div>
             </div>
             <div>
                 <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Điểm tập trung</div>
@@ -77,7 +77,7 @@
 <div class="card" style="margin-bottom:20px">
     <div class="card-header">
         <div class="card-title">👥 Danh sách khách hàng</div>
-        <span class="badge badge-info">{{ $schedule->bookings->count() }} người</span>
+        <span class="badge badge-info">{{ $totalPassengers }} người</span>
     </div>
     <div class="card-body" style="padding-top:12px">
         @if($schedule->bookings->count() > 0)
@@ -90,6 +90,7 @@
                         <th>Email</th>
                         <th>Điện thoại</th>
                         <th>CCCD</th>
+                        <th>Số người</th>
                         <th>Trạng thái</th>
                         <th>Thanh toán</th>
                     </tr>
@@ -100,30 +101,36 @@
                         <td style="color:var(--text-muted);font-weight:600">{{ $i + 1 }}</td>
                         <td>
                             <div style="font-weight:600">{{ $booking->customer->fullname ?? '—' }}</div>
+                            @if($booking->participant_count > 1)
+                            <div style="font-size:12px;color:var(--text-muted)">Người đại diện nhóm đặt</div>
+                            @endif
                         </td>
                         <td style="color:var(--text-muted)">{{ $booking->customer->email ?? '—' }}</td>
                         <td>{{ $booking->customer->phone ?? '—' }}</td>
                         <td style="font-family:monospace;font-size:13px">{{ $booking->customer->id_number ?? '—' }}</td>
                         <td>
+                            <span class="badge badge-info">{{ $booking->participant_count }} người</span>
+                        </td>
+                        <td>
                             @if($booking->status == 'upcoming')
-                                <span class="badge badge-info">Sắp tới</span>
+                            <span class="badge badge-info">Sắp tới</span>
                             @elseif($booking->status == 'ongoing')
-                                <span class="badge badge-success">Đang đi</span>
+                            <span class="badge badge-success">Đang đi</span>
                             @elseif($booking->status == 'completed')
-                                <span class="badge badge-gray">Hoàn thành</span>
+                            <span class="badge badge-gray">Hoàn thành</span>
                             @elseif($booking->status == 'cancelled')
-                                <span class="badge badge-danger">Đã hủy</span>
+                            <span class="badge badge-danger">Đã hủy</span>
                             @else
-                                <span class="badge badge-gray">{{ $booking->status }}</span>
+                            <span class="badge badge-gray">{{ $booking->status }}</span>
                             @endif
                         </td>
                         <td>
                             @if($booking->payment_status == 'paid')
-                                <span class="badge badge-success">Đã thanh toán</span>
+                            <span class="badge badge-success">Đã thanh toán</span>
                             @elseif($booking->payment_status == 'deposit')
-                                <span class="badge badge-warning">Đặt cọc</span>
+                            <span class="badge badge-warning">Đặt cọc</span>
                             @else
-                                <span class="badge badge-danger">Chưa thanh toán</span>
+                            <span class="badge badge-danger">Chưa thanh toán</span>
                             @endif
                         </td>
                     </tr>
@@ -181,7 +188,7 @@
                     @if($fb->rating)
                     <div style="color:#f59e0b;font-size:16px;letter-spacing:2px">
                         @for($i=1;$i<=5;$i++){{ $i<=$fb->rating ? '★' : '☆' }}@endfor
-                        <span style="font-size:13px;color:var(--text-muted);margin-left:6px">{{ $fb->rating }}/5</span>
+                            <span style="font-size:13px;color:var(--text-muted);margin-left:6px">{{ $fb->rating }}/5</span>
                     </div>
                     @endif
                     @if($fb->type == 'su_co')

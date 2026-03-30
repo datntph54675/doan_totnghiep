@@ -10,9 +10,15 @@ use App\Models\Feedback;
 use App\Models\GuideAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 
 class GuideController extends Controller
 {
+    private function bookingPassengerTotal(Collection $bookings): int
+    {
+        return (int) $bookings->sum('participant_count');
+    }
+
     private function assignedScheduleIds(int $guideId)
     {
         return GuideAssignment::where('guide_id', $guideId)
@@ -55,7 +61,10 @@ class GuideController extends Controller
             ->limit(5)
             ->get();
 
-        return view('guide.dashboard', compact('guide', 'upcomingTours', 'ongoingTours', 'completedTours'));
+        $currentPassengerTotal = $upcomingTours->sum(fn($schedule) => $this->bookingPassengerTotal($schedule->bookings))
+            + $ongoingTours->sum(fn($schedule) => $this->bookingPassengerTotal($schedule->bookings));
+
+        return view('guide.dashboard', compact('guide', 'upcomingTours', 'ongoingTours', 'completedTours', 'currentPassengerTotal'));
     }
 
     public function tourDetail($scheduleId)
@@ -79,7 +88,9 @@ class GuideController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('guide.tour-detail', compact('schedule', 'itineraries', 'feedbacks'));
+        $totalPassengers = $this->bookingPassengerTotal($schedule->bookings);
+
+        return view('guide.tour-detail', compact('schedule', 'itineraries', 'feedbacks', 'totalPassengers'));
     }
 
     public function attendance($scheduleId)
@@ -99,7 +110,9 @@ class GuideController extends Controller
             ->orderBy('marked_at', 'desc')
             ->get();
 
-        return view('guide.attendance', compact('schedule', 'attendances'));
+        $totalPassengers = $this->bookingPassengerTotal($schedule->bookings);
+
+        return view('guide.attendance', compact('schedule', 'attendances', 'totalPassengers'));
     }
 
     public function markAttendance(Request $request, $scheduleId)
@@ -190,10 +203,7 @@ class GuideController extends Controller
             : 0;
 
         $totalCustomers = $guide
-            ? \App\Models\Booking::whereIn(
-                'schedule_id',
-                $assignedScheduleIds
-            )->distinct('customer_id')->count('customer_id')
+            ? (int) \App\Models\Booking::whereIn('schedule_id', $assignedScheduleIds)->sum('num_people')
             : 0;
 
         return view('guide.profile', compact('guide', 'totalTours', 'totalCustomers'));
@@ -249,15 +259,15 @@ class GuideController extends Controller
 
         $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
 
-        // Lấy danh sách khách hàng từ các tour của hướng dẫn viên
-        $customers = \App\Models\Booking::with('customer')
+        $bookings = \App\Models\Booking::with(['customer', 'schedule.tour'])
             ->whereIn('schedule_id', $assignedScheduleIds)
             ->get()
-            ->map(function ($booking) {
-                return $booking->customer;
-            });
+            ->sortByDesc('booking_date')
+            ->values();
 
-        return view('guide.customer-list', compact('customers'));
+        $totalPassengers = $this->bookingPassengerTotal($bookings);
+
+        return view('guide.customer-list', compact('bookings', 'totalPassengers'));
     }
 
     /**

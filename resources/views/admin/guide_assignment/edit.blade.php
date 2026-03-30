@@ -86,6 +86,10 @@
             </ul>
         </div>
 
+        <div class="alert alert-warning">
+            <small>Nếu đổi hướng dẫn viên hoặc đổi lịch khởi hành, hệ thống sẽ tự đặt lại trạng thái về <strong>Chờ xác nhận</strong> cho bản phân công mới.</small>
+        </div>
+
         <div class="d-flex gap-2">
             <a href="{{ route('admin.guide-assignments.index') }}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Quay lại
