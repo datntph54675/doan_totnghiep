@@ -9,14 +9,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
         :root {
-            --primary: #059669;
-            --primary-light: #10b981;
-            --primary-dark: #047857;
-            --primary-bg: #ecfdf5;
-            --sidebar-bg: #0f172a;
+            --primary: #0066cc;
+            --primary-light: #3b82f6;
+            --primary-dark: #004fa3;
+            --primary-bg: #e8f2ff;
+            --sidebar-bg: #1a1a2e;
             --sidebar-text: #94a3b8;
-            --sidebar-active: #10b981;
-            --bg: #f8fafc;
+            --sidebar-active: #3b82f6;
+            --bg: #f7faff;
             --card: #ffffff;
             --border: #e2e8f0;
             --text: #0f172a;
@@ -73,7 +73,7 @@
         .brand-icon {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, var(--primary-light), #34d399);
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -105,7 +105,7 @@
         .user-avatar {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, var(--primary-light), #6366f1);
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -127,7 +127,7 @@
 
         .user-role {
             font-size: 11px;
-            color: var(--primary-light);
+            color: #3b82f6;
             margin-top: 2px;
         }
 
@@ -451,7 +451,7 @@
         .tour-thumb {
             width: 48px;
             height: 48px;
-            background: linear-gradient(135deg, var(--primary-light), #34d399);
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
             border-radius: 10px;
             display: flex;
             align-items: center;
