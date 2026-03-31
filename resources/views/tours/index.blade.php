@@ -315,8 +315,8 @@
                     <form action="{{ route('tours.index') }}" method="GET" id="filterForm">
                         <div class="filter-section">
                             <div class="filter-label">Từ khóa</div>
-                            <input class="filter-input" type="text" name="search" placeholder="Tên tour, địa điểm..."
-                                value="{{ request('search') }}">
+                            <input class="filter-input" type="text" name="search"
+                                placeholder="Tên tour, mô tả, nhà cung cấp..." value="{{ request('search') }}">
                         </div>
                         <div class="filter-section">
                             <div class="filter-label">Danh mục</div>
@@ -353,6 +353,29 @@
                             </div>
                         </div>
                         <div class="filter-section">
+                            <div class="filter-label">Khởi hành từ ngày</div>
+                            <input class="filter-input" type="date" name="start_date" value="{{ request('start_date') }}"
+                                min="{{ now()->toDateString() }}">
+                        </div>
+                        <div class="filter-section">
+                            <div class="filter-label">Sắp xếp</div>
+                            <select class="filter-input" name="sort" style="cursor:pointer">
+                                <option value="newest" {{ request('sort', 'newest') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
+                                <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
+                                <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
+                                <option value="duration_asc" {{ request('sort') == 'duration_asc' ? 'selected' : '' }}>Số ngày tăng dần</option>
+                                <option value="duration_desc" {{ request('sort') == 'duration_desc' ? 'selected' : '' }}>Số ngày giảm dần</option>
+                                <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Tên A-Z</option>
+                            </select>
+                        </div>
+                        <div class="filter-section">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.9rem;color:var(--text-dark)">
+                                <input type="checkbox" name="available_only" value="1"
+                                    {{ request('available_only') ? 'checked' : '' }}>
+                                Chỉ hiển thị tour còn chỗ
+                            </label>
+                        </div>
+                        <div class="filter-section">
                             <button type="submit" class="filter-apply">
                                 <i class="fas fa-search"></i> Áp Dụng
                             </button>
@@ -368,14 +391,25 @@
             <!-- TOUR RESULTS -->
             <div class="tours-main">
                 <!-- Active filters -->
-                @if (request()->hasAny(['search', 'category', 'min_price', 'max_price', 'duration']))
+                @if (request()->hasAny(['search', 'category', 'min_price', 'max_price', 'duration', 'start_date', 'available_only', 'sort']))
                     <div class="active-filters">
                         <span style="font-size:.8rem;color:var(--text-light);align-self:center">Đang lọc:</span>
                         @if (request('search'))
                             <span class="filter-tag">Từ khóa: "{{ request('search') }}"</span>
                         @endif
+                        @if (request('category'))
+                            <span class="filter-tag">
+                                Danh mục: {{ optional($categories->firstWhere('category_id', (int) request('category')))->name ?? 'Đã chọn' }}
+                            </span>
+                        @endif
                         @if (request('duration'))
                             <span class="filter-tag">{{ request('duration') }} ngày</span>
+                        @endif
+                        @if (request('start_date'))
+                            <span class="filter-tag">Khởi hành từ: {{ \Carbon\Carbon::parse(request('start_date'))->format('d/m/Y') }}</span>
+                        @endif
+                        @if (request('available_only'))
+                            <span class="filter-tag">Còn chỗ</span>
                         @endif
                         @if (request('min_price') || request('max_price'))
                             <span class="filter-tag">
@@ -389,6 +423,16 @@
                 <div class="results-header">
                     <div class="results-count">
                         Tìm thấy <strong>{{ $tours->total() }}</strong> tour
+                    </div>
+                    <div style="font-size:.85rem;color:var(--text-light)">
+                        Sắp xếp: <strong>{{ match(request('sort', 'newest')) {
+                            'price_asc' => 'Giá tăng dần',
+                            'price_desc' => 'Giá giảm dần',
+                            'duration_asc' => 'Số ngày tăng dần',
+                            'duration_desc' => 'Số ngày giảm dần',
+                            'name_asc' => 'Tên A-Z',
+                            default => 'Mới nhất',
+                        } }}</strong>
                     </div>
                 </div>
 

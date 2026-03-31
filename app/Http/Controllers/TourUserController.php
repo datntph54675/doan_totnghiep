@@ -16,32 +16,76 @@ class TourUserController extends Controller
     {
         app(TourAvailabilityService::class)->sync();
 
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', 'integer', 'exists:categories,category_id'],
+            'min_price' => ['nullable', 'numeric', 'min:0'],
+            'max_price' => ['nullable', 'numeric', 'min:0', 'gte:min_price'],
+            'duration' => ['nullable', 'integer', 'min:1'],
+            'start_date' => ['nullable', 'date', 'after_or_equal:today'],
+            'available_only' => ['nullable', 'in:1'],
+            'sort' => ['nullable', 'in:newest,price_asc,price_desc,duration_asc,duration_desc,name_asc'],
+        ]);
+
         $query = Tour::visibleToUsers()->with('category');
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
-        }
+        if (!empty($filters['search'])) {
+            $search = trim($filters['search']);
 
-        if ($request->filled('category')) {
-            $query->whereHas('category', function ($categoryQuery) use ($request) {
-                $categoryQuery->where('status', 'active')
-                    ->where('category_id', $request->category);
+            $query->where(function ($tourQuery) use ($search) {
+                $tourQuery->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('supplier', 'like', "%{$search}%")
+                    ->orWhereHas('category', function ($categoryQuery) use ($search) {
+                        $categoryQuery->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
-        if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
+        if (!empty($filters['category'])) {
+            $query->whereHas('category', function ($categoryQuery) use ($filters) {
+                $categoryQuery->where('status', 'active')
+                    ->where('category_id', $filters['category']);
+            });
         }
 
-        if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+        if (!empty($filters['min_price'])) {
+            $query->where('price', '>=', $filters['min_price']);
         }
 
-        if ($request->filled('duration')) {
-            $query->where('duration', $request->duration);
+        if (!empty($filters['max_price'])) {
+            $query->where('price', '<=', $filters['max_price']);
         }
 
-        $tours = $query->orderBy('tour_id', 'desc')->paginate(9)->withQueryString();
+        if (!empty($filters['duration'])) {
+            $query->where('duration', $filters['duration']);
+        }
+
+        if (!empty($filters['start_date'])) {
+            $query->whereHas('departureSchedules', function ($scheduleQuery) use ($filters) {
+                $scheduleQuery->where('status', 'scheduled')
+                    ->whereDate('start_date', '>=', $filters['start_date']);
+            });
+        }
+
+        if (!empty($filters['available_only'])) {
+            $query->whereHas('departureSchedules', function ($scheduleQuery) {
+                $scheduleQuery->where('status', 'scheduled')
+                    ->whereDate('start_date', '>', now()->toDateString())
+                    ->where('available_spots', '>', 0);
+            });
+        }
+
+        match ($filters['sort'] ?? 'newest') {
+            'price_asc' => $query->orderBy('price')->orderByDesc('tour_id'),
+            'price_desc' => $query->orderByDesc('price')->orderByDesc('tour_id'),
+            'duration_asc' => $query->orderBy('duration')->orderByDesc('tour_id'),
+            'duration_desc' => $query->orderByDesc('duration')->orderByDesc('tour_id'),
+            'name_asc' => $query->orderBy('name')->orderByDesc('tour_id'),
+            default => $query->orderByDesc('tour_id'),
+        };
+
+        $tours = $query->paginate(9)->withQueryString();
         $categories = Category::where('status', 'active')->orderBy('name')->get();
 
         return view('tours.index', compact('tours', 'categories'));
