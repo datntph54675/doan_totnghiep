@@ -52,9 +52,10 @@ class UserFeedbackController extends Controller
 
         Feedback::create([
             'booking_id' => $booking->booking_id,
-            'type' => 'danh_gia',
+            'type' => Feedback::TYPE_REVIEW,
             'rating' => $validated['rating'],
             'content' => $validated['content'],
+            'is_hidden' => false,
             'created_at' => now(),
         ]);
 

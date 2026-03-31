@@ -121,6 +121,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Feedback
         Route::get('feedback', [FeedbackController::class, 'index'])->name('feedback.index');
         Route::post('feedback/hide/{id}', [FeedbackController::class, 'hide'])->name('feedback.hide');
+        Route::post('feedback/unhide/{id}', [FeedbackController::class, 'unhide'])->name('feedback.unhide');
 
         // Guide Feedback
         Route::resource('guide-feedback', AdminGuideFeedbackController::class)->only(['index', 'show']);
