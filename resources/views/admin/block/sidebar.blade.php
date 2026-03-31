@@ -104,16 +104,15 @@
                 {{-- Hóa đơn --}}
                 <li>
                     <a href='#hoadons' data-bs-toggle="collapse">
-                        <i data-feather="shopping-bag"></i>
+                        <i data-feather="file-text"></i>
                         <span> Hóa đơn </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="hoadons">
+                    <div class="collapse {{ Request::is('admin/invoices*') ? 'show' : '' }}" id="hoadons">
                         <ul class="nav-second-level">
                             <li>
-                                <a class='tp-link' href="#">Danh sách</a>
+                                <a class='tp-link' href="{{ route('admin.invoices.index') }}">Danh sách</a>
                             </li>
-
                         </ul>
                     </div>
                 </li>
