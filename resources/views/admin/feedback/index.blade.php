@@ -5,8 +5,41 @@
 @section('content')
     <div class="mb-4 d-flex justify-content-between align-items-center">
         <div>
-            <h2 class="fw-bold text-dark m-0">Danh sách Feedback</h2>
+            <h2 class="fw-bold text-dark m-0">Danh sách Đánh giá</h2>
             <p class="text-muted small mb-0">Xem và quản lý các đánh giá từ khách hàng</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('admin.feedback.index') }}" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label small fw-bold text-secondary">Từ khóa</label>
+                    <input type="text" name="keyword" value="{{ request('keyword') }}" class="form-control"
+                        placeholder="Tên tour, khách hàng hoặc nội dung đánh giá...">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-secondary">Số sao</label>
+                    <select name="rating" class="form-select">
+                        <option value="">Tất cả</option>
+                        @for ($i = 5; $i >= 1; $i--)
+                            <option value="{{ $i }}" @selected((string) request('rating') === (string) $i)>{{ $i }} sao</option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-secondary">Hiển thị</label>
+                    <select name="visibility" class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="visible" @selected(request('visibility') === 'visible')>Đang hiển thị</option>
+                        <option value="hidden" @selected(request('visibility') === 'hidden')>Đã ẩn</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100">Lọc</button>
+                    <a href="{{ route('admin.feedback.index') }}" class="btn btn-light border w-100">Reset</a>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -31,9 +64,10 @@
                                     <span class="text-dark fw-medium">#{{ $feedback->id }}</span>
                                 </td>
                                 <td>
-                                    <div class="small fw-bold text-dark">Booking #{{ $feedback->booking_id }}</div>
-                                    <div class="text-muted" style="font-size: 11px;">Loại:
-                                        <span class="text-primary text-capitalize">{{ $feedback->type }}</span>
+                                    <div class="small fw-bold text-dark">{{ $feedback->booking?->tour?->name ?? 'Tour không xác định' }}</div>
+                                    <div class="text-muted" style="font-size: 11px;">Booking #{{ $feedback->booking_id }}</div>
+                                    <div class="text-muted" style="font-size: 11px;">Khách hàng:
+                                        <span class="text-primary">{{ $feedback->booking?->customer?->fullname ?? 'Không xác định' }}</span>
                                     </div>
                                 </td>
                                 <td>
@@ -54,7 +88,7 @@
                                 </td>
                                 <td>
                                     <p class="mb-0 small text-dark"
-                                        style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
+                                        style="display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
                                         {{ $feedback->content }}
                                     </p>
                                 </td>
@@ -67,7 +101,7 @@
                                     </div>
                                 </td>
                                 <td class="text-end pe-4">
-                                    @if ($feedback->type !== 'an')
+                                    @if (! $feedback->isHidden())
                                         <form action="{{ route('admin.feedback.hide', $feedback->id) }}" method="POST"
                                             class="d-inline-block">
                                             @csrf
@@ -77,9 +111,18 @@
                                             </button>
                                         </form>
                                     @else
-                                        <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
-                                            <i class="fas fa-lock me-1"></i> Đã ẩn
-                                        </span>
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                                                <i class="fas fa-lock me-1"></i> Đã ẩn
+                                            </span>
+                                            <form action="{{ route('admin.feedback.unhide', $feedback->id) }}" method="POST"
+                                                class="d-inline-block">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-success border-0 rounded-pill px-3">
+                                                    <i class="fas fa-eye me-1"></i> Hiện lại
+                                                </button>
+                                            </form>
+                                        </div>
                                     @endif
                                 </td>
                             </tr>
@@ -94,6 +137,12 @@
                     </tbody>
                 </table>
             </div>
+
+            @if ($feedbacks->hasPages())
+                <div class="card-footer bg-white border-top-0 py-3 px-4">
+                    {{ $feedbacks->links() }}
+                </div>
+            @endif
         </div>
     </div>
 @endsection
