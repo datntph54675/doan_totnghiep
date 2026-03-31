@@ -10,6 +10,7 @@ use App\Services\TourAvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
 class BookingController extends Controller
@@ -65,11 +66,49 @@ class BookingController extends Controller
             'email'        => 'nullable|email|max:100',
             'id_number'    => 'nullable|string|max:20',
             'num_people'   => 'required|integer|min:1|max:50',
+
+            'companions' => 'nullable|array',
+            'companions.*.fullname' => 'nullable|string|max:100',
+            'companions.*.gender' => 'nullable|in:Nam,Nữ,Khác',
+            'companions.*.birthdate' => 'nullable|date',
+            'companions.*.phone' => 'nullable|string|max:15',
+            'companions.*.email' => 'nullable|email|max:100',
+            'companions.*.id_number' => 'nullable|string|max:20',
             'note'         => 'nullable|string',
         ]);
 
+        $numPeople = (int) $validated['num_people'];
+        $companions = array_values($validated['companions'] ?? []);
+
+        if ($numPeople >= 2) {
+            $requiredCompanions = $numPeople - 1;
+
+            if (count($companions) !== $requiredCompanions) {
+                throw ValidationException::withMessages([
+                    'companions' => "Vui lòng nhập đầy đủ thông tin cho {$requiredCompanions} người đi cùng.",
+                ]);
+            }
+
+            foreach ($companions as $index => $companion) {
+                $isIncomplete = empty(trim((string) ($companion['fullname'] ?? '')))
+                    || empty(trim((string) ($companion['gender'] ?? '')))
+                    || empty(trim((string) ($companion['birthdate'] ?? '')))
+                    || empty(trim((string) ($companion['phone'] ?? '')))
+                    || empty(trim((string) ($companion['email'] ?? '')))
+                    || empty(trim((string) ($companion['id_number'] ?? '')));
+
+                if ($isIncomplete) {
+                    $position = $index + 1;
+
+                    throw ValidationException::withMessages([
+                        'companions' => "Người đi cùng #{$position}: vui lòng nhập đầy đủ họ tên, giới tính, ngày sinh, số điện thoại, email và CCCD/Hộ chiếu.",
+                    ]);
+                }
+            }
+        }
+
         try {
-            return DB::transaction(function () use ($validated, $tour, $user) {
+            return DB::transaction(function () use ($validated, $tour, $user, $companions) {
                 // 3. Sử dụng lockForUpdate để tránh Race Condition (Tranh chấp vé)
                 $schedule = DepartureSchedule::where('schedule_id', $validated['schedule_id'])
                     ->where('tour_id', $tour->tour_id)
@@ -115,6 +154,31 @@ class BookingController extends Controller
                     'note'           => $validated['note'] ?? null,
                     'expires_at'     => now()->addMinutes(3),
                 ]);
+
+                $tourCustomers = [
+                    [
+                        'schedule_id' => $validated['schedule_id'],
+                        'customer_id' => $customer->customer_id,
+                    ],
+                ];
+
+                foreach ($companions as $companion) {
+                    $companionCustomer = Customer::create([
+                        'fullname' => $companion['fullname'],
+                        'gender' => $companion['gender'],
+                        'birthdate' => $companion['birthdate'] ?? null,
+                        'phone' => $companion['phone'],
+                        'email' => $companion['email'],
+                        'id_number' => $companion['id_number'],
+                    ]);
+
+                    $tourCustomers[] = [
+                        'schedule_id' => $validated['schedule_id'],
+                        'customer_id' => $companionCustomer->customer_id,
+                    ];
+                }
+
+                DB::table('tour_customer')->insert($tourCustomers);
 
                 // 6. Trừ vé ngay lập tức để giữ chỗ (Giai đoạn 1)
                 $schedule->decrement('available_spots', $validated['num_people']);
