@@ -6,6 +6,12 @@
 
 @section('content')
 
+<style>
+    .participant-child {
+        margin-left: 20px;
+    }
+</style>
+
 <a href="{{ route('guide.dashboard') }}" class="back-link">← Quay lại Dashboard</a>
 
 {{-- TOUR INFO --}}
@@ -80,68 +86,84 @@
         <span class="badge badge-info">{{ $totalPassengers }} người</span>
     </div>
     <div class="card-body" style="padding-top:12px">
-        @if($schedule->bookings->count() > 0)
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Họ tên</th>
-                        <th>Email</th>
-                        <th>Điện thoại</th>
-                        <th>CCCD</th>
-                        <th>Số người</th>
-                        <th>Trạng thái</th>
-                        <th>Thanh toán</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($schedule->bookings as $i => $booking)
-                    <tr>
-                        <td style="color:var(--text-muted);font-weight:600">{{ $i + 1 }}</td>
-                        <td>
-                            <div style="font-weight:600">{{ $booking->customer->fullname ?? '—' }}</div>
-                            @if($booking->participant_count > 1)
-                            <div style="font-size:12px;color:var(--text-muted)">Người đại diện nhóm đặt</div>
-                            @endif
-                        </td>
-                        <td style="color:var(--text-muted)">{{ $booking->customer->email ?? '—' }}</td>
-                        <td>{{ $booking->customer->phone ?? '—' }}</td>
-                        <td style="font-family:monospace;font-size:13px">{{ $booking->customer->id_number ?? '—' }}</td>
-                        <td>
-                            <span class="badge badge-info">{{ $booking->participant_count }} người</span>
-                        </td>
-                        <td>
-                            @if($booking->status == 'upcoming')
-                            <span class="badge badge-info">Sắp tới</span>
-                            @elseif($booking->status == 'ongoing')
-                            <span class="badge badge-success">Đang đi</span>
-                            @elseif($booking->status == 'completed')
-                            <span class="badge badge-gray">Hoàn thành</span>
-                            @elseif($booking->status == 'cancelled')
-                            <span class="badge badge-danger">Đã hủy</span>
-                            @else
-                            <span class="badge badge-gray">{{ $booking->status }}</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($booking->payment_status == 'paid')
-                            <span class="badge badge-success">Đã thanh toán</span>
-                            @elseif($booking->payment_status == 'deposit')
-                            <span class="badge badge-warning">Đặt cọc</span>
-                            @else
-                            <span class="badge badge-danger">Chưa thanh toán</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        @if(($participants ?? collect())->count() > 0)
+        @php
+        $participantGroups = ($participants ?? collect())->groupBy('group_key');
+        @endphp
+
+        @foreach($participantGroups as $groupMembers)
+        @php
+        $groupLeader = $groupMembers->firstWhere('is_representative', true) ?? $groupMembers->first();
+        @endphp
+        <div style="border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;background:#fff;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f1f5f9;border-bottom:1px solid var(--border)">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span class="badge badge-info">{{ $groupLeader->group_name }}</span>
+                    <span style="font-size:13px;font-weight:600">Đại diện: {{ $groupLeader->fullname ?? '—' }}</span>
+                </div>
+                <span class="badge badge-gray">{{ $groupMembers->count() }} người</span>
+            </div>
+
+            <div style="padding:10px;">
+                @foreach($groupMembers as $participant)
+                <div class="{{ !$participant->is_representative ? 'participant-child' : '' }}"
+                    style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px;border-radius:10px;border:1px solid #e2e8f0;background:#f8fafc;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">
+                        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">
+                            {{ strtoupper(substr($participant->fullname ?? 'K', 0, 1)) }}
+                        </div>
+                        <div style="min-width:0">
+                            <div style="font-weight:600;font-size:14px">{{ $participant->fullname ?? '—' }}</div>
+                            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                                {{ $participant->phone ?? '' }}
+                                @if($participant->phone && $participant->email) · @endif
+                                {{ $participant->email ?? '' }}
+                            </div>
+                            <div style="margin-top:6px">
+                                @if($participant->is_representative)
+                                <span class="badge badge-info">Đại diện nhóm {{ $participant->group_size }} người</span>
+                                @else
+                                <span class="badge badge-gray">Người đi cùng</span>
+                                @endif
+
+                                @if($participant->booking_status == 'upcoming')
+                                <span class="badge badge-info">Sắp tới</span>
+                                @elseif($participant->booking_status == 'ongoing')
+                                <span class="badge badge-success">Đang đi</span>
+                                @elseif($participant->booking_status == 'completed')
+                                <span class="badge badge-gray">Hoàn thành</span>
+                                @elseif($participant->booking_status == 'cancelled')
+                                <span class="badge badge-danger">Đã hủy</span>
+                                @elseif(!$participant->booking_status)
+                                <span class="badge badge-gray">Theo nhóm đặt</span>
+                                @else
+                                <span class="badge badge-gray">{{ $participant->booking_status }}</span>
+                                @endif
+
+                                @if($participant->payment_status == 'paid')
+                                <span class="badge badge-success">Đã thanh toán</span>
+                                @elseif($participant->payment_status == 'deposit')
+                                <span class="badge badge-warning">Đặt cọc</span>
+                                @elseif(!$participant->payment_status)
+                                <span class="badge badge-gray">Theo nhóm đặt</span>
+                                @else
+                                <span class="badge badge-danger">Chưa thanh toán</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-family:monospace;font-size:12px;color:var(--text-muted);white-space:nowrap">
+                        CCCD: {{ $participant->id_number ?? '—' }}
+                    </div>
+                </div>
+                @endforeach
+            </div>
         </div>
+        @endforeach
         @else
         <div class="empty-state">
             <div class="empty-icon">👤</div>
-            <div class="empty-text">Chưa có khách hàng đăng ký.</div>
+            <div class="empty-text">Chưa có khách hàng đăng ký hoặc chưa có dữ liệu người đi cùng.</div>
         </div>
         @endif
     </div>

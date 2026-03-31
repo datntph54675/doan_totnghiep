@@ -11,10 +11,66 @@ use App\Models\GuideAssignment;
 use App\Services\TourAvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 
 class GuideController extends Controller
 {
+    private function scheduleParticipants(int $scheduleId): Collection
+    {
+        $participants = DB::table('tour_customer as tc')
+            ->join('customer as c', 'c.customer_id', '=', 'tc.customer_id')
+            ->leftJoin('booking as b', function ($join) {
+                $join->on('b.schedule_id', '=', 'tc.schedule_id')
+                    ->on('b.customer_id', '=', 'tc.customer_id');
+            })
+            ->where('tc.schedule_id', $scheduleId)
+            ->select([
+                'tc.id as tour_customer_id',
+                'tc.schedule_id',
+                'tc.customer_id',
+                'c.fullname',
+                'c.phone',
+                'c.email',
+                'c.id_number',
+                'b.booking_id',
+                'b.num_people',
+                'b.status as booking_status',
+                'b.payment_status',
+            ])
+            ->orderBy('tc.id')
+            ->get()
+            ->map(function ($participant) {
+                $participant->is_representative = !empty($participant->booking_id);
+                $participant->group_size = max(1, (int) ($participant->num_people ?? 1));
+
+                return $participant;
+            });
+
+        $groupNumber = 0;
+        $activeGroupKey = null;
+        $remainingCompanions = 0;
+
+        return $participants->map(function ($participant) use (&$groupNumber, &$activeGroupKey, &$remainingCompanions) {
+            if ($participant->is_representative) {
+                $groupNumber++;
+                $activeGroupKey = 'booking-' . $participant->booking_id;
+                $remainingCompanions = max(0, $participant->group_size - 1);
+            } elseif ($remainingCompanions > 0 && $activeGroupKey) {
+                $remainingCompanions--;
+            } else {
+                $groupNumber++;
+                $activeGroupKey = 'guest-' . $participant->tour_customer_id;
+                $remainingCompanions = 0;
+            }
+
+            $participant->group_key = $activeGroupKey;
+            $participant->group_name = 'Nhóm ' . $groupNumber;
+
+            return $participant;
+        });
+    }
+
     private function bookingPassengerTotal(Collection $bookings): int
     {
         return (int) $bookings->sum('participant_count');
@@ -93,9 +149,10 @@ class GuideController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $totalPassengers = $this->bookingPassengerTotal($schedule->bookings);
+        $participants = $this->scheduleParticipants((int) $schedule->schedule_id);
+        $totalPassengers = max($this->bookingPassengerTotal($schedule->bookings), $participants->count());
 
-        return view('guide.tour-detail', compact('schedule', 'itineraries', 'feedbacks', 'totalPassengers'));
+        return view('guide.tour-detail', compact('schedule', 'itineraries', 'feedbacks', 'totalPassengers', 'participants'));
     }
 
     public function attendance($scheduleId)
@@ -111,15 +168,22 @@ class GuideController extends Controller
             ->whereIn('schedule_id', $assignedScheduleIds)
             ->firstOrFail();
 
-        // Lấy danh sách điểm danh
+        $participants = $this->scheduleParticipants((int) $scheduleId);
+
+        // Lấy lịch sử điểm danh
         $attendances = Attendance::where('schedule_id', $scheduleId)
             ->with('customer')
             ->orderBy('marked_at', 'desc')
             ->get();
 
-        $totalPassengers = $this->bookingPassengerTotal($schedule->bookings);
+        $latestAttendanceByParticipant = $attendances
+            ->filter(fn($attendance) => !empty($attendance->tour_customer_id))
+            ->unique('tour_customer_id')
+            ->keyBy('tour_customer_id');
 
-        return view('guide.attendance', compact('schedule', 'attendances', 'totalPassengers'));
+        $totalPassengers = max($this->bookingPassengerTotal($schedule->bookings), $participants->count());
+
+        return view('guide.attendance', compact('schedule', 'attendances', 'participants', 'latestAttendanceByParticipant', 'totalPassengers'));
     }
 
     public function markAttendance(Request $request, $scheduleId)
@@ -133,14 +197,25 @@ class GuideController extends Controller
             ->firstOrFail();
 
         $validated = $request->validate([
-            'customer_id' => 'required|exists:customer,customer_id',
+            'tour_customer_id' => 'required|exists:tour_customer,id',
             'status' => 'required|in:present,absent,unknown',
             'note' => 'nullable|string',
         ]);
 
+        $tourCustomer = DB::table('tour_customer')
+            ->where('id', $validated['tour_customer_id'])
+            ->where('schedule_id', $scheduleId)
+            ->first();
+
+        if (!$tourCustomer) {
+            return redirect()->route('guide.attendance', $scheduleId)
+                ->with('error', 'Khách hàng không thuộc chuyến đi này.');
+        }
+
         Attendance::create([
             'schedule_id' => $scheduleId,
-            'customer_id' => $validated['customer_id'],
+            'tour_customer_id' => $tourCustomer->id,
+            'customer_id' => $tourCustomer->customer_id,
             'guide_id' => $guide->guide_id,
             'status' => $validated['status'],
             'note' => $validated['note'] ?? null,
