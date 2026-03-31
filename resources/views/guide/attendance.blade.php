@@ -73,7 +73,9 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f1f5f9;border-bottom:1px solid var(--border)">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                     <span class="badge badge-info">{{ $groupLeader->group_name }}</span>
-                    <span style="font-size:13px;font-weight:600">Đại diện: {{ $groupLeader->fullname ?? '—' }}</span>
+                    <span style="font-size:13px;font-weight:600">
+                        {{ ($groupLeader->group_size ?? 1) > 1 ? 'Đại diện' : 'Khách' }}: {{ $groupLeader->fullname ?? '—' }}
+                    </span>
                 </div>
                 <span class="badge badge-gray">{{ $groupMembers->count() }} người</span>
             </div>
@@ -102,7 +104,11 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
                             </div>
                             <div style="margin-top:6px">
                                 @if($participant->is_representative)
+                                @if(($participant->group_size ?? 1) > 1)
                                 <span class="badge badge-info">Đại diện nhóm</span>
+                                @else
+                                <span class="badge badge-info">Khách đặt tour</span>
+                                @endif
                                 @else
                                 <span class="badge badge-gray">Người đi cùng</span>
                                 @endif
