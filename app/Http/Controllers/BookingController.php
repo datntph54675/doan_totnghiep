@@ -6,6 +6,7 @@ use App\Models\Tour;
 use App\Models\Customer;
 use App\Models\Booking;
 use App\Models\DepartureSchedule;
+use App\Services\TourAvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,12 +16,14 @@ class BookingController extends Controller
 {
     public function create($tourId)
     {
+        app(TourAvailabilityService::class)->sync();
+
         $tour = Tour::visibleToUsers()
             ->with(['category', 'departureSchedules'])
             ->findOrFail($tourId);
 
         $schedules = DepartureSchedule::where('tour_id', $tourId)
-            ->whereDate('start_date', '>=', Carbon::today())
+            ->whereDate('start_date', '>', Carbon::today())
             ->where('status', 'scheduled')
             ->orderBy('start_date', 'asc')
             ->get();
@@ -32,6 +35,8 @@ class BookingController extends Controller
 
     public function store(Request $request, $tourId)
     {
+        app(TourAvailabilityService::class)->sync();
+
         $user = Auth::user();
 
         // 1. Kiểm tra Blacklist
@@ -69,7 +74,7 @@ class BookingController extends Controller
                 $schedule = DepartureSchedule::where('schedule_id', $validated['schedule_id'])
                     ->where('tour_id', $tour->tour_id)
                     ->where('status', 'scheduled')
-                    ->whereDate('start_date', '>=', Carbon::today())
+                    ->whereDate('start_date', '>', Carbon::today())
                     ->lockForUpdate()
                     ->first();
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\User;
+use App\Services\TourAvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -26,6 +27,8 @@ class UserProfileController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
+
+        app(TourAvailabilityService::class)->sync();
 
         // Tự động kiểm tra và hủy các đơn hàng hết hạn ngay khi xem trang (Lazy Cleanup)
         $this->expireOldBookings($user->user_id);
@@ -85,8 +88,15 @@ class UserProfileController extends Controller
         $confirmedBookings = Booking::with(['tour', 'schedule'])
             ->where('user_id', $userId)
             ->where('payment_status', 'paid')
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['upcoming', 'ongoing'])
             ->where('admin_confirmed', true)
+            ->orderByDesc('booking_date')
+            ->get();
+
+        $completedBookings = Booking::with(['tour', 'schedule', 'feedbacks'])
+            ->where('user_id', $userId)
+            ->where('payment_status', 'paid')
+            ->where('status', 'completed')
             ->orderByDesc('booking_date')
             ->get();
 
@@ -96,7 +106,7 @@ class UserProfileController extends Controller
             ->orderByDesc('booking_date')
             ->get();
 
-        return compact('unpaidBookings', 'pendingBookings', 'confirmedBookings', 'cancelledBookings');
+        return compact('unpaidBookings', 'pendingBookings', 'confirmedBookings', 'completedBookings', 'cancelledBookings');
     }
 
     /**

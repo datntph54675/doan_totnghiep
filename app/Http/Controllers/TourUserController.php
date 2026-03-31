@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\Tour;
 use App\Models\Category;
 use App\Models\DepartureSchedule;
+use App\Services\TourAvailabilityService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class TourUserController extends Controller
 {
     public function index(Request $request)
     {
+        app(TourAvailabilityService::class)->sync();
+
         $query = Tour::visibleToUsers()->with('category');
 
         if ($request->filled('search')) {
@@ -44,13 +49,31 @@ class TourUserController extends Controller
 
     public function show($id)
     {
+        app(TourAvailabilityService::class)->sync();
+
         $tour = Tour::visibleToUsers()
             ->with(['category', 'itineraries', 'departureSchedules'])
-            ->findOrFail($id);
+            ->find($id);
+
+        if (!$tour) {
+            $userId = Auth::id();
+
+            $hasBookedTour = $userId
+                ? Booking::where('user_id', $userId)
+                    ->where('tour_id', $id)
+                    ->where('status', '!=', 'cancelled')
+                    ->exists()
+                : false;
+
+            abort_unless($hasBookedTour, 404);
+
+            $tour = Tour::with(['category', 'itineraries', 'departureSchedules'])
+                ->findOrFail($id);
+        }
 
         $schedules = DepartureSchedule::where('tour_id', $id)
             ->whereIn('status', ['scheduled'])
-            ->where('start_date', '>=', now())
+            ->whereDate('start_date', '>', now()->toDateString())
             ->orderBy('start_date')
             ->get();
 

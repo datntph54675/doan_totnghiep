@@ -134,6 +134,7 @@
     }
 
     .status-confirmed,
+    .status-completed,
     .status-pending,
     .status-unpaid,
     .status-cancelled,
@@ -147,6 +148,11 @@
     .status-confirmed {
         background: #dcfce7;
         color: #166534;
+    }
+
+    .status-completed {
+        background: #ede9fe;
+        color: #6d28d9;
     }
 
     .status-pending {
@@ -303,6 +309,72 @@
         font-size: 14px;
     }
 
+    .feedback-card {
+        margin-top: 16px;
+        padding: 16px;
+        background: #f8fbff;
+        border: 1px solid #dbe7f5;
+        border-radius: 14px;
+    }
+
+    .feedback-title {
+        margin: 0 0 10px;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .feedback-form {
+        display: grid;
+        gap: 12px;
+    }
+
+    .feedback-field {
+        display: grid;
+        gap: 6px;
+    }
+
+    .feedback-field label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .feedback-input,
+    .feedback-textarea {
+        width: 100%;
+        border: 1px solid #dbe7f5;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 14px;
+        outline: none;
+        background: #fff;
+    }
+
+    .feedback-input:focus,
+    .feedback-textarea:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+    }
+
+    .feedback-textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .feedback-meta-box {
+        display: grid;
+        gap: 8px;
+        color: var(--text-gray);
+        font-size: 14px;
+    }
+
+    .feedback-stars {
+        color: #f59e0b;
+        letter-spacing: 2px;
+        font-size: 15px;
+    }
+
     /* ====== TABS SYSTEM ====== */
     .status-tabs-container {
         display: flex;
@@ -452,13 +524,24 @@
         </div>
         @endif
 
+        @if ($errors->any())
+        <div class="alert alert-danger" style="display:block;">
+            <div><i class="fa-solid fa-triangle-exclamation"></i> Vui lòng kiểm tra lại thông tin đánh giá:</div>
+            <ul style="margin:10px 0 0 18px; padding:0;">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <div class="content-card">
             {{-- STATUS TABS --}}
             <div class="status-tabs-container">
                 <div class="status-tabs">
                     <button class="tab-btn active" onclick="filterByStatus('all')">
                         <i class="fa-solid fa-list-ul"></i> Tất cả
-                        <span class="tab-count">{{ ($unpaidBookings->count() + $pendingBookings->count() + $confirmedBookings->count() + $cancelledBookings->count()) }}</span>
+                        <span class="tab-count">{{ ($unpaidBookings->count() + $pendingBookings->count() + $confirmedBookings->count() + $completedBookings->count() + $cancelledBookings->count()) }}</span>
                     </button>
                     <button class="tab-btn" onclick="filterByStatus('unpaid')">
                         <i class="fa-solid fa-credit-card"></i> Chờ thanh toán
@@ -471,6 +554,10 @@
                     <button class="tab-btn" onclick="filterByStatus('confirmed')">
                         <i class="fa-solid fa-circle-check"></i> Đã xác nhận
                         <span class="tab-count">{{ $confirmedBookings->count() }}</span>
+                    </button>
+                    <button class="tab-btn" onclick="filterByStatus('completed')">
+                        <i class="fa-solid fa-flag-checkered"></i> Hoàn thành
+                        <span class="tab-count">{{ $completedBookings->count() }}</span>
                     </button>
                     <button class="tab-btn" onclick="filterByStatus('cancelled')">
                         <i class="fa-solid fa-circle-xmark"></i> Hủy/Hết hạn
@@ -635,6 +722,81 @@
                 @endif
             </section>
 
+            <section class="booking-section" id="section-completed">
+                <h2 class="booking-section-title">Đã hoàn thành ({{ ($completedBookings ?? collect())->count() }})</h2>
+                @if (($completedBookings ?? collect())->isEmpty())
+                <div class="empty-state">Chưa có tour nào hoàn thành.</div>
+                @else
+                <div class="booking-list">
+                    @foreach ($completedBookings as $booking)
+                    @php $feedback = $booking->feedbacks->first(); @endphp
+                    <article class="booking-item">
+                        <div class="booking-item-head">
+                            <h3 class="booking-title">{{ $booking->tour->name ?? 'Tour không xác định' }}</h3>
+                            <span class="status-completed">Hoàn thành</span>
+                        </div>
+
+                        <div class="booking-meta">
+                            <div>Mã booking: #{{ $booking->booking_id }}</div>
+                            <div>Ngày đặt: {{ optional($booking->booking_date)->format('d/m/Y H:i') }}</div>
+                            <div>Khởi hành: {{ optional(optional($booking->schedule)->start_date)->format('d/m/Y') ?? '-' }}</div>
+                            <div>Kết thúc: {{ optional(optional($booking->schedule)->end_date)->format('d/m/Y') ?? '-' }}</div>
+                        </div>
+
+                        <div class="booking-price-row">
+                            <div class="booking-price">{{ number_format($booking->total_price, 0, ',', '.') }} ₫</div>
+                            <div class="booking-actions">
+                                @if ($booking->tour_id)
+                                <a class="btn-action btn-view" href="{{ route('tours.show', $booking->tour_id) }}">
+                                    <i class="fa-solid fa-eye"></i> Xem tour
+                                </a>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="feedback-card">
+                            @if ($feedback)
+                            <h4 class="feedback-title">Đánh giá của bạn</h4>
+                            <div class="feedback-meta-box">
+                                <div class="feedback-stars">{{ str_repeat('★', (int) $feedback->rating) }}{{ str_repeat('☆', max(0, 5 - (int) $feedback->rating)) }}</div>
+                                <div>{{ $feedback->content }}</div>
+                                <div>Gửi lúc: {{ optional($feedback->created_at)->format('d/m/Y H:i') }}</div>
+                            </div>
+                            @else
+                            <h4 class="feedback-title">Đánh giá tour đã hoàn thành</h4>
+                            <form method="POST" action="{{ route('user.booking.feedback', $booking->booking_id) }}" class="feedback-form">
+                                @csrf
+                                <input type="hidden" name="booking_id" value="{{ $booking->booking_id }}">
+
+                                <div class="feedback-field">
+                                    <label for="rating-{{ $booking->booking_id }}">Số sao</label>
+                                    <select id="rating-{{ $booking->booking_id }}" name="rating" class="feedback-input">
+                                        <option value="">Chọn số sao</option>
+                                        @for ($i = 5; $i >= 1; $i--)
+                                        <option value="{{ $i }}" @selected(old('booking_id') == $booking->booking_id && (int) old('rating') === $i)>{{ $i }} sao</option>
+                                        @endfor
+                                    </select>
+                                </div>
+
+                                <div class="feedback-field">
+                                    <label for="content-{{ $booking->booking_id }}">Nội dung đánh giá</label>
+                                    <textarea id="content-{{ $booking->booking_id }}" name="content" class="feedback-textarea" placeholder="Chia sẻ trải nghiệm của bạn về tour này...">{{ old('booking_id') == $booking->booking_id ? old('content') : '' }}</textarea>
+                                </div>
+
+                                <div>
+                                    <button type="submit" class="btn-action btn-pay">
+                                        <i class="fa-solid fa-paper-plane"></i> Gửi đánh giá
+                                    </button>
+                                </div>
+                            </form>
+                            @endif
+                        </div>
+                    </article>
+                    @endforeach
+                </div>
+                @endif
+            </section>
+
             <section class="booking-section" id="section-cancelled">
                 <h2 class="booking-section-title">Đã hủy ({{ ($cancelledBookings ?? collect())->count() }})</h2>
                 @if (($cancelledBookings ?? collect())->isEmpty())
@@ -756,6 +918,7 @@
                 'unpaid': document.getElementById('section-unpaid'),
                 'pending': document.getElementById('section-pending'),
                 'confirmed': document.getElementById('section-confirmed'),
+                'completed': document.getElementById('section-completed'),
                 'cancelled': document.getElementById('section-cancelled')
             };
 

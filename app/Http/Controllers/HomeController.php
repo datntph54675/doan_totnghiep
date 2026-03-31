@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Tour;
 use App\Models\Category;
+use App\Services\TourAvailabilityService;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     public function index()
     {
+        app(TourAvailabilityService::class)->sync();
+
         $featuredTours = Tour::visibleToUsers()
             ->with('category')
             ->orderBy('tour_id', 'desc')

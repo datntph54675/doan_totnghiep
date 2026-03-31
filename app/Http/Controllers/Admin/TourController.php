@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Tour;
 use App\Models\Category;
+use App\Services\TourAvailabilityService;
 use Illuminate\Support\Facades\Storage;
 
 class TourController extends Controller
@@ -97,6 +98,8 @@ class TourController extends Controller
 
     public function departureSchedules($id)
     {
+        app(TourAvailabilityService::class)->sync();
+
         $tour = Tour::with(['departureSchedules.guideAssignments.guide.user'])->findOrFail($id);
         return view('admin.tours.departure_schedules.index', compact('tour'));
     }

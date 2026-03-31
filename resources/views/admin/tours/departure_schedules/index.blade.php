@@ -64,11 +64,16 @@
                             <span class="text-muted">{{ $schedule->meeting_point ?: '---' }}</span>
                         </td>
                         <td>
-                            @if ($schedule->status == 'active' || $schedule->status == 1)
-                            <span class="badge bg-success-subtle text-success px-3 py-2">Đang hoạt động</span>
-                            @else
-                            <span class="badge bg-secondary-subtle text-secondary px-3 py-2">Tạm ẩn</span>
-                            @endif
+                            @php
+                                $statusConfig = match ($schedule->status) {
+                                    'scheduled' => ['class' => 'bg-primary-subtle text-primary', 'label' => 'Sắp khởi hành'],
+                                    'ongoing' => ['class' => 'bg-warning-subtle text-warning', 'label' => 'Đang diễn ra'],
+                                    'completed' => ['class' => 'bg-success-subtle text-success', 'label' => 'Đã hoàn thành'],
+                                    'cancelled' => ['class' => 'bg-danger-subtle text-danger', 'label' => 'Đã hủy'],
+                                    default => ['class' => 'bg-secondary-subtle text-secondary', 'label' => ucfirst((string) $schedule->status)],
+                                };
+                            @endphp
+                            <span class="badge {{ $statusConfig['class'] }} px-3 py-2">{{ $statusConfig['label'] }}</span>
                         </td>
                         <td>
                             @php

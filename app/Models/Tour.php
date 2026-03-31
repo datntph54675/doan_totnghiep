@@ -59,6 +59,10 @@ class Tour extends Model
     public function scopeVisibleToUsers(Builder $query): Builder
     {
         return $query->where('status', 'active')
+            ->whereHas('departureSchedules', function (Builder $scheduleQuery) {
+                $scheduleQuery->where('status', 'scheduled')
+                    ->whereDate('start_date', '>', today());
+            })
             ->where(function (Builder $subQuery) {
                 $subQuery->whereNull('category_id')
                     ->orWhereHas('category', function (Builder $categoryQuery) {

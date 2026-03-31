@@ -25,7 +25,7 @@ class UserTourController extends Controller
             ->findOrFail($id);
 
         $schedules = DepartureSchedule::where('tour_id', $id)
-            ->where('start_date', '>=', now())
+            ->whereDate('start_date', '>', now()->toDateString())
             ->orderBy('start_date', 'asc')
             ->get();
 

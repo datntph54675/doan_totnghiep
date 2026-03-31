@@ -21,6 +21,7 @@ use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\GuideFeedbackController;
+use App\Http\Controllers\UserFeedbackController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -63,6 +64,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [App\Http\Controllers\UserProfileController::class, 'updatePassword'])->name('user.password.update');
     Route::post('/booking/{bookingId}/cancel', [BookingController::class, 'cancel'])->name('user.booking.cancel');
     Route::get('/booking/{bookingId}/success', [BookingController::class, 'success'])->name('user.booking.success');
+    Route::post('/booking/{bookingId}/feedback', [UserFeedbackController::class, 'store'])->name('user.booking.feedback');
 });
 
 // Payment Routes
