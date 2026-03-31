@@ -21,7 +21,7 @@ class TourAvailabilityService
     private function syncDepartureSchedules(Carbon $today): void
     {
         DepartureSchedule::query()
-            ->where('status', '!=', 'cancelled')
+            ->whereNotIn('status', ['cancelled', 'completed'])
             ->chunkById(100, function ($schedules) use ($today) {
                 foreach ($schedules as $schedule) {
                     $nextStatus = match (true) {

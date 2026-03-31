@@ -8,6 +8,7 @@ use App\Models\Attendance;
 use App\Models\Itinerary;
 use App\Models\Feedback;
 use App\Models\GuideAssignment;
+use App\Services\TourAvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
@@ -28,6 +29,8 @@ class GuideController extends Controller
 
     public function dashboard()
     {
+        app(TourAvailabilityService::class)->sync();
+
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
 
@@ -43,19 +46,19 @@ class GuideController extends Controller
         $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
 
         $upcomingTours = DepartureSchedule::whereIn('schedule_id', $assignedScheduleIds)
-            ->where('start_date', '>=', now())
+            ->where('status', 'scheduled')
             ->with(['tour', 'bookings'])
             ->orderBy('start_date', 'asc')
             ->get();
 
         $ongoingTours = DepartureSchedule::whereIn('schedule_id', $assignedScheduleIds)
-            ->where('start_date', '<=', now())
-            ->where('end_date', '>=', now())
+            ->where('status', 'ongoing')
             ->with(['tour', 'bookings'])
+            ->orderBy('start_date', 'asc')
             ->get();
 
         $completedTours = DepartureSchedule::whereIn('schedule_id', $assignedScheduleIds)
-            ->where('end_date', '<', now())
+            ->where('status', 'completed')
             ->with(['tour', 'bookings'])
             ->orderBy('end_date', 'desc')
             ->limit(5)
@@ -69,6 +72,8 @@ class GuideController extends Controller
 
     public function tourDetail($scheduleId)
     {
+        app(TourAvailabilityService::class)->sync();
+
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
         $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
@@ -95,6 +100,8 @@ class GuideController extends Controller
 
     public function attendance($scheduleId)
     {
+        app(TourAvailabilityService::class)->sync();
+
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
         $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
@@ -146,6 +153,8 @@ class GuideController extends Controller
 
     public function itinerary($scheduleId)
     {
+        app(TourAvailabilityService::class)->sync();
+
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
         $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
@@ -191,6 +200,8 @@ class GuideController extends Controller
 
     public function profile()
     {
+        app(TourAvailabilityService::class)->sync();
+
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
 
@@ -199,7 +210,7 @@ class GuideController extends Controller
             : collect();
 
         $totalTours = $guide
-            ? DepartureSchedule::whereIn('schedule_id', $assignedScheduleIds)->where('end_date', '<', now())->count()
+            ? DepartureSchedule::whereIn('schedule_id', $assignedScheduleIds)->where('status', 'completed')->count()
             : 0;
 
         $totalCustomers = $guide
@@ -250,6 +261,8 @@ class GuideController extends Controller
     }
     public function customerList()
     {
+        app(TourAvailabilityService::class)->sync();
+
         $user = Auth::user();
         $guide = Guide::where('user_id', $user->user_id)->first();
 
