@@ -16,6 +16,32 @@ use Illuminate\Support\Collection;
 
 class GuideController extends Controller
 {
+    private function assignParticipantGroups(Collection $participants): Collection
+    {
+        $groupNumber = 0;
+        $activeGroupKey = null;
+        $remainingCompanions = 0;
+
+        return $participants->map(function ($participant) use (&$groupNumber, &$activeGroupKey, &$remainingCompanions) {
+            if ($participant->is_representative) {
+                $groupNumber++;
+                $activeGroupKey = 'booking-' . $participant->booking_id;
+                $remainingCompanions = max(0, $participant->group_size - 1);
+            } elseif ($remainingCompanions > 0 && $activeGroupKey) {
+                $remainingCompanions--;
+            } else {
+                $groupNumber++;
+                $activeGroupKey = 'guest-' . $participant->tour_customer_id;
+                $remainingCompanions = 0;
+            }
+
+            $participant->group_key = $activeGroupKey;
+            $participant->group_name = 'Nhóm ' . $groupNumber;
+
+            return $participant;
+        });
+    }
+
     private function scheduleParticipants(int $scheduleId): Collection
     {
         $participants = DB::table('tour_customer as tc')
@@ -47,28 +73,7 @@ class GuideController extends Controller
                 return $participant;
             });
 
-        $groupNumber = 0;
-        $activeGroupKey = null;
-        $remainingCompanions = 0;
-
-        return $participants->map(function ($participant) use (&$groupNumber, &$activeGroupKey, &$remainingCompanions) {
-            if ($participant->is_representative) {
-                $groupNumber++;
-                $activeGroupKey = 'booking-' . $participant->booking_id;
-                $remainingCompanions = max(0, $participant->group_size - 1);
-            } elseif ($remainingCompanions > 0 && $activeGroupKey) {
-                $remainingCompanions--;
-            } else {
-                $groupNumber++;
-                $activeGroupKey = 'guest-' . $participant->tour_customer_id;
-                $remainingCompanions = 0;
-            }
-
-            $participant->group_key = $activeGroupKey;
-            $participant->group_name = 'Nhóm ' . $groupNumber;
-
-            return $participant;
-        });
+        return $this->assignParticipantGroups($participants);
     }
 
     private function bookingPassengerTotal(Collection $bookings): int
@@ -342,20 +347,66 @@ class GuideController extends Controller
         $guide = Guide::where('user_id', $user->user_id)->first();
 
         if (!$guide) {
-            return view('guide.customer-list', ['customers' => collect()]);
+            return view('guide.customer-list', [
+                'participants' => collect(),
+                'totalPassengers' => 0,
+            ]);
         }
 
         $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
 
-        $bookings = \App\Models\Booking::with(['customer', 'schedule.tour'])
-            ->whereIn('schedule_id', $assignedScheduleIds)
+        $participants = DB::table('tour_customer as tc')
+            ->join('customer as c', 'c.customer_id', '=', 'tc.customer_id')
+            ->join('departure_schedule as ds', 'ds.schedule_id', '=', 'tc.schedule_id')
+            ->join('tours as t', 't.tour_id', '=', 'ds.tour_id')
+            ->leftJoin('booking as b', 'b.customer_id', '=', 'tc.customer_id')
+            ->whereIn('tc.schedule_id', $assignedScheduleIds)
+            ->where(function ($query) {
+                $query->whereNull('b.booking_id')
+                    ->orWhereColumn('b.schedule_id', 'tc.schedule_id');
+            })
+            ->select([
+                'tc.id as tour_customer_id',
+                'tc.schedule_id',
+                'c.customer_id',
+                'c.fullname',
+                'c.email',
+                'c.phone',
+                'c.id_number',
+                't.name as tour_name',
+                'ds.start_date',
+                'b.booking_id',
+                'b.num_people',
+                'b.status as booking_status',
+                'b.payment_status',
+            ])
+            ->orderByDesc('ds.start_date')
+            ->orderBy('tc.id')
             ->get()
-            ->sortByDesc('booking_date')
+
+            ->map(function ($participant) {
+                $participant->is_representative = !empty($participant->booking_id);
+                $participant->group_size = max(1, (int) ($participant->num_people ?? 1));
+
+                return $participant;
+            })
             ->values();
 
-        $totalPassengers = $this->bookingPassengerTotal($bookings);
+        $currentScheduleId = null;
 
-        return view('guide.customer-list', compact('bookings', 'totalPassengers'));
+        $participants = $participants->groupBy('schedule_id')->flatMap(function ($scheduleParticipants) {
+            return $this->assignParticipantGroups($scheduleParticipants->values());
+        })->values()->map(function ($participant) use (&$currentScheduleId) {
+            if ($currentScheduleId !== $participant->schedule_id) {
+                $currentScheduleId = $participant->schedule_id;
+            }
+
+            return $participant;
+        });
+
+        $totalPassengers = $participants->count();
+
+        return view('guide.customer-list', compact('participants', 'totalPassengers'));
     }
 
     /**
