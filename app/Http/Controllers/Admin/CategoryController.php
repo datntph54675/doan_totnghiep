@@ -28,11 +28,19 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+        ], [
+            'name.required' => 'Tên danh mục là bắt buộc.',
+            'name.string' => 'Tên danh mục phải là chuỗi ký tự.',
+            'name.max' => 'Tên danh mục không được vượt quá :max ký tự.',
+            'description.string' => 'Mô tả danh mục phải là chuỗi ký tự.',
+        ], [
+            'name' => 'Tên danh mục',
+            'description' => 'Mô tả danh mục',
         ]);
 
         Category::create($request->all());
 
-        return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được ẩn.');
+        return redirect()->route('admin.categories.index')->with('success', 'Tạo danh mục thành công.');
     }
 
     public function show(Category $category)
@@ -51,16 +59,24 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+        ], [
+            'name.required' => 'Tên danh mục là bắt buộc.',
+            'name.string' => 'Tên danh mục phải là chuỗi ký tự.',
+            'name.max' => 'Tên danh mục không được vượt quá :max ký tự.',
+            'description.string' => 'Mô tả danh mục phải là chuỗi ký tự.',
+        ], [
+            'name' => 'Tên danh mục',
+            'description' => 'Mô tả danh mục',
         ]);
 
-        // Kiểm tra nếu danh mục có tour thì không cho phép thay đổi status
-        if ($category->tours()->exists() && $request->status != $category->status) {
-            return redirect()->back()->with('error', 'Không thể thay đổi trạng thái danh mục đã có tour.');
+        // Nếu danh mục đã có tour liên kết thì không cho phép chỉnh sửa bất kỳ trường nào
+        if ($category->tours()->exists()) {
+            return redirect()->back()->withInput()->with('error', 'Không thể chỉnh sửa danh mục vì đã có tour liên kết.');
         }
 
         $category->update($request->all());
 
-        return redirect()->route('admin.categories.index')->with('success', 'Danh mục đã được cập nhật.');
+        return redirect()->route('admin.categories.index')->with('success', 'Cập nhật danh mục thành công.');
     }
 
     public function destroy(Category $category)

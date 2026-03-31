@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tour extends Model
 {
@@ -43,6 +44,11 @@ class Tour extends Model
     public function itineraries()
     {
         return $this->hasMany(Itinerary::class, 'tour_id', 'tour_id');
+    }
+
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'tour_id', 'tour_id');
     }
 
     public function feedbacks()
