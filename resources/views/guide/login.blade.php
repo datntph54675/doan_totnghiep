@@ -18,7 +18,7 @@
 
         .left-panel {
             flex: 1;
-            background: linear-gradient(135deg, #064e3b 0%, #065f46 40%, #047857 100%);
+            background: linear-gradient(135deg, #0d1b3e 0%, #1a1a2e 40%, #16213e 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -108,7 +108,7 @@
 
         .login-logo {
             width: 52px; height: 52px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
             border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
             font-size: 26px;
@@ -152,15 +152,15 @@
 
         .form-control:focus {
             outline: none;
-            border-color: #10b981;
+            border-color: #3b82f6;
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(16,185,129,.1);
+            box-shadow: 0 0 0 3px rgba(59,130,246,.1);
         }
 
         .btn-login {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #3b82f6, #0066cc);
             color: #fff;
             border: none;
             border-radius: 10px;
@@ -174,7 +174,7 @@
 
         .btn-login:hover {
             transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(5,150,105,.35);
+            box-shadow: 0 8px 20px rgba(0,102,204,.35);
         }
 
         .btn-login:active { transform: translateY(0); }
@@ -195,11 +195,11 @@
         .hint {
             margin-top: 20px;
             padding: 14px 16px;
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
             border-radius: 10px;
             font-size: 13px;
-            color: #166534;
+            color: #1e40af;
         }
 
         .back-home {
@@ -212,7 +212,7 @@
             transition: color .2s;
         }
 
-        .back-home:hover { color: #10b981; }
+        .back-home:hover { color: #0066cc; }
 
         @media (max-width: 768px) {
             .left-panel { display: none; }
