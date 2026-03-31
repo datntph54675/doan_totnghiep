@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\GuideFeedbackController as AdminGuideFeedbackController;
 use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\GoogleAuthController;
@@ -129,6 +130,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Contacts
         Route::resource('contacts', ContactController::class)->only(['index', 'show', 'update', 'destroy']);
+
+        // Invoices
+        Route::get('invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+        Route::get('invoices/{id}', [InvoiceController::class, 'show'])->name('invoices.show');
     });
 });
 
