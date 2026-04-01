@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Tour;
+use App\Notifications\BookingConfirmedNotification;
 use Illuminate\Http\Request;
 
 class BookingController extends Controller
@@ -96,6 +97,11 @@ class BookingController extends Controller
         $booking->update([
             'admin_confirmed' => true,
         ]);
+
+        // Gửi email xác nhận booking đến khách hàng
+        if ($booking->customer && $booking->customer->email) {
+            $booking->customer->notify(new BookingConfirmedNotification($booking));
+        }
 
         return redirect()->back()->with('success', 'Đã xác nhận booking cho khách thành công.');
     }
