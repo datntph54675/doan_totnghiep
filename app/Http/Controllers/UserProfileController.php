@@ -30,6 +30,9 @@ class UserProfileController extends Controller
 
         app(TourAvailabilityService::class)->sync();
 
+        // Tự động cập nhật trạng thái về completed cho tour đã kết thúc
+        $this->completeFinishedBookings($user->user_id);
+
         // Tự động kiểm tra và hủy các đơn hàng hết hạn ngay khi xem trang (Lazy Cleanup)
         $this->expireOldBookings($user->user_id);
 
@@ -58,13 +61,28 @@ class UserProfileController extends Controller
                 if ($booking->schedule) {
                     $booking->schedule()->increment('available_spots', $booking->num_people);
                 }
-                
+
                 // Gửi thông báo
                 $user = \App\Models\User::find($booking->user_id);
                 if ($user) {
                     $user->notify(new \App\Notifications\BookingExpiredNotification($booking));
                 }
             });
+        }
+    }
+
+    private function completeFinishedBookings(int $userId)
+    {
+        $bookings = Booking::with('schedule')
+            ->where('user_id', $userId)
+            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', 'completed')
+            ->where('payment_status', 'paid')
+            ->whereHas('schedule', fn ($query) => $query->where('end_date', '<', now()))
+            ->get();
+
+        foreach ($bookings as $booking) {
+            $booking->update(['status' => 'completed']);
         }
     }
 
@@ -99,6 +117,13 @@ class UserProfileController extends Controller
             ->where('status', 'completed')
             ->orderByDesc('booking_date')
             ->get();
+
+        // Nếu có schedule end date đã qua thì đảm bảo trạng thái hoàn thành trước khi người dùng đánh giá
+        foreach ($completedBookings as $booking) {
+            if (!$booking->schedule?->end_date || $booking->schedule->end_date->isPast()) {
+                // Trạng thái đã là completed ở đây, đủ điều kiện cho đánh giá nếu chưa đánh giá.
+            }
+        }
 
         $cancelledBookings = Booking::with(['tour', 'schedule'])
             ->where('user_id', $userId)

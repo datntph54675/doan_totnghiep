@@ -61,6 +61,29 @@ class Booking extends Model
         return $this->hasMany(Feedback::class, 'booking_id', 'booking_id');
     }
 
+    public function hasReview(): bool
+    {
+        return $this->feedbacks()->where('type', Feedback::TYPE_REVIEW)->exists();
+    }
+
+    public function canBeReviewed(): bool
+    {
+        if ($this->status !== 'completed' || $this->payment_status !== 'paid') {
+            return false;
+        }
+
+        if ($this->hasReview()) {
+            return false;
+        }
+
+        $scheduleEnd = $this->schedule?->end_date;
+        if ($scheduleEnd && $scheduleEnd->isFuture()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function getParticipantCountAttribute(): int
     {
         return max(1, (int) $this->num_people);
