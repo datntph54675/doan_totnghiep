@@ -57,13 +57,17 @@
                     <div class="col-md-6 mb-4">
                         <label for="status" class="form-label fw-bold text-secondary">Trạng thái</label>
                         <select name="status" id="status" class="form-select @error('status') is-invalid @enderror" required>
-                            <option value="scheduled" {{ old('status', $schedule->status) == 'scheduled' ? 'selected' : '' }}>Đã lên lịch</option>
-                            <option value="ongoing" {{ old('status', $schedule->status) == 'ongoing' ? 'selected' : '' }}>Đang diễn ra</option>
-                            <option value="completed" {{ old('status', $schedule->status) == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
-                            <option value="cancelled" {{ old('status', $schedule->status) == 'cancelled' ? 'selected' : '' }}>Hủy</option>
+                            @foreach($allowedStatuses as $status)
+                                <option value="{{ $status }}" {{ old('status', $schedule->status) == $status ? 'selected' : '' }}>
+                                    {{ \App\Models\DepartureSchedule::STATUS_LABELS[$status] ?? ucfirst($status) }}
+                                </option>
+                            @endforeach
                         </select>
+                        <div class="form-text">
+                            Chỉ được chuyển theo thứ tự: Đã lên lịch → Đang diễn ra → Hoàn thành. Trạng thái trước Hoàn thành có thể hủy, nhưng đã hủy hoặc hoàn thành thì không thể quay lại.
+                        </div>
                         @error('status')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 

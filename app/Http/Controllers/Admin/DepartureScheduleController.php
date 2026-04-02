@@ -6,14 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\DepartureSchedule;
 use App\Models\Tour;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class DepartureScheduleController extends Controller
 {
     public function create($tourId)
     {
         $tour = Tour::findOrFail($tourId);
+        $defaultStatus = DepartureSchedule::STATUS_SCHEDULED;
 
-        return view('admin.tours.departure_schedules.create', compact('tour'));
+        return view('admin.tours.departure_schedules.create', compact('tour', 'defaultStatus'));
     }
 
     public function store(Request $request, $tourId)
@@ -25,8 +27,10 @@ class DepartureScheduleController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'max_people' => 'required|integer|min:1',
             'meeting_point' => 'nullable|string|max:255',
-            'status' => 'required|in:scheduled,ongoing,completed,cancelled',
+            'status' => ['required', Rule::in([DepartureSchedule::STATUS_SCHEDULED])],
             'notes' => 'nullable|string',
+        ], [
+            'status.in' => 'Lịch xuất phát mới phải bắt đầu ở trạng thái Đã lên lịch.',
         ]);
 
         $data['tour_id'] = $tour->tour_id;
@@ -43,8 +47,9 @@ class DepartureScheduleController extends Controller
     {
         $tour = Tour::findOrFail($tourId);
         $schedule = DepartureSchedule::where('tour_id', $tour->tour_id)->findOrFail($scheduleId);
+        $allowedStatuses = $schedule->availableStatusOptions();
 
-        return view('admin.tours.departure_schedules.edit', compact('tour', 'schedule'));
+        return view('admin.tours.departure_schedules.edit', compact('tour', 'schedule', 'allowedStatuses'));
     }
 
     public function update(Request $request, $tourId, $scheduleId)
@@ -57,9 +62,17 @@ class DepartureScheduleController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'max_people' => 'required|integer|min:1',
             'meeting_point' => 'nullable|string|max:255',
-            'status' => 'required|in:scheduled,ongoing,completed,cancelled',
+            'status' => ['required', Rule::in(array_keys(DepartureSchedule::STATUS_LABELS))],
             'notes' => 'nullable|string',
         ]);
+
+        if (!$schedule->canTransitionTo($data['status'])) {
+            return back()
+                ->withErrors([
+                    'status' => 'Chỉ được chuyển trạng thái theo từng bước: Đã lên lịch → Đang diễn ra → Hoàn thành. Chỉ các bước trước Hoàn thành mới được phép hủy, và khi đã hủy hoặc hoàn thành thì không thể quay lại.',
+                ])
+                ->withInput();
+        }
 
         // Tính toán lại available_spots khi max_people thay đổi
         // Lấy số vé đã đặt (không tính đơn đã hủy)
