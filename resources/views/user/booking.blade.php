@@ -1154,7 +1154,7 @@
                 </div>
                 <div class="bk-card-body">
                     <div class="companions-hint">
-                        Vui lòng nhập đủ họ tên, giới tính, ngày sinh, số điện thoại, email và CCCD/Hộ chiếu cho
+                        Vui lòng nhập đủ họ tên, giới tính, ngày sinh và số điện thoại cho
                         mỗi người đi cùng.
                     </div>
                     <div id="companionsContainer"></div>
@@ -1295,8 +1295,6 @@
                 gender: item.querySelector('[data-field="gender"]')?.value || '',
                 birthdate: item.querySelector('[data-field="birthdate"]')?.value || '',
                 phone: item.querySelector('[data-field="phone"]')?.value || '',
-                email: item.querySelector('[data-field="email"]')?.value || '',
-                id_number: item.querySelector('[data-field="id_number"]')?.value || '',
             }));
         }
 
@@ -1347,16 +1345,6 @@
                                 <div class="fi-group">
                                     <div class="fi-label">Số điện thoại <span class="req">*</span></div>
                                     <input type="tel" class="fi-control" name="companions[${i}][phone]" data-field="phone" value="${escapeHtml(value.phone || '')}" placeholder="0901 234 567" required>
-                                </div>
-                            </div>
-                            <div class="fi-row">
-                                <div class="fi-group">
-                                    <div class="fi-label">Email <span class="req">*</span></div>
-                                    <input type="email" class="fi-control" name="companions[${i}][email]" data-field="email" value="${escapeHtml(value.email || '')}" placeholder="example@email.com" required>
-                                </div>
-                                <div class="fi-group">
-                                    <div class="fi-label">Số CCCD / Hộ chiếu <span class="req">*</span></div>
-                                    <input type="text" class="fi-control" name="companions[${i}][id_number]" data-field="id_number" value="${escapeHtml(value.id_number || '')}" placeholder="012 345 678 901" required>
                                 </div>
                             </div>
                         </div>
