@@ -24,11 +24,15 @@ class TourAvailabilityService
             ->whereNotIn('status', ['cancelled', 'completed'])
             ->chunkById(100, function ($schedules) use ($today) {
                 foreach ($schedules as $schedule) {
-                    $nextStatus = match (true) {
+                    $targetStatus = match (true) {
                         $schedule->end_date?->lt($today) => 'completed',
                         $schedule->start_date?->lte($today) && $schedule->end_date?->gte($today) => 'ongoing',
                         default => 'scheduled',
                     };
+
+                    $nextStatus = $schedule->canTransitionTo($targetStatus)
+                        ? $targetStatus
+                        : (DepartureSchedule::ALLOWED_TRANSITIONS[$schedule->status][0] ?? $schedule->status);
 
                     if ($schedule->status !== $nextStatus) {
                         $schedule->update(['status' => $nextStatus]);

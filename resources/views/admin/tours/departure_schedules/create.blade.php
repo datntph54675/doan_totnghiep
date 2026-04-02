@@ -55,14 +55,11 @@
 
                     <div class="col-md-6 mb-4">
                         <label for="status" class="form-label fw-bold text-secondary">Trạng thái mặc định</label>
-                        <select name="status" id="status" class="form-select @error('status') is-invalid @enderror" required>
-                            <option value="scheduled" {{ old('status') == 'scheduled' ? 'selected' : '' }}>Đã lên lịch</option>
-                            <option value="ongoing" {{ old('status') == 'ongoing' ? 'selected' : '' }}>Đang diễn ra</option>
-                            <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
-                            <option value="cancelled" {{ old('status') == 'cancelled' ? 'selected' : '' }}>Hủy</option>
-                        </select>
+                        <input type="hidden" name="status" value="{{ old('status', $defaultStatus) }}">
+                        <input type="text" value="Đã lên lịch" class="form-control" disabled>
+                        <div class="form-text">Lịch xuất phát mới luôn bắt đầu từ trạng thái Đã lên lịch.</div>
                         @error('status')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
