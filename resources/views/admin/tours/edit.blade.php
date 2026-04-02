@@ -18,6 +18,12 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
+            @if($lockedForContentUpdate ?? false)
+                <div class="alert alert-warning border-0 shadow-sm mb-4">
+                    Tour này đã có booking hoặc lịch trình nên không thể sửa nội dung chính. Bạn vẫn có thể cập nhật hình ảnh hiển thị.
+                </div>
+            @endif
+
             <form action="{{ route('admin.tours.update', $tour) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -25,7 +31,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="category_id" class="form-label fw-bold text-secondary">Danh mục</label>
-                        <select name="category_id" id="category_id" class="form-select @error('category_id') is-invalid @enderror">
+                        <select name="category_id" id="category_id" class="form-select @error('category_id') is-invalid @enderror" {{ ($lockedForContentUpdate ?? false) ? 'disabled' : '' }}>
                             <option value="">Chọn danh mục</option>
                             @foreach($categories as $category)
                             <option value="{{ $category->category_id }}" {{ old('category_id', $tour->category_id) == $category->category_id ? 'selected' : '' }}>{{ $category->name }}</option>
@@ -39,7 +45,7 @@
                     <div class="col-md-6 mb-4">
                         <label for="name" class="form-label fw-bold text-secondary">Tên Tour</label>
                         <input type="text" name="name" id="name" value="{{ old('name', $tour->name) }}"
-                            class="form-control @error('name') is-invalid @enderror" placeholder="Nhập tên tour..." required>
+                            class="form-control @error('name') is-invalid @enderror" placeholder="Nhập tên tour..." required {{ ($lockedForContentUpdate ?? false) ? 'readonly' : '' }}>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -48,7 +54,7 @@
                     <div class="col-md-6 mb-4">
                         <label for="price" class="form-label fw-bold text-secondary">Giá</label>
                         <input type="number" name="price" id="price" value="{{ old('price', $tour->price) }}"
-                            class="form-control @error('price') is-invalid @enderror" step="0.01" placeholder="Nhập giá..." required>
+                            class="form-control @error('price') is-invalid @enderror" step="0.01" placeholder="Nhập giá..." required {{ ($lockedForContentUpdate ?? false) ? 'readonly' : '' }}>
                         @error('price')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -57,7 +63,7 @@
                     <div class="col-md-6 mb-4">
                         <label for="duration" class="form-label fw-bold text-secondary">Thời gian (ngày)</label>
                         <input type="number" name="duration" id="duration" value="{{ old('duration', $tour->duration) }}"
-                            class="form-control @error('duration') is-invalid @enderror" placeholder="Nhập số ngày...">
+                            class="form-control @error('duration') is-invalid @enderror" placeholder="Nhập số ngày..." {{ ($lockedForContentUpdate ?? false) ? 'readonly' : '' }}>
                         @error('duration')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -66,7 +72,7 @@
                     <div class="col-md-6 mb-4">
                         <label for="supplier" class="form-label fw-bold text-secondary">Nhà cung cấp</label>
                         <input type="text" name="supplier" id="supplier" value="{{ old('supplier', $tour->supplier) }}"
-                            class="form-control @error('supplier') is-invalid @enderror" placeholder="Nhập nhà cung cấp...">
+                            class="form-control @error('supplier') is-invalid @enderror" placeholder="Nhập nhà cung cấp..." {{ ($lockedForContentUpdate ?? false) ? 'readonly' : '' }}>
                         @error('supplier')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -74,7 +80,7 @@
 
                     <div class="col-md-6 mb-4">
                         <label for="status" class="form-label fw-bold text-secondary">Trạng thái</label>
-                        <select name="status" id="status" class="form-select">
+                        <select name="status" id="status" class="form-select" {{ ($lockedForContentUpdate ?? false) ? 'disabled' : '' }}>
                             <option value="active" {{ old('status', $tour->status) == 'active' ? 'selected' : '' }}>Hiện (Active)</option>
                             <option value="inactive" {{ old('status', $tour->status) == 'inactive' ? 'selected' : '' }}>Ẩn (Inactive)</option>
                         </select>
@@ -105,7 +111,7 @@
                         <label for="description" class="form-label fw-bold text-secondary">Mô tả</label>
                         <textarea name="description" id="description" rows="4"
                             class="form-control @error('description') is-invalid @enderror"
-                            placeholder="Nhập mô tả chi tiết...">{{ old('description', $tour->description) }}</textarea>
+                            placeholder="Nhập mô tả chi tiết..." {{ ($lockedForContentUpdate ?? false) ? 'readonly' : '' }}>{{ old('description', $tour->description) }}</textarea>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -115,7 +121,7 @@
                         <label for="policy" class="form-label fw-bold text-secondary">Chính sách</label>
                         <textarea name="policy" id="policy" rows="4"
                             class="form-control @error('policy') is-invalid @enderror"
-                            placeholder="Nhập chính sách...">{{ old('policy', $tour->policy) }}</textarea>
+                            placeholder="Nhập chính sách..." {{ ($lockedForContentUpdate ?? false) ? 'readonly' : '' }}>{{ old('policy', $tour->policy) }}</textarea>
                         @error('policy')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -126,7 +132,7 @@
 
                 <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                        Cập nhật
+                        {{ ($lockedForContentUpdate ?? false) ? 'Cập nhật ảnh' : 'Cập nhật' }}
                     </button>
                     <a href="{{ route('admin.tours.index') }}" class="btn btn-outline-secondary px-4">
                         Hủy bỏ

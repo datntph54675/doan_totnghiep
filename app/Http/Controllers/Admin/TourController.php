@@ -125,7 +125,9 @@ class TourController extends Controller
     {
         $tour = Tour::findOrFail($id);
         $categories = Category::orderBy('name')->get();
-        return view('admin.tours.edit', compact('tour', 'categories'));
+        $lockedForContentUpdate = $tour->bookings()->exists() || $tour->itineraries()->exists();
+
+        return view('admin.tours.edit', compact('tour', 'categories', 'lockedForContentUpdate'));
     }
 
     public function show($id)
@@ -145,9 +147,25 @@ class TourController extends Controller
     public function update(Request $request, $id)
     {
         $tour = Tour::findOrFail($id);
-        // Không cho phép chỉnh sửa tour nếu đã có booking hoặc lịch trình
-        if ($tour->bookings()->exists() || $tour->itineraries()->exists()) {
-            return redirect()->route('admin.tours.index')->with('error', 'Không thể chỉnh sửa tour vì đã có đơn đặt hoặc lịch trình.');
+        $lockedForContentUpdate = $tour->bookings()->exists() || $tour->itineraries()->exists();
+
+        if ($lockedForContentUpdate) {
+            $data = $request->validate([
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            ], [
+                'image.required' => 'Vui lòng chọn hình ảnh mới cho tour.',
+                'image.image' => 'Tệp tải lên phải là hình ảnh.',
+                'image.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif, webp.',
+                'image.max' => 'Hình ảnh không được lớn hơn :max kilobytes.',
+            ]);
+
+            if ($request->hasFile('image')) {
+                $this->deleteLocalImage($tour->image);
+                $data['image'] = $request->file('image')->store('tours', 'public');
+                $tour->update(['image' => $data['image']]);
+            }
+
+            return redirect()->route('admin.tours.index')->with('success', 'Cập nhật ảnh tour thành công.');
         }
 
         $data = $request->validate([
