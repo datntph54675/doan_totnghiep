@@ -152,6 +152,7 @@ Route::prefix('guide')->group(function () {
         Route::post('assignments/{id}/reject', [\App\Http\Controllers\GuideController::class, 'rejectAssignment'])->name('guide.assignments.reject');
 
         Route::get('tour/{scheduleId}', [\App\Http\Controllers\GuideController::class, 'tourDetail'])->name('guide.tour.detail');
+        Route::post('tour/{scheduleId}/complete', [\App\Http\Controllers\GuideController::class, 'completeTour'])->name('guide.tour.complete');
         Route::get('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'attendance'])->name('guide.attendance');
         Route::post('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'markAttendance'])->name('guide.attendance.mark');
         Route::get('tour/{scheduleId}/itinerary', [\App\Http\Controllers\GuideController::class, 'itinerary'])->name('guide.itinerary');
