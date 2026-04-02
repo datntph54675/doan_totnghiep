@@ -15,6 +15,48 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    private function resolveLeadCustomer(array $validated): Customer
+    {
+        $customerData = [
+            'fullname' => $validated['fullname'],
+            'gender' => $validated['gender'],
+            'birthdate' => $validated['birthdate'] ?? null,
+            'phone' => $validated['phone'],
+            'email' => $validated['email'] ?? null,
+            'id_number' => $validated['id_number'] ?? null,
+        ];
+
+        $query = Customer::query()
+            ->where('fullname', $validated['fullname'])
+            ->where('phone', $validated['phone']);
+
+        if (!empty($validated['birthdate'])) {
+            $query->whereDate('birthdate', $validated['birthdate']);
+        }
+
+        if (!empty($validated['email'])) {
+            $query->where('email', $validated['email']);
+        }
+
+        if (!empty($validated['id_number'])) {
+            $query->where('id_number', $validated['id_number']);
+        }
+
+        $customer = $query->first();
+
+        if ($customer) {
+            $customer->fill($customerData);
+
+            if ($customer->isDirty()) {
+                $customer->save();
+            }
+
+            return $customer;
+        }
+
+        return Customer::create($customerData);
+    }
+
     public function create($tourId)
     {
         app(TourAvailabilityService::class)->sync();
@@ -122,17 +164,7 @@ class BookingController extends Controller
                     throw new \Exception("Rất tiếc, chỉ còn {$schedule->available_spots} chỗ trống cho ngày khởi hành này.");
                 }
 
-                // Tạo hoặc tìm customer theo phone
-                $customer = Customer::firstOrCreate(
-                    ['phone' => $validated['phone']],
-                    [
-                        'fullname'   => $validated['fullname'],
-                        'gender'     => $validated['gender'],
-                        'birthdate'  => $validated['birthdate'] ?? null,
-                        'email'      => $validated['email'] ?? null,
-                        'id_number'  => $validated['id_number'] ?? null,
-                    ]
-                );
+                $customer = $this->resolveLeadCustomer($validated);
 
                 $totalPrice = $tour->price * $validated['num_people'];
 
