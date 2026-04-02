@@ -64,7 +64,17 @@
                                 </tr>
                                 <tr class="border-bottom">
                                     <th class="py-3 text-muted fw-semibold text-uppercase small">Hình ảnh</th>
-                                    <td class="py-3">{{ $tour->image ?: 'Chưa có hình ảnh' }}</td>
+                                    <td class="py-3">
+                                        @if($tour->image_url)
+                                            <div class="d-flex flex-column gap-2">
+                                                <img src="{{ $tour->image_url }}" alt="{{ $tour->name }}"
+                                                    class="rounded border" style="max-width:220px; max-height:140px; object-fit:cover;">
+                                                <span class="text-muted small">{{ $tour->image }}</span>
+                                            </div>
+                                        @else
+                                            Chưa có hình ảnh
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr class="border-bottom">
                                     <th class="py-3 text-muted fw-semibold text-uppercase small">Trạng thái</th>

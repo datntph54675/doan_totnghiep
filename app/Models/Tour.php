@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Tour extends Model
 {
@@ -30,6 +32,27 @@ class Tour extends Model
     protected $casts = [
         'price' => 'decimal:2',
     ];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        $image = $this->attributes['image'] ?? null;
+
+        if (!is_string($image) || trim($image) === '') {
+            return null;
+        }
+
+        $image = trim($image);
+
+        if (filter_var($image, FILTER_VALIDATE_URL) || Str::startsWith($image, '//')) {
+            return $image;
+        }
+
+        if (Str::startsWith($image, ['/storage/', 'storage/'])) {
+            return asset(ltrim($image, '/'));
+        }
+
+        return asset('storage/' . ltrim($image, '/'));
+    }
 
     public function category()
     {

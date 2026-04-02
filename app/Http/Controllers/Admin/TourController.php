@@ -11,6 +11,29 @@ use Illuminate\Support\Facades\Storage;
 
 class TourController extends Controller
 {
+    protected function deleteLocalImage(?string $imagePath): void
+    {
+        if (!is_string($imagePath) || trim($imagePath) === '') {
+            return;
+        }
+
+        $imagePath = trim($imagePath);
+
+        if (filter_var($imagePath, FILTER_VALIDATE_URL) || str_starts_with($imagePath, '//')) {
+            return;
+        }
+
+        if (str_starts_with($imagePath, '/storage/')) {
+            $imagePath = substr($imagePath, strlen('/storage/'));
+        } elseif (str_starts_with($imagePath, 'storage/')) {
+            $imagePath = substr($imagePath, strlen('storage/'));
+        }
+
+        if ($imagePath !== '' && Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
+        }
+    }
+
     public function index(Request $request)
     {
         $query = Tour::query();
@@ -89,8 +112,7 @@ class TourController extends Controller
 
         // handle uploaded image file
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('tours', 'public');
-            $data['image'] = $path;
+            $data['image'] = $request->file('image')->store('tours', 'public');
         }
 
         $data['status'] = $data['status'] ?? 'active';
@@ -175,12 +197,8 @@ class TourController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            // delete old file if exists
-            if ($tour->image && Storage::disk('public')->exists($tour->image)) {
-                Storage::disk('public')->delete($tour->image);
-            }
-            $path = $request->file('image')->store('tours', 'public');
-            $data['image'] = $path;
+            $this->deleteLocalImage($tour->image);
+            $data['image'] = $request->file('image')->store('tours', 'public');
         }
 
         $tour->update($data);
@@ -190,6 +208,7 @@ class TourController extends Controller
     public function destroy($id)
     {
         $tour = Tour::findOrFail($id);
+        $this->deleteLocalImage($tour->image);
         $tour->delete();
         return redirect()->route('admin.tours.index')->with('success', 'Xóa tour thành công.');
     }

@@ -315,8 +315,8 @@
             @foreach($featuredTours as $i => $tour)
             <a href="{{ route('tours.show', $tour->tour_id) }}" class="tour-card">
                 <div class="tour-card-img">
-                    @if($tour->image && file_exists(storage_path('app/public/' . $tour->image)))
-                        <img src="{{ Storage::url($tour->image) }}" alt="{{ $tour->name }}" loading="lazy">
+                    @if($tour->image_url)
+                        <img src="{{ $tour->image_url }}" alt="{{ $tour->name }}" loading="lazy">
                     @else
                         <div class="tour-card-img-placeholder" style="background: linear-gradient(135deg,
                             {{ ['#667eea,#764ba2','#f093fb,#f5576c','#4facfe,#00f2fe','#43e97b,#38f9d7','#fa709a,#fee140','#30cfd0,#667eea','#a18cd1,#fbc2eb','#fda085,#f6d365'][$i % 8] }})">

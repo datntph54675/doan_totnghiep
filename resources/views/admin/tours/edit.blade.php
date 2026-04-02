@@ -18,7 +18,7 @@
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-4">
-            <form action="{{ route('admin.tours.update', $tour) }}" method="POST">
+            <form action="{{ route('admin.tours.update', $tour) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -82,8 +82,16 @@
 
                     <div class="col-md-6 mb-4">
                         <label for="image" class="form-label fw-bold text-secondary">Hình ảnh</label>
-                        <input type="text" name="image" id="image" value="{{ old('image', $tour->image) }}"
-                            class="form-control @error('image') is-invalid @enderror" placeholder="URL hình ảnh...">
+                        <input type="file" name="image" id="image"
+                            class="form-control @error('image') is-invalid @enderror" accept="image/*">
+                        @if($tour->image_url)
+                            <div class="mt-3">
+                                <div class="small text-muted mb-2">Ảnh hiện tại</div>
+                                <img src="{{ $tour->image_url }}" alt="{{ $tour->name }}"
+                                    class="img-fluid rounded border" style="max-height: 180px; object-fit: cover;">
+                            </div>
+                        @endif
+                        <small class="text-muted d-block mt-2">Tải ảnh mới để thay thế ảnh hiện tại. Định dạng: JPG, PNG, GIF, WEBP. Tối đa 2MB.</small>
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

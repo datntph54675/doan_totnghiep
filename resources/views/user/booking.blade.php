@@ -1187,8 +1187,8 @@
     {{-- RIGHT: SIDEBAR --}}
     <div class="bk-sidebar">
         <div class="bk-summary-card">
-            @if ($tour->image)
-            <img src="{{ asset('storage/' . $tour->image) }}" alt="{{ $tour->name }}" class="bk-summary-img">
+            @if ($tour->image_url)
+            <img src="{{ $tour->image_url }}" alt="{{ $tour->name }}" class="bk-summary-img">
             @else
             <div class="bk-summary-img-placeholder">✈️</div>
             @endif
