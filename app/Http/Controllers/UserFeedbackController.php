@@ -18,16 +18,8 @@ class UserFeedbackController extends Controller
             abort(403, 'Bạn không có quyền đánh giá booking này.');
         }
 
-        if ($booking->status !== 'completed') {
-            return back()->with('error', 'Chỉ có thể đánh giá tour sau khi tour đã hoàn thành.');
-        }
-
-        if ($booking->payment_status !== 'paid') {
-            return back()->with('error', 'Chỉ có thể đánh giá booking đã thanh toán.');
-        }
-
-        if ($booking->feedbacks->isNotEmpty()) {
-            return back()->with('error', 'Bạn đã gửi đánh giá cho tour này rồi.');
+        if (! $booking->canBeReviewed()) {
+            return back()->with('error', 'Bạn chỉ có thể đánh giá tour đã hoàn thành và chưa đánh giá trước đó.');
         }
 
         $validated = $request->validate([

@@ -564,7 +564,7 @@
                         <span class="tab-count">{{ $cancelledBookings->count() }}</span>
                     </button>
                 </div>
-                
+
                 {{-- SEARCH --}}
                 <div class="search-box-container">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -729,7 +729,7 @@
                 @else
                 <div class="booking-list">
                     @foreach ($completedBookings as $booking)
-                    @php $feedback = $booking->feedbacks->first(); @endphp
+                    @php $feedback = $booking->feedbacks->where('type', \App\Models\Feedback::TYPE_REVIEW)->first(); @endphp
                     <article class="booking-item">
                         <div class="booking-item-head">
                             <h3 class="booking-title">{{ $booking->tour->name ?? 'Tour không xác định' }}</h3>
@@ -762,7 +762,7 @@
                                 <div>{{ $feedback->content }}</div>
                                 <div>Gửi lúc: {{ optional($feedback->created_at)->format('d/m/Y H:i') }}</div>
                             </div>
-                            @else
+                            @elseif ($booking->canBeReviewed())
                             <h4 class="feedback-title">Đánh giá tour đã hoàn thành</h4>
                             <form method="POST" action="{{ route('user.booking.feedback', $booking->booking_id) }}" class="feedback-form">
                                 @csrf
@@ -789,6 +789,10 @@
                                     </button>
                                 </div>
                             </form>
+                            @else
+                                <div class="feedback-meta-box">
+                                    <div>Tour đã hoàn thành, hoặc đã được đánh giá rồi.</div>
+                                </div>
                             @endif
                         </div>
                     </article>
@@ -902,7 +906,7 @@
 
             // Clear search when switching tabs to avoid confusion
             document.getElementById('bookingSearch').value = '';
-            
+
             applyFilters();
         };
 
@@ -926,7 +930,7 @@
             items.forEach(item => {
                 const bookingId = item.querySelector('.booking-meta div:nth-child(1)').textContent.replace('Mã booking: #', '').trim();
                 const tourName = item.querySelector('.booking-title').textContent.toLowerCase();
-                
+
                 if (query === '' || bookingId.includes(query) || tourName.includes(query)) {
                     item.style.display = 'block';
                 } else {
