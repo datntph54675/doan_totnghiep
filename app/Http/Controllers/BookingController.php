@@ -159,6 +159,7 @@ class BookingController extends Controller
                     [
                         'schedule_id' => $validated['schedule_id'],
                         'customer_id' => $customer->customer_id,
+                        'booking_id'  => $booking->booking_id,
                     ],
                 ];
 
@@ -175,6 +176,7 @@ class BookingController extends Controller
                     $tourCustomers[] = [
                         'schedule_id' => $validated['schedule_id'],
                         'customer_id' => $companionCustomer->customer_id,
+                        'booking_id'  => $booking->booking_id,
                     ];
                 }
 
