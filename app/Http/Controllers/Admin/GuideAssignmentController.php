@@ -11,6 +11,69 @@ use App\Http\Controllers\Controller;
 
 class GuideAssignmentController extends Controller
 {
+    private function datesOverlap($startA, $endA, $startB, $endB): bool
+    {
+        return strtotime((string) $startA) <= strtotime((string) $endB)
+            && strtotime((string) $endA) >= strtotime((string) $startB);
+    }
+
+    private function hasScheduleConflict(int $guideId, int $scheduleId, ?int $ignoreAssignmentId = null): bool
+    {
+        $selectedSchedule = DepartureSchedule::select(['schedule_id', 'start_date', 'end_date'])
+            ->find($scheduleId);
+
+        if (!$selectedSchedule) {
+            return false;
+        }
+
+        $query = GuideAssignment::query()
+            ->where('guide_id', $guideId)
+            ->whereIn('status', ['pending', 'accepted'])
+            ->whereHas('schedule', function ($scheduleQuery) use ($selectedSchedule) {
+                $scheduleQuery
+                    ->whereDate('start_date', '<=', $selectedSchedule->end_date)
+                    ->whereDate('end_date', '>=', $selectedSchedule->start_date);
+            });
+
+        if ($ignoreAssignmentId) {
+            $query->where('id', '!=', $ignoreAssignmentId);
+        }
+
+        return $query->exists();
+    }
+
+    private function buildGuideConflictsBySchedule($schedules, ?int $ignoreAssignmentId = null): array
+    {
+        $assignments = GuideAssignment::query()
+            ->join('departure_schedule as ds', 'ds.schedule_id', '=', 'guide_assignment.schedule_id')
+            ->whereIn('guide_assignment.status', ['pending', 'accepted'])
+            ->when($ignoreAssignmentId, function ($query) use ($ignoreAssignmentId) {
+                $query->where('guide_assignment.id', '!=', $ignoreAssignmentId);
+            })
+            ->select([
+                'guide_assignment.guide_id',
+                'ds.start_date',
+                'ds.end_date',
+            ])
+            ->get();
+
+        $conflicts = [];
+
+        foreach ($schedules as $schedule) {
+            $busyGuideIds = [];
+
+            foreach ($assignments as $assignment) {
+                if ($this->datesOverlap($schedule->start_date, $schedule->end_date, $assignment->start_date, $assignment->end_date)) {
+                    $busyGuideIds[] = (int) $assignment->guide_id;
+                }
+            }
+
+            $conflicts[(string) $schedule->schedule_id] = array_values(array_unique($busyGuideIds));
+        }
+
+        return $conflicts;
+    }
+
     /**
      * Display a listing of guide assignments.
      */
@@ -41,8 +104,9 @@ class GuideAssignmentController extends Controller
             ->where('status', 'scheduled')
             ->get();
         $guides = Guide::with('user')->get();
+        $guideConflictsBySchedule = $this->buildGuideConflictsBySchedule($schedules);
 
-        return view('admin.guide_assignment.create', compact('schedules', 'guides'));
+        return view('admin.guide_assignment.create', compact('schedules', 'guides', 'guideConflictsBySchedule'));
     }
 
     /**
@@ -70,6 +134,12 @@ class GuideAssignmentController extends Controller
                 ->withErrors(['guide_id' => 'HDV này đã được phân công cho lịch trình đã chọn.']);
         }
 
+        if ($this->hasScheduleConflict((int) $data['guide_id'], (int) $data['schedule_id'])) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['guide_id' => 'HDV đã có lịch trùng ngày trong khoảng thời gian này. Vui lòng chọn HDV khác.']);
+        }
+
         GuideAssignment::create($data);
 
         return redirect()->route('admin.guide-assignments.index')
@@ -93,8 +163,9 @@ class GuideAssignmentController extends Controller
         $guideAssignment->load(['schedule.tour', 'guide.user', 'assigner']);
         $schedules = DepartureSchedule::with('tour')->get();
         $guides = Guide::with('user')->get();
+        $guideConflictsBySchedule = $this->buildGuideConflictsBySchedule($schedules, (int) $guideAssignment->id);
 
-        return view('admin.guide_assignment.edit', compact('guideAssignment', 'schedules', 'guides'));
+        return view('admin.guide_assignment.edit', compact('guideAssignment', 'schedules', 'guides', 'guideConflictsBySchedule'));
     }
 
     /**
@@ -117,6 +188,12 @@ class GuideAssignmentController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['guide_id' => 'HDV này đã được phân công cho lịch trình đã chọn.']);
+        }
+
+        if ($this->hasScheduleConflict((int) $data['guide_id'], (int) $data['schedule_id'], (int) $guideAssignment->id)) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['guide_id' => 'HDV đã có lịch trùng ngày trong khoảng thời gian này. Vui lòng chọn HDV khác.']);
         }
 
         $isReassigned = (int) $guideAssignment->guide_id !== (int) $data['guide_id']
