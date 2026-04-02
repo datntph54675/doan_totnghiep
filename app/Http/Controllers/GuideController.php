@@ -172,6 +172,15 @@ class GuideController extends Controller
             ->whereIn('schedule_id', $assignedScheduleIds)
             ->firstOrFail();
 
+        $assignment = GuideAssignment::where('guide_id', $guide->guide_id)
+            ->where('schedule_id', $schedule->schedule_id)
+            ->orderByDesc('id')
+            ->first();
+
+        $canMarkCompleted = $assignment
+            && $assignment->status === 'accepted'
+            && in_array($schedule->status, ['ongoing', 'completed'], true);
+
         // Lấy itinerary của tour
         $itineraries = Itinerary::where('tour_id', $schedule->tour_id)
             ->orderBy('day_number', 'asc')
@@ -185,7 +194,52 @@ class GuideController extends Controller
         $participants = $this->scheduleParticipants((int) $schedule->schedule_id);
         $totalPassengers = max($this->bookingPassengerTotal($schedule->bookings), $participants->count());
 
-        return view('guide.tour-detail', compact('schedule', 'itineraries', 'feedbacks', 'totalPassengers', 'participants'));
+        return view('guide.tour-detail', compact('schedule', 'itineraries', 'feedbacks', 'totalPassengers', 'participants', 'assignment', 'canMarkCompleted'));
+    }
+
+    public function completeTour($scheduleId)
+    {
+        $user = Auth::user();
+        $guide = Guide::where('user_id', $user->user_id)->first();
+
+        if (!$guide) {
+            return redirect()->back()->with('error', 'Không tìm thấy thông tin hướng dẫn viên');
+        }
+
+        $schedule = DepartureSchedule::where('schedule_id', $scheduleId)->firstOrFail();
+
+        if (!in_array($schedule->status, ['ongoing', 'completed'], true)) {
+            return redirect()->back()->with('error', 'Chỉ có thể hoàn thành khi tour đang diễn ra hoặc đã hoàn thành.');
+        }
+
+        $baseQuery = GuideAssignment::where('guide_id', $guide->guide_id)
+            ->where('schedule_id', $schedule->schedule_id);
+
+        if (!$baseQuery->exists()) {
+            return redirect()->back()->with('error', 'Không tìm thấy phân công cho tour này.');
+        }
+
+        $updated = (clone $baseQuery)
+            ->where('status', 'accepted')
+            ->update([
+                'status' => 'completed',
+                'confirmed_at' => now(),
+            ]);
+
+        if ($updated > 0) {
+            return redirect()->route('guide.tour.detail', $schedule->schedule_id)
+                ->with('success', 'Đã cập nhật trạng thái phân công sang hoàn thành. Bạn có thể được gán tour mới.');
+        }
+
+        $alreadyCompleted = (clone $baseQuery)
+            ->where('status', 'completed')
+            ->exists();
+
+        if ($alreadyCompleted) {
+            return redirect()->back()->with('success', 'Phân công này đã ở trạng thái hoàn thành.');
+        }
+
+        return redirect()->back()->with('error', 'Phân công hiện tại không ở trạng thái đã chấp nhận để chuyển sang hoàn thành.');
     }
 
     public function attendance($scheduleId)

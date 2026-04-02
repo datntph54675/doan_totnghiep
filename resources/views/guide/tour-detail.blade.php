@@ -75,6 +75,14 @@
         <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
             <a href="{{ route('guide.attendance', $schedule->schedule_id) }}" class="btn btn-primary">✅ Điểm danh khách</a>
             <a href="{{ route('guide.itinerary', $schedule->schedule_id) }}" class="btn btn-outline">🗓️ Quản lý lịch trình</a>
+            @if(($canMarkCompleted ?? false) === true)
+            <form action="{{ route('guide.tour.complete', $schedule->schedule_id) }}" method="POST" onsubmit="return confirm('Xác nhận đã hoàn thành tour này?');">
+                @csrf
+                <button type="submit" class="btn btn-success">🏁 Xác nhận hoàn thành tour</button>
+            </form>
+            @elseif(($assignment->status ?? null) === 'completed')
+            <span class="badge badge-success" style="display:inline-flex;align-items:center;padding:10px 12px;">Trạng thái phân công: Hoàn thành</span>
+            @endif
         </div>
     </div>
 </div>
