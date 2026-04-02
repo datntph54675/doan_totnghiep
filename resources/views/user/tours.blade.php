@@ -71,8 +71,8 @@
     @foreach($tours as $tour)
     <a href="{{ route('user.tour.detail', $tour->tour_id) }}" class="tour-card">
         <div class="tour-card-img">
-            @if($tour->image)
-                <img src="{{ asset('storage/' . $tour->image) }}" alt="{{ $tour->name }}">
+            @if($tour->image_url)
+                <img src="{{ $tour->image_url }}" alt="{{ $tour->name }}">
             @endif
             @if($tour->category)
             <div class="tour-card-badge">{{ $tour->category->name }}</div>

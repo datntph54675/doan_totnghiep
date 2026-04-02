@@ -145,8 +145,8 @@
 
 <!-- HERO -->
 <div class="tour-hero">
-    @if($tour->image)
-        <img src="{{ asset('storage/' . $tour->image) }}" alt="{{ $tour->name }}">
+    @if($tour->image_url)
+        <img src="{{ $tour->image_url }}" alt="{{ $tour->name }}">
     @endif
     <div class="tour-hero-content">
         <div class="container">
@@ -303,8 +303,8 @@
                         @foreach($relatedTours as $r)
                         <a href="{{ route('tours.show', $r->tour_id) }}" class="tour-card">
                             <div class="tour-card-img">
-                                @if($r->image)
-                                    <img src="{{ asset('storage/' . $r->image) }}" alt="{{ $r->name }}" loading="lazy">
+                                @if($r->image_url)
+                                    <img src="{{ $r->image_url }}" alt="{{ $r->name }}" loading="lazy">
                                 @else
                                     <div class="tour-card-img-placeholder"><i class="fas fa-map-marked-alt"></i></div>
                                 @endif
@@ -389,8 +389,8 @@
     <div class="container">
         <div class="sticky-bar-flex">
             <div class="sticky-tour-info">
-                @if($tour->image)
-                    <img src="{{ asset('storage/' . $tour->image) }}" alt="tour">
+                @if($tour->image_url)
+                    <img src="{{ $tour->image_url }}" alt="tour">
                 @endif
                 <div>
                     <div class="sticky-tour-name">{{ $tour->name }}</div>
