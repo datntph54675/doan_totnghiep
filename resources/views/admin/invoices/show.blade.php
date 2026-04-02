@@ -36,9 +36,7 @@
                     <a href="{{ route('admin.invoices.index') }}" class="btn btn-outline-secondary no-print">
                         <i class="fas fa-arrow-left me-1"></i> Quay lại
                     </a>
-                    <button onclick="window.print()" class="btn btn-primary no-print">
-                        <i class="fas fa-print me-1"></i> In hóa đơn
-                    </button>
+
                 </div>
             </div>
 
