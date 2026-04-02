@@ -16,6 +16,35 @@ use Illuminate\Support\Collection;
 
 class GuideController extends Controller
 {
+    private function keepPaidGroups(Collection $participants): Collection
+    {
+        $remainingCompanions = 0;
+
+        return $participants->filter(function ($participant) use (&$remainingCompanions) {
+            if ($participant->is_representative) {
+                $isPaid = ($participant->payment_status ?? null) === 'paid';
+
+                if ($isPaid) {
+                    $remainingCompanions = max(0, $participant->group_size - 1);
+
+                    return true;
+                }
+
+                $remainingCompanions = 0;
+
+                return false;
+            }
+
+            if ($remainingCompanions > 0) {
+                $remainingCompanions--;
+
+                return true;
+            }
+
+            return false;
+        })->values();
+    }
+
     private function assignParticipantGroups(Collection $participants): Collection
     {
         $groupNumber = 0;
@@ -72,6 +101,8 @@ class GuideController extends Controller
 
                 return $participant;
             });
+
+        $participants = $this->keepPaidGroups($participants);
 
         return $this->assignParticipantGroups($participants);
     }
@@ -359,12 +390,11 @@ class GuideController extends Controller
             ->join('customer as c', 'c.customer_id', '=', 'tc.customer_id')
             ->join('departure_schedule as ds', 'ds.schedule_id', '=', 'tc.schedule_id')
             ->join('tours as t', 't.tour_id', '=', 'ds.tour_id')
-            ->leftJoin('booking as b', 'b.customer_id', '=', 'tc.customer_id')
-            ->whereIn('tc.schedule_id', $assignedScheduleIds)
-            ->where(function ($query) {
-                $query->whereNull('b.booking_id')
-                    ->orWhereColumn('b.schedule_id', 'tc.schedule_id');
+            ->leftJoin('booking as b', function ($join) {
+                $join->on('b.customer_id', '=', 'tc.customer_id')
+                    ->on('b.schedule_id', '=', 'tc.schedule_id');
             })
+            ->whereIn('tc.schedule_id', $assignedScheduleIds)
             ->select([
                 'tc.id as tour_customer_id',
                 'tc.schedule_id',
@@ -391,6 +421,10 @@ class GuideController extends Controller
                 return $participant;
             })
             ->values();
+
+        $participants = $participants->groupBy('schedule_id')->flatMap(function ($scheduleParticipants) {
+            return $this->keepPaidGroups($scheduleParticipants->values());
+        })->values();
 
         $currentScheduleId = null;
 
