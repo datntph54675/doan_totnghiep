@@ -9,13 +9,13 @@ class SyncTourStatuses extends Command
 {
     protected $signature = 'app:sync-tour-statuses';
 
-    protected $description = 'Đồng bộ trạng thái lịch khởi hành, booking và tour theo thời gian thực';
+    protected $description = 'Đồng bộ trạng thái booking và tour theo dữ liệu hiện tại';
 
     public function handle(TourAvailabilityService $tourAvailabilityService): int
     {
         $tourAvailabilityService->sync();
 
-        $this->info('Đã đồng bộ trạng thái tour, lịch khởi hành và booking.');
+        $this->info('Đã đồng bộ trạng thái tour và booking.');
 
         return self::SUCCESS;
     }
