@@ -66,18 +66,28 @@ class Booking extends Model
         return $this->feedbacks()->where('type', Feedback::TYPE_REVIEW)->exists();
     }
 
+    public function isFinished(): bool
+    {
+        if ($this->payment_status !== 'paid') {
+            return false;
+        }
+
+        if ($this->status === 'completed') {
+            return true;
+        }
+
+        $scheduleEnd = $this->schedule?->end_date;
+
+        return $scheduleEnd ? ! $scheduleEnd->isFuture() : false;
+    }
+
     public function canBeReviewed(): bool
     {
-        if ($this->status !== 'completed' || $this->payment_status !== 'paid') {
+        if (! $this->isFinished()) {
             return false;
         }
 
         if ($this->hasReview()) {
-            return false;
-        }
-
-        $scheduleEnd = $this->schedule?->end_date;
-        if ($scheduleEnd && $scheduleEnd->isFuture()) {
             return false;
         }
 

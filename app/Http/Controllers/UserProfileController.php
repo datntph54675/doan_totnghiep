@@ -108,13 +108,20 @@ class UserProfileController extends Controller
             ->where('payment_status', 'paid')
             ->whereIn('status', ['upcoming', 'ongoing'])
             ->where('admin_confirmed', true)
+            ->where(function ($query) {
+                $query->whereDoesntHave('schedule')
+                    ->orWhereHas('schedule', fn ($scheduleQuery) => $scheduleQuery->where('end_date', '>=', now()));
+            })
             ->orderByDesc('booking_date')
             ->get();
 
         $completedBookings = Booking::with(['tour', 'schedule', 'feedbacks'])
             ->where('user_id', $userId)
             ->where('payment_status', 'paid')
-            ->where('status', 'completed')
+            ->where(function ($query) {
+                $query->where('status', 'completed')
+                    ->orWhereHas('schedule', fn ($scheduleQuery) => $scheduleQuery->where('end_date', '<', now()));
+            })
             ->orderByDesc('booking_date')
             ->get();
 

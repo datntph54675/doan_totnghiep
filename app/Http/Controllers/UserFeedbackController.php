@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Feedback;
+use App\Services\TourAvailabilityService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,8 @@ class UserFeedbackController extends Controller
 {
     public function store(Request $request, int $bookingId): RedirectResponse
     {
+        app(TourAvailabilityService::class)->sync();
+
         $booking = Booking::with(['feedbacks', 'schedule', 'tour'])->findOrFail($bookingId);
 
         if ($booking->user_id !== Auth::id()) {

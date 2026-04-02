@@ -23,9 +23,11 @@ class TourAvailabilityService
             ->where('status', '!=', 'cancelled')
             ->chunkById(100, function ($bookings) {
                 foreach ($bookings as $booking) {
-                    $scheduleStatus = $booking->schedule?->status;
+                    $schedule = $booking->schedule;
+                    $scheduleStatus = $schedule?->status;
+                    $scheduleEnd = $schedule?->end_date;
 
-                    if (!$scheduleStatus) {
+                    if (! $schedule) {
                         continue;
                     }
 
@@ -34,6 +36,10 @@ class TourAvailabilityService
                         'ongoing' => 'ongoing',
                         default => 'upcoming',
                     };
+
+                    if ($scheduleEnd && $scheduleEnd->isPast()) {
+                        $nextStatus = 'completed';
+                    }
 
                     if ($booking->status !== $nextStatus) {
                         $booking->update(['status' => $nextStatus]);
