@@ -72,8 +72,6 @@ class BookingController extends Controller
             'companions.*.gender' => 'nullable|in:Nam,Nữ,Khác',
             'companions.*.birthdate' => 'nullable|date',
             'companions.*.phone' => 'nullable|string|max:15',
-            'companions.*.email' => 'nullable|email|max:100',
-            'companions.*.id_number' => 'nullable|string|max:20',
             'note'         => 'nullable|string',
         ]);
 
@@ -93,15 +91,13 @@ class BookingController extends Controller
                 $isIncomplete = empty(trim((string) ($companion['fullname'] ?? '')))
                     || empty(trim((string) ($companion['gender'] ?? '')))
                     || empty(trim((string) ($companion['birthdate'] ?? '')))
-                    || empty(trim((string) ($companion['phone'] ?? '')))
-                    || empty(trim((string) ($companion['email'] ?? '')))
-                    || empty(trim((string) ($companion['id_number'] ?? '')));
+                    || empty(trim((string) ($companion['phone'] ?? '')));
 
                 if ($isIncomplete) {
                     $position = $index + 1;
 
                     throw ValidationException::withMessages([
-                        'companions' => "Người đi cùng #{$position}: vui lòng nhập đầy đủ họ tên, giới tính, ngày sinh, số điện thoại, email và CCCD/Hộ chiếu.",
+                        'companions' => "Người đi cùng #{$position}: vui lòng nhập đầy đủ họ tên, giới tính, ngày sinh và số điện thoại.",
                     ]);
                 }
             }
@@ -168,8 +164,8 @@ class BookingController extends Controller
                         'gender' => $companion['gender'],
                         'birthdate' => $companion['birthdate'] ?? null,
                         'phone' => $companion['phone'],
-                        'email' => $companion['email'],
-                        'id_number' => $companion['id_number'],
+                        'email' => null,
+                        'id_number' => null,
                     ]);
 
                     $tourCustomers[] = [
