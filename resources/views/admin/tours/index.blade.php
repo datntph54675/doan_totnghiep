@@ -19,6 +19,37 @@
         </a>
     </div>
 
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <form method="GET" action="{{ route('admin.tours.index') }}" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <input type="text" name="keyword" class="form-control" placeholder="Tìm theo tên tour..." value="{{ request('keyword') }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="category_id" class="form-select">
+                        <option value="">-- Tất cả danh mục --</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->category_id }}" {{ request('category_id') == $cat->category_id ? 'selected' : '' }}>
+                                {{ $cat->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">-- Trạng thái --</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Đang hoạt động</option>
+                        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Tạm ẩn</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search me-1"></i> Lọc</button>
+                    <a href="{{ route('admin.tours.index') }}" class="btn btn-outline-secondary">Xóa lọc</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">

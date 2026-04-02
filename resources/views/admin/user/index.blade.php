@@ -16,6 +16,34 @@
         </div>
     </div>
 
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body">
+            <form method="GET" action="{{ url('admin/users') }}" class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <input type="text" name="keyword" class="form-control" placeholder="Tìm theo tên, email..." value="{{ request('keyword') }}">
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">-- Trạng thái --</option>
+                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Hoạt động</option>
+                        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Đang ẩn</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="is_blacklisted" class="form-select">
+                        <option value="">-- Blacklist --</option>
+                        <option value="1" {{ request('is_blacklisted') === '1' ? 'selected' : '' }}>Bị khóa</option>
+                        <option value="0" {{ request('is_blacklisted') === '0' ? 'selected' : '' }}>Bình thường</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search me-1"></i> Lọc</button>
+                    <a href="{{ url('admin/users') }}" class="btn btn-outline-secondary">Xóa lọc</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">

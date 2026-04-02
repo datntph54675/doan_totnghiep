@@ -10,6 +10,23 @@
                     <h4 class="card-title">Danh sách Liên hệ</h4>
                 </div>
                 <div class="card-body">
+                    <form method="GET" action="{{ route('admin.contacts.index') }}" class="row g-2 align-items-end mb-3">
+                        <div class="col-md-5">
+                            <input type="text" name="keyword" class="form-control" placeholder="Tìm theo tên, email, tiêu đề..." value="{{ request('keyword') }}">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="status" class="form-select">
+                                <option value="">-- Trạng thái --</option>
+                                <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
+                                <option value="replied" {{ request('status') === 'replied' ? 'selected' : '' }}>Đã trả lời</option>
+                                <option value="closed" {{ request('status') === 'closed' ? 'selected' : '' }}>Kết thúc</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-search me-1"></i> Lọc</button>
+                            <a href="{{ route('admin.contacts.index') }}" class="btn btn-outline-secondary">Xóa lọc</a>
+                        </div>
+                    </form>
                     <div class="table-responsive">
                         <table class="table table-striped table-hover">
                             <thead>

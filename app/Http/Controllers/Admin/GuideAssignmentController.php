@@ -14,13 +14,22 @@ class GuideAssignmentController extends Controller
     /**
      * Display a listing of guide assignments.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $assignments = GuideAssignment::with(['schedule.tour', 'guide.user', 'assigner'])
-            ->orderBy('assigned_at', 'desc')
-            ->paginate(10);
+        $query = GuideAssignment::with(['schedule.tour', 'guide.user', 'assigner']);
 
-        return view('admin.guide_assignment.index', compact('assignments'));
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('guide_id')) {
+            $query->where('guide_id', $request->guide_id);
+        }
+
+        $assignments = $query->orderBy('assigned_at', 'desc')->paginate(10)->withQueryString();
+        $guides = Guide::with('user')->orderBy('guide_id')->get();
+
+        return view('admin.guide_assignment.index', compact('assignments', 'guides'));
     }
 
     /**

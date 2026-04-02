@@ -11,10 +11,26 @@ use Illuminate\Support\Facades\Storage;
 
 class TourController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tours = Tour::orderBy('tour_id', 'desc')->paginate(15);
-        return view('admin.tours.index', compact('tours'));
+        $query = Tour::query();
+
+        if ($request->filled('keyword')) {
+            $query->where('name', 'like', '%' . $request->keyword . '%');
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $tours = $query->orderBy('tour_id', 'desc')->paginate(15)->withQueryString();
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.tours.index', compact('tours', 'categories'));
     }
 
     public function create()
