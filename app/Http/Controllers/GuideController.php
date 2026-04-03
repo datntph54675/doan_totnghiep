@@ -441,7 +441,10 @@ class GuideController extends Controller
             ->join('customer as c', 'c.customer_id', '=', 'tc.customer_id')
             ->join('departure_schedule as ds', 'ds.schedule_id', '=', 'tc.schedule_id')
             ->join('tours as t', 't.tour_id', '=', 'ds.tour_id')
-            ->leftJoin('booking as b', 'b.booking_id', '=', 'tc.booking_id')
+            ->leftJoin('booking as b', function ($join) {
+                $join->on('b.customer_id', '=', 'tc.customer_id')
+                    ->on('b.schedule_id', '=', 'tc.schedule_id');
+            })
             ->whereIn('tc.schedule_id', $assignedScheduleIds)
             ->select([
                 'tc.id as tour_customer_id',
