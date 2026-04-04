@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'HDV Portal') - TourViet</title>
+    <title>@yield('title', 'HDV Portal') - GoTour</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
@@ -73,17 +74,20 @@
         .brand-icon {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            background: #0066cc;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
+            flex-shrink: 0;
         }
+
+        .brand-icon i { color: #fff; font-size: 1rem; }
 
         .brand-name {
             font-size: 18px;
-            font-weight: 700;
+            font-weight: 800;
             color: #fff;
             letter-spacing: -.3px;
         }
@@ -729,9 +733,9 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <a href="{{ route('guide.dashboard') }}" class="brand-logo">
-                <div class="brand-icon">🧭</div>
+                <div class="brand-icon"><i class="fas fa-plane"></i></div>
                 <div>
-                    <div class="brand-name">TourViet</div>
+                    <div class="brand-name">GoTour</div>
                     <div class="brand-sub">HDV Portal</div>
                 </div>
             </a>
