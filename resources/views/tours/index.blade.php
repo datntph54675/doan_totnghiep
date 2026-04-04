@@ -332,16 +332,7 @@
                         </div>
                         <div class="filter-section">
                             <div class="filter-label">Số ngày</div>
-                            <select class="filter-input" name="duration" style="cursor:pointer">
-                                <option value="">Bất kỳ</option>
-                                <option value="1" {{ request('duration') == '1' ? 'selected' : '' }}>1 ngày</option>
-                                <option value="2" {{ request('duration') == '2' ? 'selected' : '' }}>2 ngày</option>
-                                <option value="3" {{ request('duration') == '3' ? 'selected' : '' }}>3 ngày</option>
-                                <option value="4" {{ request('duration') == '4' ? 'selected' : '' }}>4 ngày</option>
-                                <option value="5" {{ request('duration') == '5' ? 'selected' : '' }}>5 ngày</option>
-                                <option value="6" {{ request('duration') == '6' ? 'selected' : '' }}>6 ngày</option>
-                                <option value="7" {{ request('duration') == '7' ? 'selected' : '' }}>7 ngày</option>
-                            </select>
+                            <input class="filter-input" type="number" name="duration" min="1" placeholder="Nhập số ngày" value="{{ request('duration') }}">
                         </div>
                         <div class="filter-section">
                             <div class="filter-label">Giá (VNĐ)</div>
