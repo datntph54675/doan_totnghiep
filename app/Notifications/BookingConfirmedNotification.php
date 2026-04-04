@@ -44,7 +44,7 @@ class BookingConfirmedNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject('[GoTour] Xác nhận đặt tour thành công - ' . $tour->name)
-            ->greeting('Chào ' . $customer->full_name . ',')
+            ->greeting('Chào ' . $customer->fullname . ',')
             ->line('Chúc mừng! Đơn đặt tour của bạn đã được admin xác nhận thành công.')
             ->line('**Thông tin tour:**')
             ->line('🏷️ **Tên tour:** ' . $tour->name)

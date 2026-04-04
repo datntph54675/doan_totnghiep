@@ -7,7 +7,7 @@ use App\Models\Booking;
 use App\Models\Tour;
 use App\Notifications\BookingConfirmedNotification;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -104,7 +104,7 @@ class BookingController extends Controller
             $booking->customer->notify(new BookingConfirmedNotification($booking));
         } catch (\Exception $e) {
             // Log lỗi nhưng không làm dừng quá trình
-            \Log::error('Failed to send booking confirmation email: ' . $e->getMessage());
+            Log::error('Failed to send booking confirmation email: ' . $e->getMessage());
         }
 
         return redirect()->back()->with('success', 'Đã xác nhận booking cho khách thành công.');
