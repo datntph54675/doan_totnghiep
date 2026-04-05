@@ -99,13 +99,16 @@ class BookingController extends Controller
             'admin_confirmed' => true,
         ]);
 
-        // Gửi email thông báo cho khách hàng
-        try {
-            $booking->customer->notify(new BookingConfirmedNotification($booking));
-        } catch (\Exception $e) {
-            // Log lỗi nhưng không làm dừng quá trình
-            Log::error('Failed to send booking confirmation email: ' . $e->getMessage());
-        }
+// Gửi email thông báo cho khách hàng
+try {
+    if ($booking->customer && $booking->customer->email) {
+        $booking->customer->notify(new BookingConfirmedNotification($booking));
+    }
+} catch (\Exception $e) {
+    // Log lỗi nhưng không làm dừng quá trình
+    Log::error('Failed to send booking confirmation email: ' . $e->getMessage());
+}
+        
 
         return redirect()->back()->with('success', 'Đã xác nhận booking cho khách thành công.');
     }
@@ -136,20 +139,31 @@ class BookingController extends Controller
         $currentStatus = $booking->status;
         $currentPayment = $booking->payment_status;
 
+        // Xây dựng rules động tùy theo tình trạng thanh toán
+        $statusRule = $currentPayment === 'unpaid'
+            ? 'prohibited|in:' . $currentStatus  // Chỉ cho phép status hiện tại khi chưa thanh toán
+            : 'required|in:upcoming,ongoing,completed,cancelled'; // Require khi đã thanh toán
+
         $data = $request->validate([
-            'status' => 'required|in:upcoming,ongoing,completed,cancelled',
+            'status' => $statusRule,
             'payment_status' => 'required|in:unpaid,deposit,paid,refunded',
             'note' => 'nullable|string',
         ], [
             'status.required' => 'Trạng thái là bắt buộc.',
             'status.in' => 'Trạng thái không hợp lệ.',
+            'status.prohibited' => 'Không thể thay đổi trạng thái khi chưa thanh toán.',
             'payment_status.required' => 'Trạng thái thanh toán là bắt buộc.',
             'payment_status.in' => 'Trạng thái thanh toán không hợp lệ.',
         ]);
 
-        // Chưa thanh toán thì chưa đươc phép thay đổi trạng thái
-        if ($currentPayment === 'unpaid' && $data['status'] !== $currentStatus) {
-            return back()->withErrors(['status' => 'Không thể thay đổi trạng thái khi chưa thanh toán.']);
+        // Khi chưa thanh toán, status sẽ không có trong $data, cần set default
+        if (!isset($data['status'])) {
+            $data['status'] = $currentStatus;
+        }
+
+        // Admin chưa xác nhận thì không được thay đổi trạng thái booking
+        if (!$booking->canEditStatus() && $data['status'] !== $currentStatus) {
+            return back()->withErrors(['status' => 'Admin chưa xác nhận booking nên không thể thay đổi trạng thái.']);
         }
 
         // Trạng thái không được đổi tùy tiện phải theo quy trình
@@ -172,6 +186,6 @@ class BookingController extends Controller
             $booking->update(['admin_confirmed' => false]);
         }
 
-        return redirect()->route('admin.bookings.index', $booking)->with('success', 'Booking đã được cập nhật.');
+        return redirect()->route('admin.bookings.show', $booking)->with('success', 'Booking đã được cập nhật.');
     }
 }

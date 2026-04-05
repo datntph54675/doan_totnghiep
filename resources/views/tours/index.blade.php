@@ -432,8 +432,8 @@
                         @foreach ($tours as $i => $tour)
                             <a href="{{ route('tours.show', $tour->tour_id) }}" class="tour-card">
                                 <div class="tour-card-img">
-                                    @if ($tour->image && file_exists(storage_path('app/public/' . $tour->image)))
-                                        <img src="{{ Storage::url($tour->image) }}" alt="{{ $tour->name }}"
+                                    @if ($tour->image_url)
+                                        <img src="{{ $tour->image_url }}" alt="{{ $tour->name }}"
                                             loading="lazy">
                                     @else
                                         <div class="tour-card-img-placeholder"

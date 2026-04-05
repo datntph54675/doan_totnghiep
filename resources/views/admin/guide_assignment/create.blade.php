@@ -46,6 +46,9 @@
                 @error('guide_id')
                 <span class="invalid-feedback d-block">{{ $message }}</span>
                 @enderror
+                <div id="guide-conflict-note" class="form-text text-danger d-none">
+                    Một số HDV đang bận lịch trùng ngày nên đã bị khóa lựa chọn.
+                </div>
             </div>
         </div>
 
@@ -68,4 +71,53 @@
         </div>
     </form>
 </div>
+
+<script id="guide-conflicts-data" type="application/json">
+    {
+        !!json_encode($guideConflictsBySchedule ?? []) !!
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const scheduleSelect = document.getElementById('schedule_id');
+        const guideSelect = document.getElementById('guide_id');
+        const note = document.getElementById('guide-conflict-note');
+        const conflictsBySchedule = JSON.parse(document.getElementById('guide-conflicts-data').textContent || '{}');
+
+        function updateGuideAvailability() {
+            const scheduleId = scheduleSelect.value;
+            const busyGuideIds = new Set((conflictsBySchedule[scheduleId] || []).map(String));
+            let hasBusyGuide = false;
+
+            Array.from(guideSelect.options).forEach(function(option) {
+                if (!option.value) {
+                    return;
+                }
+
+                if (!option.dataset.baseText) {
+                    option.dataset.baseText = option.textContent.replace(/\s*\(Bận trùng lịch\)$/u, '');
+                }
+
+                const isBusy = busyGuideIds.has(option.value);
+                option.disabled = isBusy;
+                option.textContent = isBusy ? option.dataset.baseText + ' (Bận trùng lịch)' : option.dataset.baseText;
+
+                if (isBusy) {
+                    hasBusyGuide = true;
+                }
+
+                if (isBusy && option.selected) {
+                    option.selected = false;
+                    guideSelect.value = '';
+                }
+            });
+
+            note.classList.toggle('d-none', !(scheduleId && hasBusyGuide));
+        }
+
+        scheduleSelect.addEventListener('change', updateGuideAvailability);
+        updateGuideAvailability();
+    });
+</script>
 @endsection

@@ -6,13 +6,23 @@
 
 @section('content')
 
+<style>
+    .participant-child {
+        margin-left: 20px;
+    }
+</style>
+
 <a href="{{ route('guide.tour.detail', $schedule->schedule_id) }}" class="back-link">← Quay lại Chi tiết Tour</a>
 
 {{-- STATS --}}
 @php
-$present = $attendances->where('status','present')->count();
-$absent = $attendances->where('status','absent')->count();
-$total = $totalPassengers;
+$present = ($participants ?? collect())->filter(function ($participant) use ($latestAttendanceByParticipant) {
+return optional($latestAttendanceByParticipant->get($participant->tour_customer_id))->status === 'present';
+})->count();
+$absent = ($participants ?? collect())->filter(function ($participant) use ($latestAttendanceByParticipant) {
+return optional($latestAttendanceByParticipant->get($participant->tour_customer_id))->status === 'absent';
+})->count();
+$total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect())->count() : $totalPassengers;
 @endphp
 <div class="stats-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:20px">
     <div class="stat-card">
@@ -48,53 +58,85 @@ $total = $totalPassengers;
 {{-- CUSTOMER LIST --}}
 <div class="card">
     <div class="card-header">
-        <div class="card-title">👥 Danh sách khách</div>
+        <div class="card-title">👥 Danh sách khách theo nhóm</div>
     </div>
     <div class="card-body" style="padding-top:12px">
-        @forelse($schedule->bookings as $booking)
-        @php $latest = $attendances->where('customer_id', $booking->customer->customer_id)->first(); @endphp
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;border-radius:10px;border:1px solid var(--border);background:#fafafa;margin-bottom:10px;transition:all .2s"
-            onmouseover="this.style.borderColor='#10b981';this.style.background='#ecfdf5'"
-            onmouseout="this.style.borderColor='var(--border)';this.style.background='#fafafa'">
-            <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">
-                <div style="width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0">
-                    {{ strtoupper(substr($booking->customer->fullname ?? 'K', 0, 1)) }}
+        @php
+        $participantGroups = ($participants ?? collect())->groupBy('group_key');
+        @endphp
+
+        @forelse($participantGroups as $groupMembers)
+        @php
+        $groupLeader = $groupMembers->firstWhere('is_representative', true) ?? $groupMembers->first();
+        @endphp
+        <div style="border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;background:#fff;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#f1f5f9;border-bottom:1px solid var(--border)">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span class="badge badge-info">{{ $groupLeader->group_name }}</span>
+                    <span style="font-size:13px;font-weight:600">
+                        {{ ($groupLeader->group_size ?? 1) > 1 ? 'Đại diện' : 'Khách' }}: {{ $groupLeader->fullname ?? '—' }}
+                    </span>
                 </div>
-                <div style="min-width:0">
-                    <div style="font-weight:600;font-size:15px">{{ $booking->customer->fullname ?? '—' }}</div>
-                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
-                        {{ $booking->customer->phone ?? '' }}
-                        @if($booking->customer->phone && $booking->customer->email) · @endif
-                        {{ $booking->customer->email ?? '' }}
-                    </div>
-                    @if($booking->participant_count > 1)
-                    <div style="margin-top:6px">
-                        <span class="badge badge-info">Đại diện nhóm {{ $booking->participant_count }} người</span>
-                    </div>
-                    @endif
-                    @if($latest)
-                    <div style="margin-top:6px">
-                        @if($latest->status == 'present')
-                        <span class="badge badge-success">✓ Có mặt</span>
-                        @elseif($latest->status == 'absent')
-                        <span class="badge badge-danger">✗ Vắng mặt</span>
-                        @else
-                        <span class="badge badge-warning">? Chưa rõ</span>
-                        @endif
-                        <span style="font-size:11px;color:var(--text-muted);margin-left:6px">{{ $latest->marked_at->format('H:i d/m') }}</span>
-                        @if($latest->note)
-                        <span style="font-size:12px;color:var(--text-muted)"> · {{ $latest->note }}</span>
-                        @endif
-                    </div>
-                    @else
-                    <span class="badge badge-gray" style="margin-top:6px">Chưa điểm danh</span>
-                    @endif
-                </div>
+                <span class="badge badge-gray">{{ $groupMembers->count() }} người</span>
             </div>
-            <button class="btn btn-primary btn-sm"
-                onclick="openModal({{ $booking->customer->customer_id }}, '{{ addslashes($booking->customer->fullname ?? '') }}')">
-                ✏️ Điểm danh
-            </button>
+
+            <div style="padding:10px;">
+                @foreach($groupMembers as $participant)
+                @php
+                $latest = $latestAttendanceByParticipant->get($participant->tour_customer_id);
+                $defaultBg = $participant->is_representative ? '#f8fafc' : '#fcfcfd';
+                @endphp
+                <div class="{{ !$participant->is_representative ? 'participant-child' : '' }}"
+                    style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px;border-radius:10px;border:1px solid #e2e8f0;background:#f8fafc;margin-bottom:8px;"
+                    data-default-bg="{{ $defaultBg }}"
+                    onmouseover="this.style.borderColor='#10b981';this.style.background='#ecfdf5'"
+                    onmouseout="restoreParticipantRow(this)">
+                    <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">
+                        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">
+                            {{ strtoupper(substr($participant->fullname ?? 'K', 0, 1)) }}
+                        </div>
+                        <div style="min-width:0">
+                            <div style="font-weight:600;font-size:14px">{{ $participant->fullname ?? '—' }}</div>
+                            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">
+                                {{ $participant->phone ?? '' }}
+                                @if($participant->phone && $participant->email) · @endif
+                                {{ $participant->email ?? '' }}
+                            </div>
+                            <div style="margin-top:6px">
+                                @if($participant->is_representative)
+                                @if(($participant->group_size ?? 1) > 1)
+                                <span class="badge badge-info">Đại diện nhóm</span>
+                                @else
+                                <span class="badge badge-info">Khách đặt tour</span>
+                                @endif
+                                @else
+                                <span class="badge badge-gray">Người đi cùng</span>
+                                @endif
+
+                                @if($latest)
+                                @if($latest->status == 'present')
+                                <span class="badge badge-success">✓ Có mặt</span>
+                                @elseif($latest->status == 'absent')
+                                <span class="badge badge-danger">✗ Vắng mặt</span>
+                                @else
+                                <span class="badge badge-warning">? Chưa rõ</span>
+                                @endif
+                                <span style="font-size:11px;color:var(--text-muted);margin-left:6px">{{ $latest->marked_at->format('H:i d/m') }}</span>
+                                @else
+                                <span class="badge badge-gray">Chưa điểm danh</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm"
+                        data-tour-customer-id="{{ $participant->tour_customer_id }}"
+                        data-participant-name="{{ e($participant->fullname ?? '') }}"
+                        onclick="openModal(this)">
+                        ✏️ Điểm danh
+                    </button>
+                </div>
+                @endforeach
+            </div>
         </div>
         @empty
         <div class="empty-state">
@@ -155,7 +197,7 @@ $total = $totalPassengers;
 
         <form method="POST" action="{{ route('guide.attendance.mark', $schedule->schedule_id) }}">
             @csrf
-            <input type="hidden" name="customer_id" id="customerId">
+            <input type="hidden" name="tour_customer_id" id="tourCustomerId">
 
             <div class="form-group">
                 <label class="form-label">Trạng thái</label>
@@ -201,8 +243,11 @@ $total = $totalPassengers;
 
 @push('scripts')
 <script>
-    function openModal(id, name) {
-        document.getElementById('customerId').value = id;
+    function openModal(buttonEl) {
+        const id = buttonEl.getAttribute('data-tour-customer-id') || '';
+        const name = buttonEl.getAttribute('data-participant-name') || '';
+
+        document.getElementById('tourCustomerId').value = id;
         document.getElementById('modalName').textContent = 'Khách hàng: ' + name;
         document.getElementById('modal').classList.add('active');
         // reset
@@ -212,6 +257,11 @@ $total = $totalPassengers;
 
     function closeModal() {
         document.getElementById('modal').classList.remove('active');
+    }
+
+    function restoreParticipantRow(el) {
+        el.style.borderColor = '#e2e8f0';
+        el.style.background = el.dataset.defaultBg || '#f8fafc';
     }
 
     function selectStatus(el, val) {

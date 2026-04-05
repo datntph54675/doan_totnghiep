@@ -19,6 +19,37 @@
     </a>
 </div>
 
+<div class="card border-0 shadow-sm mb-3">
+    <div class="card-body">
+        <form method="GET" action="{{ route('admin.guide-assignments.index') }}" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <select name="guide_id" class="form-select">
+                    <option value="">-- Tất cả HDV --</option>
+                    @foreach($guides as $guide)
+                        <option value="{{ $guide->guide_id }}" {{ request('guide_id') == $guide->guide_id ? 'selected' : '' }}>
+                            {{ $guide->user->fullname ?? 'N/A' }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">-- Trạng thái --</option>
+                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Chờ xác nhận</option>
+                    <option value="accepted" {{ request('status') === 'accepted' ? 'selected' : '' }}>Đã chấp nhận</option>
+                    <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Từ chối</option>
+                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Hoàn thành</option>
+                    <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Hủy</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search me-1"></i> Lọc</button>
+                <a href="{{ route('admin.guide-assignments.index') }}" class="btn btn-outline-secondary">Xóa lọc</a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card border-0 shadow-sm">
     <div class="card-body p-0">
         <div class="table-responsive">

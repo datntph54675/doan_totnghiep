@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập HDV - TourViet</title>
+    <title>Đăng nhập HDV - GoTour</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
@@ -108,12 +109,14 @@
 
         .login-logo {
             width: 52px; height: 52px;
-            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            background: #0066cc;
             border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
             font-size: 26px;
             margin-bottom: 20px;
         }
+
+        .login-logo i { color: #fff; font-size: 1.3rem; }
 
         .login-title {
             font-size: 26px;
@@ -224,8 +227,10 @@
 
 <div class="left-panel">
     <div class="left-content">
-        <span class="left-icon">🧭</span>
-        <div class="left-title">TourViet HDV</div>
+        <span class="left-icon" style="display:flex;align-items:center;justify-content:center;width:72px;height:72px;background:#0066cc;border-radius:18px;margin:0 auto 24px;">
+            <i class="fas fa-plane" style="color:#fff;font-size:2rem;"></i>
+        </span>
+        <div class="left-title">GoTour HDV</div>
         <div class="left-sub">Cổng thông tin dành riêng cho Hướng dẫn viên du lịch</div>
 
         <div class="features">
@@ -252,7 +257,7 @@
 <div class="right-panel">
     <div class="login-box">
         <div class="login-header">
-            <div class="login-logo">🧭</div>
+            <div class="login-logo"><i class="fas fa-plane"></i></div>
             <div class="login-title">Đăng nhập</div>
             <div class="login-sub">Dành cho Hướng dẫn viên du lịch</div>
         </div>

@@ -11,14 +11,24 @@ use Illuminate\Support\Str;
 class GuideController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $guides = Guide::whereHas('user', function ($query) {
-            $query->where('role', 'tour_guide');
-        })
-            ->with('user')
-            ->orderBy('guide_id', 'desc')
-            ->paginate(20);
+        $query = Guide::whereHas('user', function ($q) {
+            $q->where('role', 'tour_guide');
+        })->with('user');
+
+        if ($request->filled('keyword')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('fullname', 'like', '%' . $request->keyword . '%')
+                  ->orWhere('email', 'like', '%' . $request->keyword . '%');
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $guides = $query->orderBy('guide_id', 'desc')->paginate(20)->withQueryString();
 
         return view('admin.guide.index', compact('guides'));
     }

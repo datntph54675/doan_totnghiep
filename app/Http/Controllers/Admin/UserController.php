@@ -11,9 +11,27 @@ class UserController extends Controller
     /**
      * Display a listing of the users with role 'user'.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::where('role', 'user')->orderBy('user_id', 'desc')->paginate(20);
+        $query = User::where('role', 'user');
+
+        if ($request->filled('keyword')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('fullname', 'like', '%' . $request->keyword . '%')
+                  ->orWhere('email', 'like', '%' . $request->keyword . '%');
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('is_blacklisted')) {
+            $query->where('is_blacklisted', (bool) $request->is_blacklisted);
+        }
+
+        $users = $query->orderBy('user_id', 'desc')->paginate(20)->withQueryString();
+
         return view('admin.user.index', compact('users'));
     }
 

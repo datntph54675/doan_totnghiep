@@ -61,6 +61,39 @@ class Booking extends Model
         return $this->hasMany(Feedback::class, 'booking_id', 'booking_id');
     }
 
+    public function hasReview(): bool
+    {
+        return $this->feedbacks()->where('type', Feedback::TYPE_REVIEW)->exists();
+    }
+
+    public function isFinished(): bool
+    {
+        if ($this->payment_status !== 'paid') {
+            return false;
+        }
+
+        if ($this->status === 'completed') {
+            return true;
+        }
+
+        $scheduleEnd = $this->schedule?->end_date;
+
+        return $scheduleEnd ? ! $scheduleEnd->isFuture() : false;
+    }
+
+    public function canBeReviewed(): bool
+    {
+        if (! $this->isFinished()) {
+            return false;
+        }
+
+        if ($this->hasReview()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function getParticipantCountAttribute(): int
     {
         return max(1, (int) $this->num_people);
@@ -75,9 +108,9 @@ class Booking extends Model
 
     public const PAYMENT_STATUS = [
         'unpaid' => 'Chưa thanh toán',
-        'deposit' => 'Đặt cọc',
+        // 'deposit' => 'Đặt cọc',
         'paid' => 'Đã thanh toán',
-        'refunded' => 'Đã hoàn tiền',
+        // 'refunded' => 'Đã hoàn tiền',
     ];
 
     public function isCancelled(): bool
@@ -100,5 +133,10 @@ class Booking extends Model
     public function canBeRefundedByAdmin(): bool
     {
         return $this->status === 'cancelled' && $this->payment_status === 'paid';
+    }
+
+    public function canEditStatus(): bool
+    {
+        return $this->admin_confirmed;
     }
 }

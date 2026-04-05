@@ -123,8 +123,8 @@
 
 {{-- HERO --}}
 <div class="hero">
-    @if($tour->image)
-        <img src="{{ asset('storage/' . $tour->image) }}" alt="{{ $tour->name }}">
+    @if($tour->image_url)
+        <img src="{{ $tour->image_url }}" alt="{{ $tour->name }}">
     @endif
     <div class="hero-content">
         <div class="container">

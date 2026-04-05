@@ -10,10 +10,53 @@ use App\Services\TourAvailabilityService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    private function resolveLeadCustomer(array $validated): Customer
+    {
+        $customerData = [
+            'fullname' => $validated['fullname'],
+            'gender' => $validated['gender'],
+            'birthdate' => $validated['birthdate'] ?? null,
+            'phone' => $validated['phone'],
+            'email' => $validated['email'] ?? null,
+            'id_number' => $validated['id_number'] ?? null,
+        ];
+
+        $query = Customer::query()
+            ->where('fullname', $validated['fullname'])
+            ->where('phone', $validated['phone']);
+
+        if (!empty($validated['birthdate'])) {
+            $query->whereDate('birthdate', $validated['birthdate']);
+        }
+
+        if (!empty($validated['email'])) {
+            $query->where('email', $validated['email']);
+        }
+
+        if (!empty($validated['id_number'])) {
+            $query->where('id_number', $validated['id_number']);
+        }
+
+        $customer = $query->first();
+
+        if ($customer) {
+            $customer->fill($customerData);
+
+            if ($customer->isDirty()) {
+                $customer->save();
+            }
+
+            return $customer;
+        }
+
+        return Customer::create($customerData);
+    }
+
     public function create($tourId)
     {
         app(TourAvailabilityService::class)->sync();
@@ -65,11 +108,45 @@ class BookingController extends Controller
             'email'        => 'nullable|email|max:100',
             'id_number'    => 'nullable|string|max:20',
             'num_people'   => 'required|integer|min:1|max:50',
+
+            'companions' => 'nullable|array',
+            'companions.*.fullname' => 'nullable|string|max:100',
+            'companions.*.gender' => 'nullable|in:Nam,Nữ,Khác',
+            'companions.*.birthdate' => 'nullable|date',
+            'companions.*.phone' => 'nullable|string|max:15',
             'note'         => 'nullable|string',
         ]);
 
+        $numPeople = (int) $validated['num_people'];
+        $companions = array_values($validated['companions'] ?? []);
+
+        if ($numPeople >= 2) {
+            $requiredCompanions = $numPeople - 1;
+
+            if (count($companions) !== $requiredCompanions) {
+                throw ValidationException::withMessages([
+                    'companions' => "Vui lòng nhập đầy đủ thông tin cho {$requiredCompanions} người đi cùng.",
+                ]);
+            }
+
+            foreach ($companions as $index => $companion) {
+                $isIncomplete = empty(trim((string) ($companion['fullname'] ?? '')))
+                    || empty(trim((string) ($companion['gender'] ?? '')))
+                    || empty(trim((string) ($companion['birthdate'] ?? '')))
+                    || empty(trim((string) ($companion['phone'] ?? '')));
+
+                if ($isIncomplete) {
+                    $position = $index + 1;
+
+                    throw ValidationException::withMessages([
+                        'companions' => "Người đi cùng #{$position}: vui lòng nhập đầy đủ họ tên, giới tính, ngày sinh và số điện thoại.",
+                    ]);
+                }
+            }
+        }
+
         try {
-            return DB::transaction(function () use ($validated, $tour, $user) {
+            return DB::transaction(function () use ($validated, $tour, $user, $companions) {
                 // 3. Sử dụng lockForUpdate để tránh Race Condition (Tranh chấp vé)
                 $schedule = DepartureSchedule::where('schedule_id', $validated['schedule_id'])
                     ->where('tour_id', $tour->tour_id)
@@ -87,17 +164,7 @@ class BookingController extends Controller
                     throw new \Exception("Rất tiếc, chỉ còn {$schedule->available_spots} chỗ trống cho ngày khởi hành này.");
                 }
 
-                // Tạo hoặc tìm customer theo phone
-                $customer = Customer::firstOrCreate(
-                    ['phone' => $validated['phone']],
-                    [
-                        'fullname'   => $validated['fullname'],
-                        'gender'     => $validated['gender'],
-                        'birthdate'  => $validated['birthdate'] ?? null,
-                        'email'      => $validated['email'] ?? null,
-                        'id_number'  => $validated['id_number'] ?? null,
-                    ]
-                );
+                $customer = $this->resolveLeadCustomer($validated);
 
                 $totalPrice = $tour->price * $validated['num_people'];
 
@@ -115,6 +182,33 @@ class BookingController extends Controller
                     'note'           => $validated['note'] ?? null,
                     'expires_at'     => now()->addMinutes(3),
                 ]);
+
+                $tourCustomers = [
+                    [
+                        'schedule_id' => $validated['schedule_id'],
+                        'customer_id' => $customer->customer_id,
+                        'booking_id'  => $booking->booking_id,
+                    ],
+                ];
+
+                foreach ($companions as $companion) {
+                    $companionCustomer = Customer::create([
+                        'fullname' => $companion['fullname'],
+                        'gender' => $companion['gender'],
+                        'birthdate' => $companion['birthdate'] ?? null,
+                        'phone' => $companion['phone'],
+                        'email' => null,
+                        'id_number' => null,
+                    ]);
+
+                    $tourCustomers[] = [
+                        'schedule_id' => $validated['schedule_id'],
+                        'customer_id' => $companionCustomer->customer_id,
+                        'booking_id'  => $booking->booking_id,
+                    ];
+                }
+
+                DB::table('tour_customer')->insert($tourCustomers);
 
                 // 6. Trừ vé ngay lập tức để giữ chỗ (Giai đoạn 1)
                 $schedule->decrement('available_spots', $validated['num_people']);

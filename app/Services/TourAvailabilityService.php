@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Booking;
-use App\Models\DepartureSchedule;
 use App\Models\Tour;
 use Illuminate\Support\Carbon;
 
@@ -13,28 +12,8 @@ class TourAvailabilityService
     {
         $today = Carbon::today();
 
-        $this->syncDepartureSchedules($today);
         $this->syncBookings();
         $this->syncTours($today);
-    }
-
-    private function syncDepartureSchedules(Carbon $today): void
-    {
-        DepartureSchedule::query()
-            ->whereNotIn('status', ['cancelled', 'completed'])
-            ->chunkById(100, function ($schedules) use ($today) {
-                foreach ($schedules as $schedule) {
-                    $nextStatus = match (true) {
-                        $schedule->end_date?->lt($today) => 'completed',
-                        $schedule->start_date?->lte($today) && $schedule->end_date?->gte($today) => 'ongoing',
-                        default => 'scheduled',
-                    };
-
-                    if ($schedule->status !== $nextStatus) {
-                        $schedule->update(['status' => $nextStatus]);
-                    }
-                }
-            }, 'schedule_id');
     }
 
     private function syncBookings(): void
@@ -44,9 +23,11 @@ class TourAvailabilityService
             ->where('status', '!=', 'cancelled')
             ->chunkById(100, function ($bookings) {
                 foreach ($bookings as $booking) {
-                    $scheduleStatus = $booking->schedule?->status;
+                    $schedule = $booking->schedule;
+                    $scheduleStatus = $schedule?->status;
+                    $scheduleEnd = $schedule?->end_date;
 
-                    if (!$scheduleStatus) {
+                    if (! $schedule) {
                         continue;
                     }
 
@@ -55,6 +36,10 @@ class TourAvailabilityService
                         'ongoing' => 'ongoing',
                         default => 'upcoming',
                     };
+
+                    if ($scheduleEnd && $scheduleEnd->isPast()) {
+                        $nextStatus = 'completed';
+                    }
 
                     if ($booking->status !== $nextStatus) {
                         $booking->update(['status' => $nextStatus]);

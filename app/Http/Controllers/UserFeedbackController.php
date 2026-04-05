@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Feedback;
+use App\Services\TourAvailabilityService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,22 +13,16 @@ class UserFeedbackController extends Controller
 {
     public function store(Request $request, int $bookingId): RedirectResponse
     {
+        app(TourAvailabilityService::class)->sync();
+
         $booking = Booking::with(['feedbacks', 'schedule', 'tour'])->findOrFail($bookingId);
 
         if ($booking->user_id !== Auth::id()) {
             abort(403, 'Bạn không có quyền đánh giá booking này.');
         }
 
-        if ($booking->status !== 'completed') {
-            return back()->with('error', 'Chỉ có thể đánh giá tour sau khi tour đã hoàn thành.');
-        }
-
-        if ($booking->payment_status !== 'paid') {
-            return back()->with('error', 'Chỉ có thể đánh giá booking đã thanh toán.');
-        }
-
-        if ($booking->feedbacks->isNotEmpty()) {
-            return back()->with('error', 'Bạn đã gửi đánh giá cho tour này rồi.');
+        if (! $booking->canBeReviewed()) {
+            return back()->with('error', 'Bạn chỉ có thể đánh giá tour đã hoàn thành và chưa đánh giá trước đó.');
         }
 
         $validated = $request->validate([

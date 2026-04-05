@@ -92,6 +92,14 @@
                 @endif
 
                 <h5 class="mb-3">Cập nhật trạng thái</h5>
+
+                @if (!$booking->canEditStatus() && $booking->payment_status === 'paid')
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Lưu ý:</strong> Bạn cần xác nhận booking cho khách trước khi có thể thay đổi trạng thái tour.
+                    </div>
+                @endif
+
                 <form action="{{ route('admin.bookings.update', $booking) }}" method="POST">
                     @csrf
                     @method('PUT')
@@ -99,7 +107,7 @@
                     <div class="row mb-3">
                         <label class="col-sm-3 col-form-label">Trạng thái</label>
                         <div class="col-sm-9">
-                            <select name="status" class="form-select" required>
+                            <select name="status" class="form-select" required {{ !$booking->canEditStatus() ? 'disabled' : '' }}>
                                 @foreach (\App\Models\Booking::STATUS as $value => $label)
                                 <option value="{{ $value }}"
                                     {{ $booking->status === $value ? 'selected' : '' }}>
@@ -107,6 +115,11 @@
                                 </option>
                                 @endforeach
                             </select>
+                            @if (!$booking->canEditStatus())
+                                <div class="text-muted mt-1">
+                                    <i class="fas fa-info-circle"></i> Admin chưa xác nhận booking nên không thể thay đổi trạng thái.
+                                </div>
+                            @endif
                             @error('status')
                             <div class="text-danger mt-1">{{ $message }}</div>
                             @enderror
@@ -137,7 +150,9 @@
                     <a href="{{ route('admin.bookings.index') }}" class="btn btn-outline-secondary px-4">
                         <i class="fas fa-arrow-left me-1"></i> Quay lại
                     </a>
-                    <button type="submit" class="btn btn-primary">Cập nhật</button>
+                    <button type="submit" class="btn btn-primary" {{ !$booking->canEditStatus() && $booking->payment_status === 'paid' ? 'disabled' : '' }}>
+                        Cập nhật
+                    </button>
                 </form>
             </div>
         </div>
