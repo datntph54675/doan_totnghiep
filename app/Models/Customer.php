@@ -32,4 +32,12 @@ class Customer extends Model
     {
         return $this->hasMany(Booking::class, 'customer_id', 'customer_id');
     }
+
+    /**
+     * Route notifications for the mail channel.
+     */
+    public function routeNotificationForMail($notification)
+    {
+        return $this->email;
+    }
 }

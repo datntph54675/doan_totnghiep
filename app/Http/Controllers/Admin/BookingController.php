@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Tour;
 use App\Notifications\BookingConfirmedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -98,10 +99,16 @@ class BookingController extends Controller
             'admin_confirmed' => true,
         ]);
 
-        // Gửi email xác nhận booking đến khách hàng
-        if ($booking->customer && $booking->customer->email) {
-            $booking->customer->notify(new BookingConfirmedNotification($booking));
-        }
+// Gửi email thông báo cho khách hàng
+try {
+    if ($booking->customer && $booking->customer->email) {
+        $booking->customer->notify(new BookingConfirmedNotification($booking));
+    }
+} catch (\Exception $e) {
+    // Log lỗi nhưng không làm dừng quá trình
+    Log::error('Failed to send booking confirmation email: ' . $e->getMessage());
+}
+        
 
         return redirect()->back()->with('success', 'Đã xác nhận booking cho khách thành công.');
     }
@@ -133,7 +140,7 @@ class BookingController extends Controller
         $currentPayment = $booking->payment_status;
 
         // Xây dựng rules động tùy theo tình trạng thanh toán
-        $statusRule = $currentPayment === 'unpaid' 
+        $statusRule = $currentPayment === 'unpaid'
             ? 'prohibited|in:' . $currentStatus  // Chỉ cho phép status hiện tại khi chưa thanh toán
             : 'required|in:upcoming,ongoing,completed,cancelled'; // Require khi đã thanh toán
 
