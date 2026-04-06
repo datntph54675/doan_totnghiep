@@ -22,17 +22,33 @@
     <div class="card border-0 shadow-sm mb-3">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.guides.index') }}" class="row g-2 align-items-end">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <input type="text" name="keyword" class="form-control" placeholder="Tìm theo tên, email..." value="{{ request('keyword') }}">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <select name="status" class="form-select">
                         <option value="">-- Trạng thái --</option>
                         <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Hoạt động</option>
                         <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Không hoạt động</option>
                     </select>
                 </div>
-                <div class="col-md-4 d-flex gap-2">
+                <div class="col-md-2">
+                    <select name="language" class="form-select">
+                        <option value="">-- Ngôn ngữ --</option>
+                        @foreach($languages as $lang)
+                            <option value="{{ $lang }}" {{ request('language') === $lang ? 'selected' : '' }}>{{ $lang }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="specialization" class="form-select">
+                        <option value="">-- Chuyên môn --</option>
+                        @foreach($specializations as $spec)
+                            <option value="{{ $spec }}" {{ request('specialization') === $spec ? 'selected' : '' }}>{{ $spec }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary"><i class="fas fa-search me-1"></i> Lọc</button>
                     <a href="{{ route('admin.guides.index') }}" class="btn btn-outline-secondary">Xóa lọc</a>
                 </div>
