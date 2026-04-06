@@ -61,7 +61,7 @@ class UserProfileController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $booking = Booking::with(['tour.itineraries', 'tour.category', 'schedule', 'feedbacks'])
+        $booking = Booking::with(['tour.itineraries', 'tour.category', 'schedule', 'customer', 'feedbacks'])
             ->where('user_id', $user->user_id)
             ->findOrFail($bookingId);
 

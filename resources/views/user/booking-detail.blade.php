@@ -426,6 +426,134 @@
             </div>
         </div>
 
+        {{-- Customer Info --}}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-icon">👤</div>
+                <h2>Thông tin khách hàng</h2>
+            </div>
+            <div class="card-body">
+                @if($booking->customer)
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Họ và tên</label>
+                        <div class="value">{{ $booking->customer->fullname }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Số điện thoại</label>
+                        <div class="value">{{ $booking->customer->phone ?? '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Email</label>
+                        <div class="value">{{ $booking->customer->email ?? '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Giới tính</label>
+                        <div class="value">
+                            @php
+                                $genderMap = ['male' => 'Nam', 'female' => 'Nữ', 'other' => 'Khác'];
+                            @endphp
+                            {{ $genderMap[$booking->customer->gender] ?? '—' }}
+                        </div>
+                    </div>
+                    @if($booking->customer->id_number)
+                    <div class="info-item">
+                        <label>CCCD / Hộ chiếu</label>
+                        <div class="value">{{ $booking->customer->id_number }}</div>
+                    </div>
+                    @endif
+                    @if($booking->customer->birthdate)
+                    <div class="info-item">
+                        <label>Ngày sinh</label>
+                        <div class="value">{{ \Carbon\Carbon::parse($booking->customer->birthdate)->format('d/m/Y') }}</div>
+                    </div>
+                    @endif
+                </div>
+                @else
+                <p style="color:var(--text-gray); font-size:14px;">Không có thông tin khách hàng.</p>
+                @endif
+            </div>
+        </div>
+
+        {{-- Invoice --}}
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-icon">🧾</div>
+                <h2>Hóa đơn</h2>
+            </div>
+            <div class="card-body">
+                @php
+                    $unitPrice = $booking->num_people > 0
+                        ? round($booking->total_price / $booking->num_people)
+                        : $booking->tour?->price ?? 0;
+                @endphp
+
+                {{-- Invoice table --}}
+                <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                    <thead>
+                        <tr style="background:#f8fafc; border-bottom:2px solid var(--border);">
+                            <th style="text-align:left; padding:10px 12px; color:var(--text-gray); font-weight:700; text-transform:uppercase; font-size:12px; letter-spacing:.5px;">Dịch vụ</th>
+                            <th style="text-align:center; padding:10px 12px; color:var(--text-gray); font-weight:700; text-transform:uppercase; font-size:12px; letter-spacing:.5px;">Số lượng</th>
+                            <th style="text-align:right; padding:10px 12px; color:var(--text-gray); font-weight:700; text-transform:uppercase; font-size:12px; letter-spacing:.5px;">Đơn giá</th>
+                            <th style="text-align:right; padding:10px 12px; color:var(--text-gray); font-weight:700; text-transform:uppercase; font-size:12px; letter-spacing:.5px;">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border);">
+                            <td style="padding:14px 12px;">
+                                <div style="font-weight:600; color:var(--text-dark);">{{ $booking->tour->name ?? 'Tour' }}</div>
+                                @if($booking->schedule)
+                                <div style="font-size:12px; color:var(--text-gray); margin-top:3px;">
+                                    {{ $booking->schedule->start_date?->format('d/m/Y') }} — {{ $booking->schedule->end_date?->format('d/m/Y') }}
+                                </div>
+                                @endif
+                            </td>
+                            <td style="text-align:center; padding:14px 12px; font-weight:600;">{{ $booking->num_people }} người</td>
+                            <td style="text-align:right; padding:14px 12px; color:var(--text-gray);">{{ number_format($unitPrice, 0, ',', '.') }} ₫</td>
+                            <td style="text-align:right; padding:14px 12px; font-weight:700; color:var(--text-dark);">{{ number_format($booking->num_people * $unitPrice, 0, ',', '.') }} ₫</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <hr class="divider">
+
+                {{-- Summary --}}
+                <div style="display:flex; flex-direction:column; gap:10px; max-width:340px; margin-left:auto;">
+                    <div style="display:flex; justify-content:space-between; font-size:14px; color:var(--text-gray);">
+                        <span>Tạm tính ({{ $booking->num_people }} người)</span>
+                        <span>{{ number_format($booking->total_price, 0, ',', '.') }} ₫</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:14px; color:var(--text-gray);">
+                        <span>Phí dịch vụ</span>
+                        <span>Miễn phí</span>
+                    </div>
+                    <hr class="divider" style="margin:4px 0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:15px; font-weight:700; color:var(--text-dark);">Tổng cộng</span>
+                        <span class="price-highlight">{{ number_format($booking->total_price, 0, ',', '.') }} ₫</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-gray);">
+                        <span>Trạng thái thanh toán</span>
+                        <span class="badge {{ $booking->payment_status === 'paid' ? 'badge-paid' : 'badge-unpaid' }}">
+                            {{ \App\Models\Booking::PAYMENT_STATUS[$booking->payment_status] ?? $booking->payment_status }}
+                        </span>
+                    </div>
+                    @if($booking->payment_method)
+                    <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-gray);">
+                        <span>Phương thức</span>
+                        <span style="font-weight:600; color:var(--text-dark);">{{ strtoupper($booking->payment_method) }}</span>
+                    </div>
+                    @endif
+                    @if($booking->vnp_transaction_no)
+                    <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-gray);">
+                        <span>Mã giao dịch</span>
+                        <span style="font-weight:600; color:var(--text-dark); font-family:monospace;">{{ $booking->vnp_transaction_no }}</span>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         {{-- Itinerary --}}
         @if($booking->tour?->itineraries?->count())
         <div class="card">
