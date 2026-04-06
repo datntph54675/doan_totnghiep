@@ -23,6 +23,20 @@ class UserProfileController extends Controller
         return view('user.profile', compact('user'));
     }
 
+    public function paymentHistory()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $payments = Booking::with(['tour', 'schedule'])
+            ->where('user_id', $user->user_id)
+            ->where('payment_status', 'paid')
+            ->orderByDesc('updated_at')
+            ->paginate(15);
+
+        return view('user.payment-history', compact('user', 'payments'));
+    }
+
     public function showBooking(int $bookingId)
     {
         /** @var \App\Models\User $user */
