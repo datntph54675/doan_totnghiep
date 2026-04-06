@@ -266,6 +266,18 @@
         transform: translateY(-1px);
     }
 
+    .btn-detail {
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+
+    .btn-detail:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+        transform: translateY(-1px);
+    }
+
     .booking-actions {
         display: flex;
         align-items: center;
@@ -611,6 +623,10 @@
                                 </a>
                                 @endif
 
+                                <a class="btn-action btn-detail" href="{{ route('user.booking.detail', $booking->booking_id) }}">
+                                    <i class="fa-solid fa-file-lines"></i> Chi tiết
+                                </a>
+
                                 <a class="btn-action btn-pay" href="{{ route('payment.choose', $booking->booking_id) }}">
                                     <i class="fa-solid fa-credit-card"></i> Thanh toán ngay
                                 </a>
@@ -660,6 +676,9 @@
                                     <i class="fa-solid fa-eye"></i> Xem tour
                                 </a>
                                 @endif
+                                <a class="btn-action btn-detail" href="{{ route('user.booking.detail', $booking->booking_id) }}">
+                                    <i class="fa-solid fa-file-lines"></i> Chi tiết
+                                </a>
                                 @if ($booking->canBeCancelledByUser())
                                 <form class="booking-cancel-form" action="{{ route('user.booking.cancel', $booking->booking_id) }}" method="POST"
                                     onsubmit="return confirm('Bạn có chắc muốn hủy booking này không?')">
@@ -705,6 +724,9 @@
                                     <i class="fa-solid fa-eye"></i> Xem tour
                                 </a>
                                 @endif
+                                <a class="btn-action btn-detail" href="{{ route('user.booking.detail', $booking->booking_id) }}">
+                                    <i class="fa-solid fa-file-lines"></i> Chi tiết
+                                </a>
                                 @if ($booking->canBeCancelledByUser())
                                 <form class="booking-cancel-form" action="{{ route('user.booking.cancel', $booking->booking_id) }}" method="POST"
                                     onsubmit="return confirm('Bạn có chắc muốn hủy booking này không?')">
@@ -751,6 +773,9 @@
                                     <i class="fa-solid fa-eye"></i> Xem tour
                                 </a>
                                 @endif
+                                <a class="btn-action btn-detail" href="{{ route('user.booking.detail', $booking->booking_id) }}">
+                                    <i class="fa-solid fa-file-lines"></i> Chi tiết & Đánh giá
+                                </a>
                             </div>
                         </div>
 
@@ -844,6 +869,9 @@
                                     <i class="fa-solid fa-eye"></i> Xem tour
                                 </a>
                                 @endif
+                                <a class="btn-action btn-detail" href="{{ route('user.booking.detail', $booking->booking_id) }}">
+                                    <i class="fa-solid fa-file-lines"></i> Chi tiết
+                                </a>
                             </div>
                         </div>
                     </article>
