@@ -28,9 +28,20 @@ class GuideController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('language')) {
+            $query->where('language', 'like', '%' . $request->language . '%');
+        }
+
+        if ($request->filled('specialization')) {
+            $query->where('specialization', 'like', '%' . $request->specialization . '%');
+        }
+
+        $languages = Guide::whereNotNull('language')->distinct()->pluck('language')->sort()->values();
+        $specializations = Guide::whereNotNull('specialization')->distinct()->pluck('specialization')->sort()->values();
+
         $guides = $query->orderBy('guide_id', 'desc')->paginate(20)->withQueryString();
 
-        return view('admin.guide.index', compact('guides'));
+        return view('admin.guide.index', compact('guides', 'languages', 'specializations'));
     }
 
 
