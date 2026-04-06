@@ -295,6 +295,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ route('user.pending.reviews') }}" class="nav-link">
+                            <i class="fa-solid fa-star"></i>
+                            Chờ đánh giá
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link text-danger">
                             <i class="fa-solid fa-right-from-bracket"></i>
                             Đăng xuất

@@ -23,6 +23,25 @@ class UserProfileController extends Controller
         return view('user.profile', compact('user'));
     }
 
+    public function pendingReviews()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        app(TourAvailabilityService::class)->sync();
+        $this->completeFinishedBookings($user->user_id);
+
+        $pendingReviews = Booking::with(['tour', 'schedule', 'feedbacks'])
+            ->where('user_id', $user->user_id)
+            ->where('status', 'completed')
+            ->where('payment_status', 'paid')
+            ->get()
+            ->filter(fn($b) => $b->canBeReviewed())
+            ->values();
+
+        return view('user.pending-reviews', compact('user', 'pendingReviews'));
+    }
+
     public function paymentHistory()
     {
         /** @var \App\Models\User $user */
