@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/password', [App\Http\Controllers\UserProfileController::class, 'updatePassword'])->name('user.password.update');
     Route::post('/booking/{bookingId}/cancel', [BookingController::class, 'cancel'])->name('user.booking.cancel');
     Route::get('/booking/{bookingId}/success', [BookingController::class, 'success'])->name('user.booking.success');
+    Route::get('/booking/{bookingId}', [App\Http\Controllers\UserProfileController::class, 'showBooking'])->name('user.booking.detail');
     Route::post('/booking/{bookingId}/feedback', [UserFeedbackController::class, 'store'])->name('user.booking.feedback');
 });
 

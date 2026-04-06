@@ -23,6 +23,20 @@ class UserProfileController extends Controller
         return view('user.profile', compact('user'));
     }
 
+    public function showBooking(int $bookingId)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        $booking = Booking::with(['tour.itineraries', 'tour.category', 'schedule', 'feedbacks'])
+            ->where('user_id', $user->user_id)
+            ->findOrFail($bookingId);
+
+        $feedback = $booking->feedbacks->where('type', \App\Models\Feedback::TYPE_REVIEW)->first();
+
+        return view('user.booking-detail', compact('booking', 'feedback'));
+    }
+
     public function bookings()
     {
         /** @var \App\Models\User $user */
