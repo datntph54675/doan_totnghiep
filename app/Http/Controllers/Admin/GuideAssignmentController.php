@@ -100,9 +100,16 @@ class GuideAssignmentController extends Controller
      */
     public function create()
     {
+        // Lấy các schedule_id đã có phân công đang active (pending hoặc accepted)
+        $assignedScheduleIds = GuideAssignment::whereIn('status', ['pending', 'accepted'])
+            ->pluck('schedule_id')
+            ->toArray();
+
         $schedules = DepartureSchedule::with('tour')
             ->where('status', 'scheduled')
+            ->whereNotIn('schedule_id', $assignedScheduleIds)
             ->get();
+
         $guides = Guide::with('user')->get();
         $guideConflictsBySchedule = $this->buildGuideConflictsBySchedule($schedules);
 

@@ -19,17 +19,23 @@
                 <select name="schedule_id" id="schedule_id"
                     class="form-select @error('schedule_id') is-invalid @enderror" required>
                     <option value="">-- Chọn lịch khởi hành --</option>
-                    @foreach ($schedules as $schedule)
+                    @forelse ($schedules as $schedule)
                     <option value="{{ $schedule->schedule_id }}" @selected(old('schedule_id')==$schedule->schedule_id)>
                         {{ $schedule->tour->name }} -
                         {{ \Illuminate\Support\Carbon::parse($schedule->start_date)->format('d/m/Y') }} đến
                         {{ \Illuminate\Support\Carbon::parse($schedule->end_date)->format('d/m/Y') }}
                     </option>
-                    @endforeach
+                    @empty
+                    <option disabled>Tất cả lịch trình đã được phân công HDV</option>
+                    @endforelse
                 </select>
                 @error('schedule_id')
                 <span class="invalid-feedback d-block">{{ $message }}</span>
                 @enderror
+                <div class="form-text text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Chỉ hiển thị lịch trình chưa có HDV được phân công. Lịch đã có phân công (đang chờ/đã chấp nhận) sẽ không xuất hiện.
+                </div>
             </div>
 
             <div class="col-md-6 mb-3">
