@@ -289,6 +289,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ route('user.payment.history') }}" class="nav-link">
+                            <i class="fa-solid fa-credit-card"></i>
+                            Lịch sử thanh toán
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-link text-danger">
                             <i class="fa-solid fa-right-from-bracket"></i>
                             Đăng xuất

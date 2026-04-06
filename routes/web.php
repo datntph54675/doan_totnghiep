@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile', [App\Http\Controllers\UserProfileController::class, 'edit'])->name('user.profile');
     Route::get('/profile/bookings', [App\Http\Controllers\UserProfileController::class, 'bookings'])->name('user.bookings');
+    Route::get('/profile/payment-history', [App\Http\Controllers\UserProfileController::class, 'paymentHistory'])->name('user.payment.history');
     Route::put('/profile', [App\Http\Controllers\UserProfileController::class, 'updateProfile'])->name('user.profile.update');
     Route::put('/profile/password', [App\Http\Controllers\UserProfileController::class, 'updatePassword'])->name('user.password.update');
     Route::post('/booking/{bookingId}/cancel', [BookingController::class, 'cancel'])->name('user.booking.cancel');
