@@ -129,14 +129,6 @@
         background: linear-gradient(135deg, #ee2624, #ff6b35);
         color: #fff;
     }
-    .method-icon.vietqr {
-        background: linear-gradient(135deg, #0066cc, #00aaff);
-        color: #fff;
-    }
-    .method-icon.momo {
-        background: linear-gradient(135deg, #ae2070, #d82d8b);
-        color: #fff;
-    }
 
     .method-name {
         font-size: 20px;
@@ -190,20 +182,6 @@
     }
     .btn-pay.vnpay-btn:hover {
         box-shadow: 0 8px 20px rgba(238,38,36,0.3);
-        transform: translateY(-2px);
-    }
-    .btn-pay.vietqr-btn {
-        background: linear-gradient(135deg, #0066cc, #00aaff);
-    }
-    .btn-pay.vietqr-btn:hover {
-        box-shadow: 0 8px 20px rgba(0,102,204,0.3);
-        transform: translateY(-2px);
-    }
-    .btn-pay.momo-btn {
-        background: linear-gradient(135deg, #ae2070, #d82d8b);
-    }
-    .btn-pay.momo-btn:hover {
-        box-shadow: 0 8px 20px rgba(174,32,112,0.3);
         transform: translateY(-2px);
     }
 
@@ -317,7 +295,7 @@
         </div>
 
         <!-- Phương thức thanh toán -->
-        <div class="methods-grid">
+        <div class="methods-grid" style="grid-template-columns: 1fr; max-width: 450px; margin-left: auto; margin-right: auto;">
             <!-- VNPAY -->
             <div class="method-card">
                 <div class="method-icon vnpay">
@@ -335,45 +313,6 @@
                     <button type="submit" class="btn-pay vnpay-btn">
                         <i class="fa-solid fa-lock"></i>
                         Thanh toán VNPAY
-                    </button>
-                </form>
-            </div>
-
-            <!-- VietQR -->
-            <div class="method-card">
-                <div class="method-icon vietqr">
-                    <i class="fa-solid fa-qrcode"></i>
-                </div>
-                <div class="method-name">VietQR</div>
-                <div class="method-desc">Chuyển khoản ngân hàng qua mã QR - Nhanh chóng với mọi ứng dụng ngân hàng</div>
-                <ul class="method-features">
-                    <li><i class="fa-solid fa-check"></i> Quét QR bằng app ngân hàng bất kỳ</li>
-                    <li><i class="fa-solid fa-check"></i> Tự động điền số tiền & nội dung</li>
-                    <li><i class="fa-solid fa-check"></i> Không cần đăng ký thêm</li>
-                </ul>
-                <a href="{{ route('payment.vietqr', $booking->booking_id) }}" class="btn-pay vietqr-btn">
-                    <i class="fa-solid fa-qrcode"></i>
-                    Chuyển khoản QR
-                </a>
-            </div>
-
-            <!-- MoMo -->
-            <div class="method-card">
-                <div class="method-icon momo">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
-                <div class="method-name">MoMo</div>
-                <div class="method-desc">Thanh toán qua ví điện tử MoMo - Nhanh chóng, tiện lợi</div>
-                <ul class="method-features">
-                    <li><i class="fa-solid fa-check"></i> Quét QR bằng app MoMo</li>
-                    <li><i class="fa-solid fa-check"></i> Chuyển tiền chỉ trong vài giây</li>
-                    <li><i class="fa-solid fa-check"></i> Phổ biến nhất Việt Nam</li>
-                </ul>
-                <form action="{{ route('payment.momo', $booking->booking_id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn-pay momo-btn">
-                        <i class="fa-solid fa-wallet"></i>
-                        Thanh toán MoMo
                     </button>
                 </form>
             </div>
