@@ -274,9 +274,22 @@
                             </div>
                             <div class="sch-info">
                                 <span><i class="fas fa-map-marker-alt"></i> {{ $s->meeting_point ?? 'Liên hệ' }}</span>
-                                <span><i class="fas fa-users"></i> Còn chỗ: {{ $s->max_people }} khách</span>
+                                <span style="color: {{ $s->available_spots <= 0 ? '#dc2626' : ($s->available_spots <= 5 ? '#d97706' : 'inherit') }}; font-weight: {{ $s->available_spots <= 5 ? '700' : 'normal' }}">
+                                    <i class="fas fa-users"></i>
+                                    @if($s->available_spots <= 0)
+                                        Hết chỗ
+                                    @elseif($s->available_spots <= 5)
+                                        Còn chỗ: {{ $s->available_spots }} khách (sắp hết)
+                                    @else
+                                        Còn chỗ: {{ $s->available_spots }} khách
+                                    @endif
+                                </span>
                             </div>
+                            @if($s->available_spots > 0)
                             <a href="{{ route('user.booking', $tour->tour_id) }}?schedule={{ $s->schedule_id }}" class="sch-btn">Chọn chuyến này</a>
+                            @else
+                            <button class="sch-btn" disabled style="opacity:.5; cursor:not-allowed; border-color:#d1d5db; color:#9ca3af;">Hết chỗ</button>
+                            @endif
                         </div>
                         @endforeach
                     </div>
@@ -419,7 +432,7 @@
     window.addEventListener('scroll', function() {
         const bar = document.getElementById('sticky-bar');
         const scrollPos = window.scrollY;
-        
+
         if (scrollPos > 500) {
             bar.classList.add('visible');
         } else {

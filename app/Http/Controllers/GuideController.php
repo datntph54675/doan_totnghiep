@@ -257,20 +257,35 @@ class GuideController extends Controller
 
         $participants = $this->scheduleParticipants((int) $scheduleId);
 
-        // Lấy lịch sử điểm danh
+        $today = now()->toDateString();
+
+        // Lấy điểm danh hôm nay (dùng để hiển thị trạng thái hiện tại)
+        $todayAttendanceByParticipant = Attendance::where('schedule_id', $scheduleId)
+            ->where('attendance_date', $today)
+            ->get()
+            ->keyBy('tour_customer_id');
+
+        // Lấy toàn bộ lịch sử điểm danh (tất cả các ngày)
         $attendances = Attendance::where('schedule_id', $scheduleId)
             ->with('customer')
+            ->orderBy('attendance_date', 'desc')
             ->orderBy('marked_at', 'desc')
             ->get();
 
-        $latestAttendanceByParticipant = $attendances
-            ->filter(fn($attendance) => !empty($attendance->tour_customer_id))
-            ->unique('tour_customer_id')
-            ->keyBy('tour_customer_id');
+        // Giữ tương thích với view cũ (latestAttendanceByParticipant = hôm nay)
+        $latestAttendanceByParticipant = $todayAttendanceByParticipant;
 
         $totalPassengers = max($this->bookingPassengerTotal($schedule->bookings), $participants->count());
 
-        return view('guide.attendance', compact('schedule', 'attendances', 'participants', 'latestAttendanceByParticipant', 'totalPassengers'));
+        return view('guide.attendance', compact(
+            'schedule',
+            'attendances',
+            'participants',
+            'latestAttendanceByParticipant',
+            'todayAttendanceByParticipant',
+            'totalPassengers',
+            'today'
+        ));
     }
 
     public function markAttendance(Request $request, $scheduleId)
@@ -299,15 +314,24 @@ class GuideController extends Controller
                 ->with('error', 'Khách hàng không thuộc chuyến đi này.');
         }
 
-        Attendance::create([
-            'schedule_id' => $scheduleId,
-            'tour_customer_id' => $tourCustomer->id,
-            'customer_id' => $tourCustomer->customer_id,
-            'guide_id' => $guide->guide_id,
-            'status' => $validated['status'],
-            'note' => $validated['note'] ?? null,
-            'marked_at' => now(),
-        ]);
+        $today = now()->toDateString();
+
+        // Mỗi ngày chỉ 1 bản ghi điểm danh cho mỗi khách
+        // Nếu hôm nay đã điểm rồi thì cập nhật, chưa thì tạo mới
+        Attendance::updateOrCreate(
+            [
+                'schedule_id'      => $scheduleId,
+                'tour_customer_id' => $tourCustomer->id,
+                'attendance_date'  => $today,
+            ],
+            [
+                'customer_id' => $tourCustomer->customer_id,
+                'guide_id'    => $guide->guide_id,
+                'status'      => $validated['status'],
+                'note'        => $validated['note'] ?? null,
+                'marked_at'   => now(),
+            ]
+        );
 
         return redirect()->route('guide.attendance', $scheduleId)
             ->with('success', 'Điểm danh thành công!');
