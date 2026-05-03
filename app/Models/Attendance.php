@@ -16,6 +16,7 @@ class Attendance extends Model
         'tour_customer_id',
         'customer_id',
         'guide_id',
+        'attendance_date',
         'status',
         'note',
         'marked_at',
@@ -23,6 +24,7 @@ class Attendance extends Model
 
     protected $casts = [
         'marked_at' => 'datetime',
+        'attendance_date' => 'date',
     ];
 
     public function schedule(): BelongsTo

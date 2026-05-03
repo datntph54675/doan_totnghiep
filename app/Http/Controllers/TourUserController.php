@@ -91,7 +91,7 @@ class TourUserController extends Controller
         return view('tours.index', compact('tours', 'categories'));
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         app(TourAvailabilityService::class)->sync();
 

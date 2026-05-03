@@ -121,9 +121,11 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
                                 @else
                                 <span class="badge badge-warning">? Chưa rõ</span>
                                 @endif
-                                <span style="font-size:11px;color:var(--text-muted);margin-left:6px">{{ $latest->marked_at->format('H:i d/m') }}</span>
+                                <span style="font-size:11px;color:var(--text-muted);margin-left:6px">
+                                    Hôm nay {{ $latest->marked_at->format('H:i') }}
+                                </span>
                                 @else
-                                <span class="badge badge-gray">Chưa điểm danh</span>
+                                <span class="badge badge-gray">Chưa điểm danh hôm nay</span>
                                 @endif
                             </div>
                         </div>
@@ -155,36 +157,49 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
         <span class="badge badge-gray">{{ $attendances->count() }} lần</span>
     </div>
     <div class="card-body" style="padding-top:12px">
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Khách hàng</th>
-                        <th>Trạng thái</th>
-                        <th>Ghi chú</th>
-                        <th>Thời gian</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($attendances as $att)
-                    <tr>
-                        <td style="font-weight:600">{{ $att->customer->fullname ?? '—' }}</td>
-                        <td>
-                            @if($att->status == 'present')
-                            <span class="badge badge-success">✓ Có mặt</span>
-                            @elseif($att->status == 'absent')
-                            <span class="badge badge-danger">✗ Vắng mặt</span>
-                            @else
-                            <span class="badge badge-warning">? Chưa rõ</span>
-                            @endif
-                        </td>
-                        <td style="color:var(--text-muted);font-size:13px">{{ $att->note ?? '—' }}</td>
-                        <td style="color:var(--text-muted);font-size:13px">{{ $att->marked_at->format('H:i d/m/Y') }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        @php
+            $attendancesByDate = $attendances->groupBy(fn($a) => \Carbon\Carbon::parse($a->attendance_date)->format('d/m/Y'));
+        @endphp
+        @foreach($attendancesByDate as $date => $records)
+        <div style="margin-bottom:16px;">
+            <div style="font-size:13px;font-weight:700;color:var(--text-muted);padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:8px;">
+                📅 {{ $date }}
+                @if($date === \Carbon\Carbon::parse($today)->format('d/m/Y'))
+                    <span class="badge badge-success" style="margin-left:6px;">Hôm nay</span>
+                @endif
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Khách hàng</th>
+                            <th>Trạng thái</th>
+                            <th>Ghi chú</th>
+                            <th>Thời gian</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($records as $att)
+                        <tr>
+                            <td style="font-weight:600">{{ $att->customer->fullname ?? '—' }}</td>
+                            <td>
+                                @if($att->status == 'present')
+                                <span class="badge badge-success">✓ Có mặt</span>
+                                @elseif($att->status == 'absent')
+                                <span class="badge badge-danger">✗ Vắng mặt</span>
+                                @else
+                                <span class="badge badge-warning">? Chưa rõ</span>
+                                @endif
+                            </td>
+                            <td style="color:var(--text-muted);font-size:13px">{{ $att->note ?? '—' }}</td>
+                            <td style="color:var(--text-muted);font-size:13px">{{ $att->marked_at->format('H:i') }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
+        @endforeach
     </div>
 </div>
 @endif
