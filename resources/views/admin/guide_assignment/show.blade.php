@@ -185,14 +185,13 @@
             <i class="bi bi-pencil"></i> Chỉnh sửa
         </a>
         <form action="{{ route('admin.guide-assignments.destroy', $guideAssignment->id) }}" method="POST"
-            style="display:inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa không?');">
+            style="display:inline;" onsubmit="return confirm('Bạn chắc chắn muốn ẩn phân công này?');">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">
-                <i class="bi bi-trash"></i> Xóa
+                <i class="bi bi-trash"></i> Ẩn
             </button>
         </form>
-
     </div>
 </div>
 @endsection

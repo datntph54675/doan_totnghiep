@@ -47,6 +47,7 @@ class GuideAssignmentController extends Controller
         $assignments = GuideAssignment::query()
             ->join('departure_schedule as ds', 'ds.schedule_id', '=', 'guide_assignment.schedule_id')
             ->whereIn('guide_assignment.status', ['pending', 'accepted'])
+            ->whereNull('guide_assignment.deleted_at')
             ->when($ignoreAssignmentId, function ($query) use ($ignoreAssignmentId) {
                 $query->where('guide_assignment.id', '!=', $ignoreAssignmentId);
             })
@@ -100,8 +101,9 @@ class GuideAssignmentController extends Controller
      */
     public function create()
     {
-        // Lấy các schedule_id đã có phân công đang active (pending hoặc accepted)
+        // Lấy các schedule_id đã có phân công đang active (pending hoặc accepted) và không bị xóa
         $assignedScheduleIds = GuideAssignment::whereIn('status', ['pending', 'accepted'])
+            ->whereNull('deleted_at')
             ->pluck('schedule_id')
             ->toArray();
 
@@ -129,13 +131,15 @@ class GuideAssignmentController extends Controller
 
         $data['assigned_by'] = Auth::id() ?? (Auth::user()->user_id ?? null);
         $data['assigned_at'] = now();
-        $data['status'] = 'pending'; // Khởi tạo trạng thái là chờ xác nhận
+        $data['confirmed_at'] = now();
+        $data['status'] = 'accepted'; // Trạng thái là đã xác nhận ngay lập tức
 
-        $exists = GuideAssignment::where('schedule_id', $data['schedule_id'])
+        $exists = GuideAssignment::withTrashed()
+            ->where('schedule_id', $data['schedule_id'])
             ->where('guide_id', $data['guide_id'])
-            ->exists();
+            ->first();
 
-        if ($exists) {
+        if ($exists && !$exists->trashed()) {
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['guide_id' => 'HDV này đã được phân công cho lịch trình đã chọn.']);
@@ -203,26 +207,10 @@ class GuideAssignmentController extends Controller
                 ->withErrors(['guide_id' => 'HDV đã có lịch trùng ngày trong khoảng thời gian này. Vui lòng chọn HDV khác.']);
         }
 
-        $isReassigned = (int) $guideAssignment->guide_id !== (int) $data['guide_id']
-            || (int) $guideAssignment->schedule_id !== (int) $data['schedule_id'];
-
-        if ($isReassigned) {
-            $data['status'] = 'pending';
-            $data['confirmed_at'] = null;
-            $data['rejection_reason'] = null;
-            $data['assigned_at'] = now();
-            $data['assigned_by'] = Auth::id() ?? (Auth::user()->user_id ?? null);
-        }
-
         $guideAssignment->update($data);
 
         return redirect()->route('admin.guide-assignments.index')
-            ->with(
-                'success',
-                $isReassigned
-                    ? 'Đã phân công lại HDV. Trạng thái xác nhận đã được đặt lại về chờ xác nhận.'
-                    : 'Cập nhật phân công HDV thành công'
-            );
+            ->with('success', 'Cập nhật phân công HDV thành công');
     }
 
     /**
@@ -230,7 +218,7 @@ class GuideAssignmentController extends Controller
      */
     public function destroy(GuideAssignment $guideAssignment)
     {
-        $guideAssignment->delete();
+        $guideAssignment->delete(); // Soft delete
 
         return redirect()->route('admin.guide-assignments.index')
             ->with('success', 'Xóa phân công HDV thành công');

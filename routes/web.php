@@ -144,11 +144,6 @@ Route::prefix('guide')->group(function () {
         Route::post('logout', [GuideAuthController::class, 'logout'])->name('guide.logout');
         Route::get('dashboard', [\App\Http\Controllers\GuideController::class, 'dashboard'])->name('guide.dashboard');
 
-        // Assignment confirmation routes
-        Route::get('assignments', [\App\Http\Controllers\GuideController::class, 'assignmentList'])->name('guide.assignments');
-        Route::post('assignments/{id}/accept', [\App\Http\Controllers\GuideController::class, 'acceptAssignment'])->name('guide.assignments.accept');
-        Route::post('assignments/{id}/reject', [\App\Http\Controllers\GuideController::class, 'rejectAssignment'])->name('guide.assignments.reject');
-
         Route::get('tour/{scheduleId}', [\App\Http\Controllers\GuideController::class, 'tourDetail'])->name('guide.tour.detail');
         Route::post('tour/{scheduleId}/complete', [\App\Http\Controllers\GuideController::class, 'completeTour'])->name('guide.tour.complete');
         Route::get('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'attendance'])->name('guide.attendance');
