@@ -132,10 +132,10 @@
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <form action="{{ route('admin.guide-assignments.destroy', $assignment->id) }}" method="POST"
-                                    class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                    class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn ẩn phân công này?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Ẩn">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>

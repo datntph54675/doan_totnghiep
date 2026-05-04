@@ -83,7 +83,10 @@
             flex-shrink: 0;
         }
 
-        .brand-icon i { color: #fff; font-size: 1rem; }
+        .brand-icon i {
+            color: #fff;
+            font-size: 1rem;
+        }
 
         .brand-name {
             font-size: 18px;
@@ -754,12 +757,6 @@
             <a href="{{ route('guide.dashboard') }}"
                 class="nav-item {{ request()->routeIs('guide.dashboard') ? 'active' : '' }}">
                 <span class="nav-icon">🏠</span> Dashboard
-            </a>
-
-            <div class="nav-label">Phân công tour</div>
-            <a href="{{ route('guide.assignments') }}"
-                class="nav-item {{ request()->routeIs('guide.assignments') ? 'active' : '' }}">
-                <span class="nav-icon">📋</span> Danh sách tour gán
             </a>
 
             <div class="nav-label">Tour của tôi</div>
