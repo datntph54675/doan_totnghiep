@@ -7,17 +7,20 @@
             <div class="logo-box">
                 <a href="{{ route('home') }}">
                     @if(Route::is('momo.mock'))
-                        <img src="https://developers.momo.vn/v2/images/logo.png" alt="logo"
-                            style="width:70px; height:70px; padding: 5px;">
+                    <img src="https://developers.momo.vn/v2/images/logo.png" alt="logo"
+                        style="width:70px; height:70px; padding: 5px;">
                     @else
-                        <img src="{{ asset('assets/admin/images/logo-dark.png') }}" alt="logo"
-                            style="width:160px; height:70px;">
+                    <img src="{{ asset('assets/admin/images/logo-dark.png') }}" alt="logo"
+                        style="width:160px; height:70px;">
                     @endif
                 </a>
             </div>
             <!-- End Logo Box -->
 
             <ul id="side-menu">
+                @php
+                $statisticsMenuOpen = request()->routeIs('admin.dashboard');
+                @endphp
 
                 <!-- Quản trị -->
 
@@ -26,21 +29,21 @@
 
                 {{-- Thống kê --}}
                 <li>
-                    <a href='#dbs' data-bs-toggle="collapse">
+                    <a href='#dbs' data-bs-toggle="collapse" aria-expanded="{{ $statisticsMenuOpen ? 'true' : 'false' }}">
                         <i data-feather="home"></i>
                         <span> Thống kê </span>
                         <span class="menu-arrow"></span>
                     </a>
-                    <div class="collapse" id="dbs">
+                    <div class="collapse {{ $statisticsMenuOpen ? 'show' : '' }}" id="dbs">
                         <ul class="nav-second-level">
                             <li>
-                                <a href="#" class="tp-link">Dashboard</a>
+                                <a href="{{ route('admin.dashboard') }}" class="tp-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Tổng quan</a>
                             </li>
                             <li>
-                                <a class='tp-link' href="#">Thống kê 1</a>
+                                <a class='tp-link' href="{{ route('admin.dashboard') }}#doanh-thu">Doanh thu</a>
                             </li>
                             <li>
-                                <a class='tp-link' href="#">Thống kê 2</a>
+                                <a class='tp-link' href="{{ route('admin.dashboard') }}#hieu-suat-tour">Hiệu suất tour</a>
                             </li>
                         </ul>
                     </div>
