@@ -99,15 +99,7 @@
                                         <a href="{{ route('admin.tours.departure-schedules.index', $tour->tour_id) }}"
                                             class="btn btn-sm btn-outline-success me-2" title="Lịch xuất phát">
                                             <i class="fas fa-calendar"></i>
-                                        </a>
-                                        <form action="{{ route('admin.tours.destroy', $tour) }}" method="POST"
-                                            class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        </a>                                      
                                     </div>
                                 </td>
                             </tr>
