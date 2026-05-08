@@ -102,7 +102,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('guide-assignments', GuideAssignmentController::class);
 
         // Tours
-        Route::resource('tours', TourController::class);
+        Route::resource('tours', TourController::class)->except(['destroy']);
         Route::get('tours/{tour}/departure-schedules', [TourController::class, 'departureSchedules'])->name('tours.departure-schedules.index');
 
         // Departure Schedules (Nested under Tours)
