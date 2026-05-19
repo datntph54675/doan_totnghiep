@@ -116,6 +116,17 @@ class GuideController extends Controller
             ->pluck('schedule_id');
     }
 
+    private function currentDayNumber(DepartureSchedule $schedule): int
+    {
+        $startDate = $schedule->start_date instanceof \Carbon\CarbonInterface
+            ? $schedule->start_date->copy()->startOfDay()
+            : \Carbon\Carbon::parse($schedule->start_date)->startOfDay();
+
+        $today = now()->startOfDay();
+
+        return max(1, (int) $startDate->diffInDays($today, false) + 1);
+    }
+
     public function dashboard()
     {
         app(TourAvailabilityService::class)->sync();
@@ -242,7 +253,7 @@ class GuideController extends Controller
         return redirect()->back()->with('error', 'Phân công hiện tại không ở trạng thái đã chấp nhận để chuyển sang hoàn thành.');
     }
 
-    public function attendance($scheduleId)
+    public function attendance(Request $request, $scheduleId)
     {
         app(TourAvailabilityService::class)->sync();
 
@@ -258,16 +269,38 @@ class GuideController extends Controller
         $participants = $this->scheduleParticipants((int) $scheduleId);
 
         $today = now()->toDateString();
+        $dayNumber = $this->currentDayNumber($schedule);
 
-        // Lấy điểm danh hôm nay (dùng để hiển thị trạng thái hiện tại)
-        $todayAttendanceByParticipant = Attendance::where('schedule_id', $scheduleId)
-            ->where('attendance_date', $today)
+        $todayItineraries = Itinerary::where('tour_id', $schedule->tour_id)
+            ->where('day_number', $dayNumber)
+            ->orderBy('itinerary_id', 'asc')
+            ->get();
+
+        $selectedItineraryId = (int) $request->query('itinerary_id', 0);
+        if ($selectedItineraryId > 0 && !$todayItineraries->contains('itinerary_id', $selectedItineraryId)) {
+            $selectedItineraryId = 0;
+        }
+
+        if ($selectedItineraryId === 0 && $todayItineraries->isNotEmpty()) {
+            $selectedItineraryId = (int) $todayItineraries->first()->itinerary_id;
+        }
+
+        $todayAttendanceQuery = Attendance::where('schedule_id', $scheduleId)
+            ->where('attendance_date', $today);
+
+        if ($selectedItineraryId > 0) {
+            $todayAttendanceQuery->where('itinerary_id', $selectedItineraryId);
+        } else {
+            $todayAttendanceQuery->whereRaw('1 = 0');
+        }
+
+        $todayAttendanceByParticipant = $todayAttendanceQuery
             ->get()
             ->keyBy('tour_customer_id');
 
         // Lấy toàn bộ lịch sử điểm danh (tất cả các ngày)
         $attendances = Attendance::where('schedule_id', $scheduleId)
-            ->with('customer')
+            ->with(['customer', 'itinerary'])
             ->orderBy('attendance_date', 'desc')
             ->orderBy('marked_at', 'desc')
             ->get();
@@ -284,7 +317,10 @@ class GuideController extends Controller
             'latestAttendanceByParticipant',
             'todayAttendanceByParticipant',
             'totalPassengers',
-            'today'
+            'today',
+            'dayNumber',
+            'todayItineraries',
+            'selectedItineraryId'
         ));
     }
 
@@ -299,10 +335,15 @@ class GuideController extends Controller
             ->firstOrFail();
 
         $validated = $request->validate([
+            'itinerary_id' => 'required|integer|exists:itinerary,itinerary_id',
             'tour_customer_id' => 'required|exists:tour_customer,id',
             'status' => 'required|in:present,absent,unknown',
             'note' => 'nullable|string',
         ]);
+
+        $schedule = DepartureSchedule::with('tour')
+            ->where('schedule_id', $scheduleId)
+            ->firstOrFail();
 
         $tourCustomer = DB::table('tour_customer')
             ->where('id', $validated['tour_customer_id'])
@@ -315,12 +356,24 @@ class GuideController extends Controller
         }
 
         $today = now()->toDateString();
+        $dayNumber = $this->currentDayNumber($schedule);
 
-        // Mỗi ngày chỉ 1 bản ghi điểm danh cho mỗi khách
+        $itinerary = Itinerary::where('itinerary_id', $validated['itinerary_id'])
+            ->where('tour_id', $schedule->tour_id)
+            ->where('day_number', $dayNumber)
+            ->first();
+
+        if (!$itinerary) {
+            return redirect()->route('guide.attendance', ['scheduleId' => $scheduleId, 'itinerary_id' => $validated['itinerary_id']])
+                ->with('error', 'Lịch trình được chọn không thuộc ngày hôm nay hoặc không thuộc tour này.');
+        }
+
+        // Mỗi ngày, mỗi lịch trình chỉ có 1 bản ghi điểm danh cho mỗi khách.
         // Nếu hôm nay đã điểm rồi thì cập nhật, chưa thì tạo mới
         Attendance::updateOrCreate(
             [
                 'schedule_id'      => $scheduleId,
+                'itinerary_id'     => $itinerary->itinerary_id,
                 'tour_customer_id' => $tourCustomer->id,
                 'attendance_date'  => $today,
             ],
@@ -333,8 +386,80 @@ class GuideController extends Controller
             ]
         );
 
-        return redirect()->route('guide.attendance', $scheduleId)
+        return redirect()->route('guide.attendance', ['scheduleId' => $scheduleId, 'itinerary_id' => $itinerary->itinerary_id])
             ->with('success', 'Điểm danh thành công!');
+    }
+
+    public function markGroupAttendance(Request $request, $scheduleId)
+    {
+        $user = Auth::user();
+        $guide = Guide::where('user_id', $user->user_id)->first();
+
+        $assignedScheduleIds = $this->assignedScheduleIds($guide->guide_id);
+        DepartureSchedule::where('schedule_id', $scheduleId)
+            ->whereIn('schedule_id', $assignedScheduleIds)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'itinerary_id' => 'required|integer|exists:itinerary,itinerary_id',
+            'tour_customer_ids' => 'required|array|min:1',
+            'tour_customer_ids.*' => 'integer|distinct|exists:tour_customer,id',
+            'status' => 'required|in:present,absent,unknown',
+            'note' => 'nullable|string',
+        ]);
+
+        $schedule = DepartureSchedule::with('tour')
+            ->where('schedule_id', $scheduleId)
+            ->firstOrFail();
+
+        $today = now()->toDateString();
+        $dayNumber = $this->currentDayNumber($schedule);
+
+        $itinerary = Itinerary::where('itinerary_id', $validated['itinerary_id'])
+            ->where('tour_id', $schedule->tour_id)
+            ->where('day_number', $dayNumber)
+            ->first();
+
+        if (!$itinerary) {
+            return redirect()->route('guide.attendance', ['scheduleId' => $scheduleId, 'itinerary_id' => $validated['itinerary_id']])
+                ->with('error', 'Lịch trình được chọn không thuộc ngày hôm nay hoặc không thuộc tour này.');
+        }
+
+        $tourCustomers = DB::table('tour_customer')
+            ->where('schedule_id', $scheduleId)
+            ->whereIn('id', $validated['tour_customer_ids'])
+            ->select(['id', 'customer_id'])
+            ->get();
+
+        if ($tourCustomers->isEmpty()) {
+            return redirect()->route('guide.attendance', ['scheduleId' => $scheduleId, 'itinerary_id' => $itinerary->itinerary_id])
+                ->with('error', 'Không có khách hợp lệ để điểm danh hàng loạt.');
+        }
+
+        DB::transaction(function () use ($tourCustomers, $scheduleId, $itinerary, $validated, $today, $guide) {
+            foreach ($tourCustomers as $tourCustomer) {
+                Attendance::updateOrCreate(
+                    [
+                        'schedule_id'      => $scheduleId,
+                        'itinerary_id'     => $itinerary->itinerary_id,
+                        'tour_customer_id' => $tourCustomer->id,
+                        'attendance_date'  => $today,
+                    ],
+                    [
+                        'customer_id' => $tourCustomer->customer_id,
+                        'guide_id'    => $guide->guide_id,
+                        'status'      => $validated['status'],
+                        'note'        => $validated['note'] ?? null,
+                        'marked_at'   => now(),
+                    ]
+                );
+            }
+        });
+
+        $count = $tourCustomers->count();
+
+        return redirect()->route('guide.attendance', ['scheduleId' => $scheduleId, 'itinerary_id' => $itinerary->itinerary_id])
+            ->with('success', 'Đã điểm danh hàng loạt cho ' . $count . ' khách.');
     }
 
     public function itinerary($scheduleId)
