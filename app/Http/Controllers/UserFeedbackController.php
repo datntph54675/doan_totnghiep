@@ -21,8 +21,12 @@ class UserFeedbackController extends Controller
             abort(403, 'Bạn không có quyền đánh giá booking này.');
         }
 
-        if (! $booking->canBeReviewed()) {
-            return back()->with('error', 'Bạn chỉ có thể đánh giá tour đã hoàn thành và chưa đánh giá trước đó.');
+        if (! $booking->isFinished()) {
+            return back()->with('error', 'Bạn chỉ có thể đánh giá tour đã hoàn thành.');
+        }
+
+        if ($booking->tourAlreadyReviewedByUser()) {
+            return back()->with('error', 'Bạn đã đánh giá tour này rồi. Mỗi tour chỉ được đánh giá một lần.');
         }
 
         $validated = $request->validate([

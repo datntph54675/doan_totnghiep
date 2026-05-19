@@ -36,7 +36,10 @@ class UserProfileController extends Controller
             ->where('status', 'completed')
             ->where('payment_status', 'paid')
             ->get()
-            ->filter(fn($b) => $b->canBeReviewed())
+            ->filter(fn($b) => $b->isFinished() && ! $b->tourAlreadyReviewedByUser())
+            // Chỉ lấy 1 booking đại diện cho mỗi tour (booking mới nhất)
+            ->sortByDesc('booking_id')
+            ->unique('tour_id')
             ->values();
 
         return view('user.pending-reviews', compact('user', 'pendingReviews'));

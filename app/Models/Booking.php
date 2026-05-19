@@ -66,6 +66,21 @@ class Booking extends Model
         return $this->feedbacks()->where('type', Feedback::TYPE_REVIEW)->exists();
     }
 
+    /**
+     * Kiểm tra user đã đánh giá tour này chưa (qua bất kỳ booking nào).
+     */
+    public function tourAlreadyReviewedByUser(): bool
+    {
+        if (! $this->user_id || ! $this->tour_id) {
+            return false;
+        }
+
+        return static::where('user_id', $this->user_id)
+            ->where('tour_id', $this->tour_id)
+            ->whereHas('feedbacks', fn ($q) => $q->where('type', Feedback::TYPE_REVIEW))
+            ->exists();
+    }
+
     public function isFinished(): bool
     {
         if ($this->payment_status !== 'paid') {
@@ -87,7 +102,8 @@ class Booking extends Model
             return false;
         }
 
-        if ($this->hasReview()) {
+        // Mỗi user chỉ được đánh giá 1 lần cho mỗi tour
+        if ($this->tourAlreadyReviewedByUser()) {
             return false;
         }
 
