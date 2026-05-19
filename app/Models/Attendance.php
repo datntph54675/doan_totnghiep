@@ -13,6 +13,7 @@ class Attendance extends Model
 
     protected $fillable = [
         'schedule_id',
+        'itinerary_id',
         'tour_customer_id',
         'customer_id',
         'guide_id',
@@ -35,6 +36,11 @@ class Attendance extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'customer_id', 'customer_id');
+    }
+
+    public function itinerary(): BelongsTo
+    {
+        return $this->belongsTo(Itinerary::class, 'itinerary_id', 'itinerary_id');
     }
 
     public function guide(): BelongsTo

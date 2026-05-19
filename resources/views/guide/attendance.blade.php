@@ -14,6 +14,33 @@
 
 <a href="{{ route('guide.tour.detail', $schedule->schedule_id) }}" class="back-link">← Quay lại Chi tiết Tour</a>
 
+<div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+        <div class="card-title">🗓️ Lịch trình điểm danh hôm nay (Ngày {{ $dayNumber }})</div>
+    </div>
+    <div class="card-body" style="padding-top:12px;">
+        @if(($todayItineraries ?? collect())->isEmpty())
+            <div style="padding:12px;border-radius:10px;border:1px solid #fecaca;background:#fef2f2;color:#991b1b;font-size:13px;">
+                Chưa có lịch trình cho ngày hôm nay. Vui lòng vào Quản lý lịch trình để bổ sung trước khi điểm danh.
+            </div>
+        @else
+            <form method="GET" action="{{ route('guide.attendance', $schedule->schedule_id) }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
+                <div class="form-group" style="margin:0;min-width:280px;flex:1;">
+                    <label class="form-label" for="itineraryFilter">Chọn lịch trình</label>
+                    <select class="form-control" id="itineraryFilter" name="itinerary_id" onchange="this.form.submit()">
+                        @foreach($todayItineraries as $itinerary)
+                            <option value="{{ $itinerary->itinerary_id }}" {{ (int) $selectedItineraryId === (int) $itinerary->itinerary_id ? 'selected' : '' }}>
+                                Ngày {{ $itinerary->day_number }} - {{ $itinerary->title }}{{ $itinerary->time_start ? ' (' . $itinerary->time_start . ')' : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <a href="{{ route('guide.itinerary', $schedule->schedule_id) }}" class="btn btn-outline">🛠️ Cập nhật lịch trình</a>
+            </form>
+        @endif
+    </div>
+</div>
+
 {{-- STATS --}}
 @php
 $present = ($participants ?? collect())->filter(function ($participant) use ($latestAttendanceByParticipant) {
@@ -77,7 +104,38 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
                         {{ ($groupLeader->group_size ?? 1) > 1 ? 'Đại diện' : 'Khách' }}: {{ $groupLeader->fullname ?? '—' }}
                     </span>
                 </div>
-                <span class="badge badge-gray">{{ $groupMembers->count() }} người</span>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                    <span class="badge badge-gray">{{ $groupMembers->count() }} người</span>
+
+                    <form method="POST" action="{{ route('guide.attendance.group.mark', $schedule->schedule_id) }}" style="display:flex;gap:6px;align-items:center;">
+                        @csrf
+                        <input type="hidden" name="itinerary_id" value="{{ (int) ($selectedItineraryId ?? 0) }}">
+                        <input type="hidden" name="status" value="present">
+                        @foreach($groupMembers as $member)
+                            <input type="hidden" name="tour_customer_ids[]" value="{{ $member->tour_customer_id }}">
+                        @endforeach
+                        <button type="submit" class="btn btn-sm"
+                            style="background:#10b981;color:#fff;border:1px solid #10b981;"
+                            {{ (int)($selectedItineraryId ?? 0) <= 0 ? 'disabled' : '' }}
+                            onclick="return confirm('Xác nhận điểm danh CÓ MẶT cho cả {{ $groupMembers->count() }} khách trong nhóm này?');">
+                            ✓ Cả nhóm có mặt
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ route('guide.attendance.group.mark', $schedule->schedule_id) }}" style="display:flex;gap:6px;align-items:center;">
+                        @csrf
+                        <input type="hidden" name="itinerary_id" value="{{ (int) ($selectedItineraryId ?? 0) }}">
+                        <input type="hidden" name="status" value="absent">
+                        @foreach($groupMembers as $member)
+                            <input type="hidden" name="tour_customer_ids[]" value="{{ $member->tour_customer_id }}">
+                        @endforeach
+                        <button type="submit" class="btn btn-sm btn-outline"
+                            {{ (int)($selectedItineraryId ?? 0) <= 0 ? 'disabled' : '' }}
+                            onclick="return confirm('Xác nhận điểm danh VẮNG MẶT cho cả {{ $groupMembers->count() }} khách trong nhóm này?');">
+                            ✗ Cả nhóm vắng
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <div style="padding:10px;">
@@ -133,6 +191,7 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
                     <button class="btn btn-primary btn-sm"
                         data-tour-customer-id="{{ $participant->tour_customer_id }}"
                         data-participant-name="{{ e($participant->fullname ?? '') }}"
+                        {{ (int)($selectedItineraryId ?? 0) <= 0 ? 'disabled' : '' }}
                         onclick="openModal(this)">
                         ✏️ Điểm danh
                     </button>
@@ -173,6 +232,7 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
                     <thead>
                         <tr>
                             <th>Khách hàng</th>
+                            <th>Lịch trình</th>
                             <th>Trạng thái</th>
                             <th>Ghi chú</th>
                             <th>Thời gian</th>
@@ -182,6 +242,7 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
                         @foreach($records as $att)
                         <tr>
                             <td style="font-weight:600">{{ $att->customer->fullname ?? '—' }}</td>
+                            <td style="font-size:13px;color:var(--text-muted)">{{ $att->itinerary->title ?? '—' }}</td>
                             <td>
                                 @if($att->status == 'present')
                                 <span class="badge badge-success">✓ Có mặt</span>
@@ -213,6 +274,7 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
         <form method="POST" action="{{ route('guide.attendance.mark', $schedule->schedule_id) }}">
             @csrf
             <input type="hidden" name="tour_customer_id" id="tourCustomerId">
+            <input type="hidden" name="itinerary_id" value="{{ (int) ($selectedItineraryId ?? 0) }}">
 
             <div class="form-group">
                 <label class="form-label">Trạng thái</label>
@@ -258,7 +320,14 @@ $total = ($participants ?? collect())->count() > 0 ? ($participants ?? collect()
 
 @push('scripts')
 <script>
+    const canMarkAttendance = Number('{{ (int) ($selectedItineraryId ?? 0) }}') > 0;
+
     function openModal(buttonEl) {
+        if (!canMarkAttendance) {
+            alert('Vui lòng chọn lịch trình hôm nay trước khi điểm danh.');
+            return;
+        }
+
         const id = buttonEl.getAttribute('data-tour-customer-id') || '';
         const name = buttonEl.getAttribute('data-participant-name') || '';
 

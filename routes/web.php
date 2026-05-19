@@ -148,6 +148,7 @@ Route::prefix('guide')->group(function () {
         Route::post('tour/{scheduleId}/complete', [\App\Http\Controllers\GuideController::class, 'completeTour'])->name('guide.tour.complete');
         Route::get('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'attendance'])->name('guide.attendance');
         Route::post('tour/{scheduleId}/attendance', [\App\Http\Controllers\GuideController::class, 'markAttendance'])->name('guide.attendance.mark');
+        Route::post('tour/{scheduleId}/attendance/group', [\App\Http\Controllers\GuideController::class, 'markGroupAttendance'])->name('guide.attendance.group.mark');
         Route::get('tour/{scheduleId}/itinerary', [\App\Http\Controllers\GuideController::class, 'itinerary'])->name('guide.itinerary');
         Route::put('itinerary/{itineraryId}', [\App\Http\Controllers\GuideController::class, 'updateItinerary'])->name('guide.itinerary.update');
         Route::get('profile', [\App\Http\Controllers\GuideController::class, 'profile'])->name('guide.profile');

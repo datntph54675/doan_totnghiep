@@ -9,21 +9,32 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('attendance', function (Blueprint $table) {
-            // Thêm cột date để xác định ngày điểm danh
-            // Kết hợp (schedule_id, tour_customer_id, attendance_date) là unique
-            // => mỗi khách chỉ có 1 bản ghi điểm danh mỗi ngày
-            $table->date('attendance_date')->nullable()->after('guide_id');
-
-            $table->unique(
-                ['schedule_id', 'tour_customer_id', 'attendance_date'],
-                'unique_attendance_per_day'
-            );
+            // Thêm cột date để xác định ngày điểm danh nếu chưa có
+            if (!Schema::hasColumn('attendance', 'attendance_date')) {
+                $table->date('attendance_date')->nullable()->after('guide_id');
+            }
         });
 
+        // Thêm unique, nếu đã có thì bỏ qua lỗi
+        try {
+            Schema::table('attendance', function (Blueprint $table) {
+                $table->unique(
+                    ['schedule_id', 'tour_customer_id', 'attendance_date'],
+                    'unique_attendance_per_day'
+                );
+            });
+        } catch (\Exception $e) {
+            // Bỏ qua lỗi nếu unique đã tồn tại
+        }
+
         // Backfill: lấy ngày từ marked_at cho các bản ghi cũ
-        \Illuminate\Support\Facades\DB::statement(
-            'UPDATE attendance SET attendance_date = DATE(marked_at) WHERE attendance_date IS NULL'
-        );
+        try {
+            \Illuminate\Support\Facades\DB::statement(
+                'UPDATE attendance SET attendance_date = DATE(marked_at) WHERE attendance_date IS NULL'
+            );
+        } catch (\Exception $e) {
+            // Bỏ qua lỗi nếu đã cập nhật
+        }
     }
 
     public function down(): void
