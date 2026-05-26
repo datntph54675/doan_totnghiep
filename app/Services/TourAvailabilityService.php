@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Booking;
+use App\Models\DepartureSchedule;
 use App\Models\Tour;
 use Illuminate\Support\Carbon;
 
@@ -12,8 +13,35 @@ class TourAvailabilityService
     {
         $today = Carbon::today();
 
+        $this->syncSchedules($today);
         $this->syncBookings();
         $this->syncTours($today);
+    }
+
+    private function syncSchedules(Carbon $today): void
+    {
+        DepartureSchedule::query()
+            ->where('status', '!=', DepartureSchedule::STATUS_CANCELLED)
+            ->chunkById(100, function ($schedules) use ($today) {
+                foreach ($schedules as $schedule) {
+                    $startDate = $schedule->start_date;
+                    $endDate = $schedule->end_date;
+
+                    if (! $startDate || ! $endDate) {
+                        continue;
+                    }
+
+                    $nextStatus = match (true) {
+                        $endDate->isPast() => DepartureSchedule::STATUS_COMPLETED,
+                        $startDate->isAfter($today) => DepartureSchedule::STATUS_SCHEDULED,
+                        default => DepartureSchedule::STATUS_ONGOING,
+                    };
+
+                    if ($schedule->status !== $nextStatus) {
+                        $schedule->update(['status' => $nextStatus]);
+                    }
+                }
+            }, 'schedule_id');
     }
 
     private function syncBookings(): void
@@ -24,21 +52,20 @@ class TourAvailabilityService
             ->chunkById(100, function ($bookings) {
                 foreach ($bookings as $booking) {
                     $schedule = $booking->schedule;
-                    $scheduleStatus = $schedule?->status;
-                    $scheduleEnd = $schedule?->end_date;
 
                     if (! $schedule) {
                         continue;
                     }
 
-                    $nextStatus = match ($scheduleStatus) {
-                        'completed' => 'completed',
-                        'ongoing' => 'ongoing',
-                        default => 'upcoming',
-                    };
+                    $scheduleStart = $schedule->start_date;
+                    $scheduleEnd = $schedule->end_date;
+
+                    $nextStatus = 'upcoming';
 
                     if ($scheduleEnd && $scheduleEnd->isPast()) {
                         $nextStatus = 'completed';
+                    } elseif ($scheduleStart && ! $scheduleStart->isAfter(Carbon::today()) && $scheduleEnd && ! $scheduleEnd->isBefore(Carbon::today())) {
+                        $nextStatus = 'ongoing';
                     }
 
                     if ($booking->status !== $nextStatus) {
@@ -53,12 +80,12 @@ class TourAvailabilityService
         Tour::query()
             ->chunkById(100, function ($tours) use ($today) {
                 foreach ($tours as $tour) {
-                    $hasOpenRegistration = $tour->departureSchedules()
-                        ->where('status', 'scheduled')
-                        ->whereDate('start_date', '>', $today)
+                    $hasActiveSchedule = $tour->departureSchedules()
+                        ->where('status', '!=', DepartureSchedule::STATUS_CANCELLED)
+                        ->whereDate('end_date', '>=', $today)
                         ->exists();
 
-                    $nextStatus = $hasOpenRegistration ? 'active' : 'inactive';
+                    $nextStatus = $hasActiveSchedule ? 'active' : 'inactive';
 
                     if ($tour->status !== $nextStatus) {
                         $tour->update(['status' => $nextStatus]);

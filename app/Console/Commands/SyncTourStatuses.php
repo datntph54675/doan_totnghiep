@@ -9,7 +9,7 @@ class SyncTourStatuses extends Command
 {
     protected $signature = 'app:sync-tour-statuses';
 
-    protected $description = 'Đồng bộ trạng thái booking và tour theo dữ liệu hiện tại';
+    protected $description = 'Đồng bộ trạng thái lịch xuất phát, booking và tour theo dữ liệu hiện tại';
 
     public function handle(TourAvailabilityService $tourAvailabilityService): int
     {

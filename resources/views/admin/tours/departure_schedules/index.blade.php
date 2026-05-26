@@ -108,7 +108,7 @@
                                     class="btn btn-sm btn-outline-info me-2" title="Phân công HDV">
                                     <i class="fas fa-user"></i>
                                 </a>
-                                <form
+                                {{-- <form
                                     action="{{ route('admin.tours.departure-schedules.destroy', ['tour' => $tour->tour_id, 'schedule' => $schedule->schedule_id]) }}"
                                     method="POST" class="d-inline"
                                     onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
@@ -117,7 +117,7 @@
                                     <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
                                         <i class="fas fa-trash"></i>
                                     </button>
-                                </form>
+                                </form> --}}
                             </div>
                         </td>
                     </tr>
